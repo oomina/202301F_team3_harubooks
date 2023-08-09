@@ -1,0 +1,353 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+	pageEncoding="UTF-8"%>
+<%@taglib uri="http://tiles.apache.org/tags-tiles" prefix="tiles" %>
+<%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags" %>
+
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="/resources/asset/css/myHaru.css">
+    <!--아이콘-->
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@3.4.0/fonts/remixicon.css" rel="stylesheet">
+    
+   <style type="text/css">
+       @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@200&display=swap');
+	   @import url('https://fonts.googleapis.com/css2?family=Nanum+Pen+Script&display=swap');
+	   @import url('https://fonts.googleapis.com/css2?family=Jua&display=swap');
+	   @import url('https://fonts.googleapis.com/css2?family=Nanum+Gothic&display=swap');
+		
+		 #modal-parse-div {
+			position: fixed; /* 위치 고정 */
+			left: 0px;
+			top: 0px;
+			width: 100vw; /* 사이즈 고정 */
+			height: 100vh;
+			z-index: 100; /* 클 수록 앞으로 나옴 */
+			display: none; /* 처음엔 안 보여야 함 */
+			background-color: #5b5a5ac2;
+		}
+		
+		#modal-setting-div {
+			padding: 5px;
+			width: 20%; /* 부모 기준 */
+			height: 45%;
+			margin: 200px auto; /* 수평 중앙 정렬 */
+			background-color: rgb(253, 253, 253);
+			border: 1px solid rgba(218, 218, 218, 0.76);
+			border-radius: 20px;
+			position: relative;
+			justify-content: center;
+			text-align: center;
+		}
+		
+		#modal-setting-close{
+			float: right;
+			border: none;
+			background-color:rgb(253, 253, 253);
+			margin-right: 10px;
+			font-size: 25px;
+			font-weight: bold;
+			cursor: pointer;
+		}
+		
+		#setting-img-parse{
+			display: flex;
+		    flex-direction: column;
+		    margin: 20px 30px 8px 30px;
+		 }
+		   
+		#setting-img-div {
+			display: flex;
+		    align-items: center;
+		    justify-content: center;
+		    width: 200px;
+		    height: 200px;
+		    border-radius: 50%;
+		    border: 2px solid #4dac27;
+		    margin: 0px auto;
+		}
+		   
+	    #setting-img-div img{
+	        width: 180px;
+	        height: 180px;
+	        object-fit: cover;
+	        border-radius: 50%;
+	        object-position: center;
+	    }
+	   
+	    #modal-setting-all-div{
+	    	justify-content: center;
+	    	display: grid;
+	    }
+	   
+		.modal-setting-all{
+			font-family: 'Nanum Gothic', sans-serif;
+			display: flex;
+    		margin-top: 8px;
+    		font-weight: bold;
+		}
+		
+		.modal-setting-padding{
+			margin-right: 15px;
+		}
+		
+		#modal-setting-profile-btn
+		, #modal-setting-complete-btn
+		, #modal-setting-cancle-btn
+		, #modal-setting-nick-text
+		, #modal-setting-profile-file{
+			display: none;
+		}
+		
+		#modal-setting-nick-text{
+			text-align: center;
+			width: 130px;
+			font-family: 'Nanum Gothic', sans-serif;
+			font-weight: bold;
+			color: rgb(146, 145, 145)
+		}
+		
+		#modal-setting-btns-div{
+			display: flex;
+      	    justify-content: center;
+      	    margin-top: 13px;
+		}
+		
+		.modal-setting-btns{
+      	    font-family: 'Nanum Gothic', sans-serif;
+			color: white;
+			background: #53b12e;
+      	    font-weight: bold;
+      	    font-size: 0.9em;
+      	    padding: 5px 10px;
+      	    border: none;
+      	    border-radius: 0.2rem;
+      	    margin-right: 5px;
+      	    cursor: pointer;
+		}
+   </style> 
+</head>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js"></script> 
+<script src="https://kit.fontawesome.com/87e7dd5b05.js" crossorigin="anonymous"></script>
+
+<body>
+	<input type="hidden" value="<sec:authentication property="name"/>" id="sec-name">
+	<div id="myhru-main-div">
+	<!-- 헤더 -->
+	<tiles:insertAttribute name="myHaruHeader" />
+	
+	<div id="main"> 
+		<!-- 사이드바 프로필 -->	
+		<tiles:insertAttribute name="myHaruLeftSidebar"/>
+		
+		<!-- 메인 -->
+		<div id="home">
+			<tiles:insertAttribute name="myHaruContent" ignore="true"/>
+		</div>
+		
+		<!-- 게시글 작성 모달 -->
+		<div id="modal-parse-div">
+			<div id="modal-setting-div">
+				<button id="modal-setting-close" onclick="settingModalClose()">x</button>
+				<div id="setting-img-parse">
+					<div id="setting-img-div"><img id="modal-settig-img" alt="" src=""></div>
+				</div>
+				<div id="modal-setting-all-div">
+					<div class="modal-setting-all">
+						<span class="modal-setting-padding">아이디 : </span>
+						<span id="modal-setting-id"></span><br>
+					</div>
+					<div class="modal-setting-all">
+						<span class="modal-setting-padding">닉네임 : </span>
+						<span id="modal-setting-nick"></span><br>
+						<input type="hidden" value="<sec:authentication property="name"/>" id="sec-name">
+						<input type="text" id="modal-setting-nick-text" maxlength="7" >
+						<input type="file" id="modal-setting-profile-file" accept="image/*" >
+					</div>
+				</div>
+				<div id="modal-setting-btns-div">
+					<button type="button" class="modal-setting-btns" id="modal-setting-start-btn">수정하기</button>
+					<button type="button" class="modal-setting-btns" id="modal-setting-profile-btn">프로필 변경</button>
+					<button type="button" class="modal-setting-btns" id="modal-setting-complete-btn">수정완료</button>
+				<button type="button" class="modal-setting-btns" id="modal-setting-cancle-btn">수정취소</button>
+				</div>
+			</div>
+		</div>
+		
+		<!-- 사이드바 위치 북마크 -->
+		<tiles:insertAttribute name="myHaruRightSidebar"/>
+		
+	</div>
+	</div>
+</body>
+<script type="text/javascript">
+    var mySetInfo = document.querySelector("#my-set-info");			// 왼쪽 사이드바에 수정하기 버튼
+    var memberImg = document.querySelector("#member-img");			// 왼쪽 사이드바 이미지
+    var memberNick = document.querySelector("#member-nick");		// 왼쪽 사이드바 닉네임
+    var memberId = document.querySelector("#member-id");			// 왼쪽 사이드바 아이디
+    var modalParseDiv = document.querySelector("#modal-parse-div"); // 모달창    	
+    var modalSettingImg = document.querySelector("#modal-settig-img"); 		// 모달의 프로필 이미지 
+    var modalSettingNick = document.querySelector("#modal-setting-nick"); 	// 모달의 닉네임
+    var modalSettingId = document.querySelector("#modal-setting-id");		// 모달의 아이디	
+	var modalSettingStartBtn = document.querySelector("#modal-setting-start-btn");			// 수정하기 버튼
+    var modalSettingProfileBtn = document.querySelector("#modal-setting-profile-btn"); 		// 프로필 변경 버튼
+    var modalSettingCompleteBtn = document.querySelector("#modal-setting-complete-btn"); 	// 수정완료 버튼
+    var modalSettingCancleBtn = document.querySelector("#modal-setting-cancle-btn"); 		// 수정취소 버튼
+    var modalSettingNickText = document.querySelector("#modal-setting-nick-text");			// 수정할 때 닉네임 설정
+    var modalSettingProfileFile = document.querySelector("#modal-setting-profile-file");	// 수정할 때 프로필 파일 설정					
+    var settingFormData = document.querySelector("#setting-form-data");						// 폼 정보
+	var name = document.querySelector("#sec-name").value;									// 세션 사용자 이름
+    var tempProfile;																		// 프로필 저장할 공간
+    var fileTempNm;																			// 파일 저장 이름		
+    
+    $(function(){
+		    userInfoLoad();	
+	})
+	
+    // 처음에 해당 사용자의 닉네임, 아이디, 프로필을 가져온다.
+	function userInfoLoad(){
+    	$.ajax({
+			type : "get",
+			url : "/myHaru/getUser",
+			data: {
+				id:name
+			},
+			contentType: "application/json",
+			beforeSend : function(xhr){
+				xhr.setRequestHeader("${_csrf.headerName}", "${_csrf.token}");
+			},
+			success: function(res){
+				tempProfile = res.mem_profile;
+				memberImg.src = "/upload/images/" + res.mem_profile;
+				memberNick.textContent = res.mem_nicknm
+				memberId.textContent = res.ae_id;
+				modalSettingImg.src = "/upload/images/" + res.mem_profile;
+				modalSettingId.textContent = res.ae_id;
+				modalSettingNick.textContent = res.mem_nicknm;
+				modalSettingNickText.value = res.mem_nicknm;
+         	},
+         	error: function(ex){
+         		console.log("error");
+         	}
+	    })
+    }
+	
+    // 수정하기 버튼 눌렀을 때
+	mySetInfo.addEventListener('click', function(event){
+		modalParseDiv.style.display = "block";
+		userInfoLoad()
+	})
+	
+	// 모달창 닫기(X)를 누를 때
+	function settingModalClose(){
+		modalParseDiv.style.display = "none";
+		modalSettingNick.style.display = "block";
+		modalSettingStartBtn.style.display = "block";
+		modalSettingProfileBtn.style.display = "none";
+		modalSettingCompleteBtn.style.display = "none";	
+		modalSettingCancleBtn.style.display = "none";
+		modalSettingNickText.style.display = "none";
+	}
+	
+    // 수정하기 버튼을 눌렀을 때
+	modalSettingStartBtn.addEventListener('click', function(){
+		modalSettingNick.style.display = "none";
+		modalSettingStartBtn.style.display = "none";
+		modalSettingProfileBtn.style.display = "block";
+		modalSettingCompleteBtn.style.display = "block";	
+		modalSettingCancleBtn.style.display = "block";
+		modalSettingNickText.style.display = "block";
+	})
+	
+	// 수정완료 버튼을 눌렀을 때
+	modalSettingCompleteBtn.addEventListener('click', function(){
+		var tempCheckText = modalSettingNick.textContent;
+		var tempSettingNick = modalSettingNickText.value; 
+		
+		if(tempSettingNick.trim() == ""){
+			modalSettingNickText.value = tempCheckText;
+		}		
+		
+		var form = new FormData();
+		form.append("ae_id", name);
+		form.append("mem_nicknm", modalSettingNickText.value);
+		if(fileTempNm!=null){
+			form.append('imgFile',fileTempNm);			
+		}else{
+			form.append('mem_profile',tempProfile);			
+		}
+		
+		$.ajax({
+			type : "post",
+			url : "/myHaru/updateUser",
+			data: form,
+		    processData: false,
+		    contentType: false,
+			beforeSend : function(xhr){
+				xhr.setRequestHeader("${_csrf.headerName}", "${_csrf.token}");
+			},
+			success: function(res){
+				modalParseDiv.style.display = "none";
+				modalSettingNick.style.display = "block";
+				modalSettingStartBtn.style.display = "block";
+				modalSettingProfileBtn.style.display = "none";
+				modalSettingCompleteBtn.style.display = "none";	
+				modalSettingCancleBtn.style.display = "none";
+				modalSettingNickText.style.display = "none";
+				userInfoLoad();	
+         	},
+         	error: function(ex){
+         		console.log("error");
+         	}
+	    })
+		
+	})
+	
+	// 프로필 사진 변경하기 눌렀을 때
+	modalSettingProfileBtn.addEventListener("click", function(){
+		modalSettingProfileFile.click();
+	})
+	
+	// 수정취소 버튼을 눌렀을 때
+	modalSettingCancleBtn.addEventListener("click", function(){
+		modalSettingNick.style.display = "block";
+		modalSettingStartBtn.style.display = "block";
+		modalSettingProfileBtn.style.display = "none";
+		modalSettingCompleteBtn.style.display = "none";	
+		modalSettingCancleBtn.style.display = "none";
+		modalSettingNickText.style.display = "none";
+		modalSettingImg.src = "/upload/images/" + tempProfile;
+		modalSettingProfileFile.value = '';
+		fileTempNm = null;
+	})
+	
+	// 프로필 사진이 변경 될 때 마다 해당 정보의 파일이 이미지인지 체크한후 src에 지정(썸네일)
+	modalSettingProfileFile.addEventListener("change", function(){
+		fileTempNm = event.target.files[0];
+		
+		if(isImageFile(fileTempNm)){
+			var reader = new FileReader();
+			reader.onload = function(e){
+				modalSettingImg.src = e.target.result;
+			}
+			reader.readAsDataURL(fileTempNm);
+		}else{
+			alert("이미지 파일을 선택해주세요!");
+		}
+	})
+	
+	// 이미지 파일인지 체크(확장자를 이용해서)
+	function isImageFile(file){
+		var ext = file.name.split(".").pop().toLowerCase();	// 파일명에서 확장자를 가져온다.
+		return ($.inArray(ext, ["jpg","jpeg","gif","png"]) === -1 ) ? false : true;
+	}
+	
+	
+</script>
+</html>

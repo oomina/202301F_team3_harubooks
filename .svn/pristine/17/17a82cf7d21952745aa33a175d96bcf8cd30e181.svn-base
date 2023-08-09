@@ -1,0 +1,22 @@
+package kr.or.ddit.service.jhs;
+
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Service;
+
+import kr.or.ddit.ResultStatus;
+
+@Service	
+public class MyLibraryServiceImpl implements IMyLibraryService {
+
+	@Override
+	public ResultStatus idCheck() {
+		String id = SecurityContextHolder.getContext().getAuthentication().getName();
+		
+		ResultStatus status = ResultStatus.OK;
+		if(id.equals("anonymousUser")) {
+			status = ResultStatus.FAIL;
+		}
+		return status;
+	}
+	
+}

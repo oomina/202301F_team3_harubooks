@@ -1,0 +1,146 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+<div class="content-wrapper" style="padding : 10px;">
+	<div class="row" style=" padding : 10px;">
+		<div class="col-lg-12 grid-margin stretch-card" >
+			<div class="card">
+			    <div class="card-body">
+			        <div class="card-title-wrapper">
+					    <h4 class="card-title" style="font-size:1.5rem; font-family: 'Nunito', sans-serif;">작가와의 만남</h4>
+					    <p class="card-description">
+                			전체 <code>1024</code>건
+               			</p>	
+				    </div>
+				    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr class="table">
+                                    <th colspan="2" style="padding : 5px;">
+                                   		<button type="button" class="btn btn-primary btn-sm" id="metaevt">진행중인 이벤트</button>
+                                    	<button type="button" class="btn btn-outline-primary btn-fw btn-sm" id="metaendevt">종료 이벤트</button>
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody style="border : 1px solid rgb(198, 147, 218)">
+                                <tr>
+                                    <td class="col-lg-6" style="border : 1px solid rgb(198, 147, 218);" >
+                                        <div style="display : flex;">
+                                            <div class="col-lg-6">
+                                                <img src="/resources/mng/images/harubookslogo1.png" alt="이미지" style="width:100%; height:100%; border-radius: 0%;"/>
+                                            </div>
+                                            <div class="col-lg-6">
+                                                <p>베르나르베르베르와 함께하는 랜선 팬사인회</p>
+                                                <p>작가 : 베르나르베르베르</p>
+                                                <p>일시 : 2023-07-07 19:00 ~ 20:00</p>
+                                                <p>참여인원 : 30명</p>
+                                                <p>한국인이 사랑하는 프랑스 작가와 팬사인회!!</p>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="col-lg-6" style="border : 1px solid rgb(198, 147, 218)">
+                                    	<div style="display : flex;">
+                                            <div class="col-lg-6">
+                                                <img src="/resources/mng/images/harubookslogo1.png" alt="이미지" style="width:100%; height:100%; border-radius: 0%;"/>
+                                            </div>
+                                            <div class="col-lg-6">
+                                                <p>베르나르베르베르와 함께하는 랜선 팬사인회</p>
+                                                <p>작가 : 베르나르베르베르</p>
+                                                <p>일시 : 2023-07-07 19:00 ~ 20:00</p>
+                                                <p>참여인원 : 30명</p>
+                                                <p>한국인이 사랑하는 프랑스 작가와 팬사인회!!</p>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+				    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr class="table-primary">
+                                    <th colspan="2">종료 이벤트</th>
+                                </tr>
+                            </thead>
+                            <tbody style="border : 1px solid rgb(198, 147, 218)">
+                            	<tr>
+                            		<td colspan="2">
+                           				<div class="col-lg-12">
+					                    	<div class="row dropdown" style="float:right;">
+                                                <select style="width: 100px; border: 1px solid lightgray;">
+                                                    <option value="year">년</option>
+                                                    <option value="month">월</option>
+                                                    <option value="title">이름</option>
+                                                </select>
+					                        	<!-- <button class="btn btn-secondary dropdown-toggle" type="button" id="metaendevtperiod" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true" style="border-radius: 0%;">
+					                          		선택
+					                        	</button> -->
+					                        	<ul class="navbar-nav mr-lg-2">
+										          <li class="nav-item nav-search d-none d-lg-block">
+										            <div class="input-group">
+										              <input type="text" class="form-control" id="navbar-search-input" placeholder="검색" aria-label="search" aria-describedby="search">
+										              <div class="input-group-prepend hover-cursor" id="navbar-search-icon">
+										                <span class="input-group-text" id="search">
+										                  <i class="icon-search"></i>
+										                </span>
+										              </div>
+										            </div>
+										          </li>
+										        </ul>
+					                        	<!-- <div class="dropdown-menu" aria-labelledby="metaendevtperiod">
+					                          		<h6 class="dropdown-header">Settings</h6>
+					                          		<a class="dropdown-item" href="#">년도/월</a>
+					                          		<a class="dropdown-item" href="#">이벤트 이름</a>
+					                          		<div class="dropdown-divider"></div>
+					                          		<a class="dropdown-item" href="#">Separated link</a>
+					                        	</div> -->
+					                      	</div>
+					                    </div>
+					                    
+                            		</td>
+                            	</tr>
+                                <tr>
+                                    <td class="col-lg-6" style="border : 1px solid rgb(198, 147, 218);" >
+                                        <div style="display : flex;">
+                                            <div class="col-lg-6">
+                                                <img src="/resources/mng/images/harubookslogo1.png" alt="이미지" style="width:100%; height:100%; border-radius: 0%;"/>
+                                            </div>
+                                            <div class="col-lg-6">
+                                                <p>베르나르베르베르와 함께하는 랜선 팬사인회</p>
+                                                <p>작가 : 베르나르베르베르</p>
+                                                <p>일시 : 2023-07-07 19:00 ~ 20:00</p>
+                                                <p>참여인원 : 30명</p>
+                                                <p>한국인이 사랑하는 프랑스 작가와 팬사인회!!</p>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="col-lg-6" style="border : 1px solid rgb(198, 147, 218)">
+                                    	<div style="display : flex;">
+                                            <div class="col-lg-6">
+                                                <img src="/resources/mng/images/harubookslogo1.png" alt="이미지" style="width:100%; height:100%; border-radius: 0%;"/>
+                                            </div>
+                                            <div class="col-lg-6">
+                                                <p>베르나르베르베르와 함께하는 랜선 팬사인회</p>
+                                                <p>작가 : 베르나르베르베르</p>
+                                                <p>일시 : 2023-07-07 19:00 ~ 20:00</p>
+                                                <p>참여인원 : 30명</p>
+                                                <p>한국인이 사랑하는 프랑스 작가와 팬사인회!!</p>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+	            </div>
+		    </div>
+	    </div>
+    </div>
+</div>
+<script>
+	/* let metaevt = document.quarySelector("#metaevt");
+	
+	function metaevtList(){
+		let xhr = new Http
+	} */
+</script>

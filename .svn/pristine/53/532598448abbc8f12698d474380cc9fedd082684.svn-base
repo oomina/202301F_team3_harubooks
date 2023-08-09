@@ -1,0 +1,22 @@
+package kr.or.ddit.service.ljy;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import kr.or.ddit.mapper.ljy.PubMngMapper;
+import kr.or.ddit.vo.ljy.PubMngVO;
+
+@Service
+public class PubMngServiceImpl implements PubMngService {
+	
+	@Autowired
+	private PubMngMapper pubMapper;
+	
+	@Override
+	public List<PubMngVO> pubList() {
+		return pubMapper.pubList();
+	}
+
+}

@@ -1,0 +1,10 @@
+package kr.or.ddit.mapper.ljy;
+
+import java.util.List;
+
+import kr.or.ddit.vo.ljy.InquiryReplyVO;
+
+public interface InquiryReplyMapper {
+	public List<InquiryReplyVO> inqRepList();
+	public int inqRepInsert(InquiryReplyVO inqRepVO);
+}

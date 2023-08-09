@@ -1,0 +1,82 @@
+package kr.or.ddit.service.bmk;
+
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.annotation.Resource;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import kr.or.ddit.controller.file.UploadFileUtils;
+import kr.or.ddit.mapper.FileMapper;
+import kr.or.ddit.mapper.bmk.HarustroyMapper;
+import kr.or.ddit.vo.FileVO;
+import kr.or.ddit.vo.bmk.BoardVO;
+
+@Service
+public class HarustroyServiceImpl implements IHarustoryService {
+
+	@Resource(name="uploadImg")
+	private String uploadImg;
+	
+	@Autowired
+	private HarustroyMapper harustroyMapper;
+	
+	@Autowired
+	private FileMapper fileMapper;
+	
+	@Override
+	public List<BoardVO> boardList(BoardVO vo) {	
+		return harustroyMapper.boardList(vo);
+	}
+
+	@Override
+	public int storyInsert(BoardVO boardVO) {
+		return harustroyMapper.storyInsert(boardVO);
+	}
+
+	@Override
+	public Map<String,Object> boardOne(String board_no) {
+		Map<String,Object> vo = new HashMap<>();
+		BoardVO bvo = harustroyMapper.boardOne(board_no);
+		List<FileVO> fvo = fileMapper.getFiles(bvo.getUa_no());
+		vo.put("board", bvo);
+		vo.put("file", fvo);
+		return vo;
+	}
+
+	@Override
+	public int storyUpdate(BoardVO boardVO) {
+		return harustroyMapper.storyUpdate(boardVO);
+	}
+
+	@Override
+	public String insertFeed(BoardVO bvo) throws IOException {
+		String status = "";
+		List<FileVO> result = UploadFileUtils.uploadFile(uploadImg, bvo.getImgFile(), "BOARD", bvo.getFilters());
+		if(result.size() > 0) {
+			String uaNo = fileMapper.getUaNo();
+			int fileResult = 0;
+			bvo.setUa_no(uaNo);
+			for(FileVO vo : result) {
+				vo.setUa_regist_id(bvo.getAe_id());
+				vo.setUa_no(uaNo);
+				fileResult += fileMapper.filesFilterInsert(vo);
+			}
+			if(fileResult > 0) {
+				int boardResult = harustroyMapper.storyInsert(bvo);
+				if(boardResult > 0) {
+					status = "OK"; 						
+				}else {
+					status = "FAIL";
+				}
+			}
+		}
+	
+		return status;
+	}
+
+}

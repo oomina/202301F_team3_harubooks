@@ -1,0 +1,143 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+	pageEncoding="UTF-8"%>
+<div class="content-wrapper" style="padding: 10px;">
+	<div class="row" style="padding: 10px;">
+		<div class="col-lg-12 grid-margin stretch-card">
+			<div class="card">
+				<div class="card-body">
+					<h4 class="card-title" style="font-size:1.25rem; font-family: 'orbit', sans-serif;">회원 상세 정보</h4>
+					<div class="table-responsive" style="overflow:hidden">
+						<form action="">
+							<table class="table" style="border:1px solid #CED4DA;">
+								<tbody>
+									<tr>
+										<th class="table-primary" style="width:10%; text-align : center;">아이디</th>
+										<td style="width:40%;"><input type="text" name="ae_id" id="ae_id" value="" style="width:100%;"></td>
+										<th class="table-primary" style="width:10%; text-align : center;">성별</th>
+										<td style="width:25%;"><input type="radio" class="mbr_gender" name="mbr_gender" id="mbr_gender1" value="남자"> 남자&nbsp;&nbsp;&nbsp;<input type="radio" class="mbr_gender" name="mbr_gender" id="mbr_gender2" value="여자"> 여자</td>
+										<td rowspan="3" style="width:15%; padding: 0px;">
+											<img src="" name="mem_profile" id="mem_profile" style="width:108%; height:100%; border-radius: 0%; margin-top : -2px; margin-left : -13px;"><br>
+										</td>
+									</tr>
+									<tr>
+										<th class="table-primary" style="text-align : center;">회원명</th>
+										<td><input type="text" name="user_nm" id="user_nm" value="" style="width:100%;"></td>
+										<th class="table-primary" style="text-align : center;">생년월일</th>
+										<td><input type="text" name="mbr_brdt" id="mbr_brdt" value="" style="width:95%;"></td>
+									</tr>
+									<tr>
+										<th class="table-primary" style="text-align : center;">닉네임</th>
+										<td><input type="text" name="mem_nicknm" id="mem_nicknm" value="" style="width:100%;"></td>
+										<th class="table-primary" style="text-align : center;">핸드폰번호</th>
+										<td><input type="text" name="mbr_telno" id="mbr_telno" value="" style="width:95%;"></td>
+									</tr>
+									<tr>
+										<th class="table-primary" style="text-align : center;">우편번호</th>
+										<td><input type="text" name="mbr_zip" id="mbr_zip" value="" style="width:83%;">&nbsp;&nbsp;&nbsp;<button type="button" class="btn btn-primary btn-sm" id="">검색</button></td>
+										<th class="table-primary" style="text-align : center;">이메일</th>
+										<td colspan="2"><input type="text" name="mbr_email" id="mbr_email" value="" style="width:100%;"></td>
+									</tr>
+									<tr>
+										<th class="table-primary" style="text-align : center;">주소</th>
+										<td><input type="text" name="mbr_addr" id="mbr_addr" value="" style="width:100%;"></td>
+										<th class="table-primary" style="text-align : center;">등급</th>
+										<td colspan="2">
+											<select name="rank_name" id="rank_name" style="width:100%;">
+												<option value="브론즈">브론즈</option>
+												<option value="실버">실버</option>
+												<option value="골드">골드</option>
+												<option value="플래티넘">플래티넘</option>
+											</select>
+										</td>
+									</tr>
+									<tr>
+										<th class="table-primary" style="text-align : center;">상세주소</th>
+										<td><input type="text" name="mbr_daddr" id="mbr_daddr" value="" style="width:100%;"></td>
+										<th class="table-primary" style="text-align : center;">마일리지</th>
+										<td colspan="2"><input type="text" name="mbr_mileage" id="mbr_mileage" value="" style="width:100%;"></td>
+									</tr>
+								</tbody>
+							</table>
+							<div class="row" style="padding-left : 30px; margin-top : 20px; margin-right : 0px; float:right;">
+								<input type="button" class="btn btn-primary" id="putBtn" onclick="mbrUpdate()" value="수정">&nbsp;&nbsp;
+								<input type="button" class="btn btn-danger" id="delBtn" onclick="mbrDelete()" value="삭제">&nbsp;&nbsp;
+								<a href="/mng/mbr"><button type="button" class="btn btn-outline-primary" id="listBtn">목록</button></a>
+							</div>
+						</form>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<script type="text/javascript">
+var mem_profile = document.querySelector("#mem_profile");	// 프로필 사진
+var putBtn = document.querySelector("#putBtn");				// 회원 정보 수정 버튼
+var delBtn = document.querySelector("#delBtn");				// 회원 정보 삭제 버튼
+
+const myForm = document.forms[0];
+
+// 회원 상세 정보
+window.onload = function(){
+	const url = document.location.href;
+	const urlArr = url.split("/");
+	const id = urlArr[urlArr.length-1];
+	
+	$.ajax({
+		type : "get",
+		url : "/mng/mbr/mbrInfo/"+id,
+		data : "",
+		contentType : "application/json; charset=utf-8",
+		success : function(result){
+			console.log("result : " + result);
+			console.log(JSON.stringify(result));
+			console.log(JSON.stringify(result.mbr_gender));
+			console.log(result.mbr_gender);
+			$("#ae_id").val(result.ae_id);
+			$("#user_nm").val(result.user_nm);
+			$("#mem_profile").attr("src","/upload/images/" + result.mem_profile);
+			$("#mem_nicknm").val(result.mem_nicknm);
+			$("#mbr_brdt").val(result.mbr_brdt);
+			$('input:radio[name="mbr_gender"][value="'+ result.mbr_gender +'"]').attr('checked', 'checked');
+			$("#mbr_telno").val(result.mbr_telno);
+			$("#mbr_email").val(result.mbr_email);
+			$("#rank_name").val(result.rank_name);
+			$("#mbr_mileage").val(result.mbr_mileage);
+			$("#mbr_zip").val(result.mbr_zip);
+			$("#mbr_addr").val(result.mbr_addr);
+			$("#mbr_daddr").val(result.mbr_daddr);
+		}
+	});
+}
+
+// 회원 정보 수정
+function mbrUpdate() {
+	let data = {
+		user_nm : myForm.user_nm.value,
+		ae_id : myForm.ae_id.value,
+		mbr_brdt : myForm.mbr_brdt.value,
+		mbr_gender : myForm.mbr_gender.value,
+		mbr_telno : myForm.mbr_telno.value,
+		mbr_email : myForm.mbr_email.value,
+		rank_name : myForm.rank_name.value,
+		mbr_mileage : myForm.mbr_mileage.value,
+		mbr_zip : myForm.mbr_zip.value,
+		mbr_addr : myForm.mbr_addr.value,
+		mbr_daddr : myForm.mbr_daddr.value
+	}
+	
+	let xhr = new XMLHttpRequest();
+	xhr.open("put","/mng/mbr",true);
+	xhr.setRequestHeader("Content-Type","application/json;charset=utf-8")
+	xhr.setRequestHeader("${_csrf.headerName}", "${_csrf.token}");
+	xhr.onreadystatechange = function(){
+		if(xhr.readyState== 4 && xhr.status == 200){
+			if(xhr.responseText != 0){
+				alert("수정 성공");
+				location.href="/mng/mbr";
+			}
+		}
+	}
+	xhr.send(JSON.stringify(data))
+}
+</script>

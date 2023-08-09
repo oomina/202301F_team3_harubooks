@@ -1,0 +1,72 @@
+@charset "UTF-8";
+#container{
+    width: 75%;
+
+    margin: 0 auto;
+    display: flex;
+    margin-top: 20px;
+}
+
+#container-1{
+    width: 70%;
+    display: flex;
+    flex-direction: column;
+}
+.content-1-1{
+   
+   border: 1px solid gold;
+   margin-left: 20px;
+}
+.info-content{
+    margin-top: 25px;
+    width: 100%;
+    border: 1px solid #d5d5d5;;
+    border-radius: 15px;
+}
+#orderInfo #prodInfo #addrInfo{
+    display: flex;
+    flex-direction: column;
+}
+#inputInfo, #zipInfo{
+    display: flex;
+    flex-direction: column;
+    width: 60%;
+    margin: 0 auto;
+    margin-bottom: 20px;
+   
+}
+.inputInfo{
+    margin-bottom: 10px;
+    height: 44px;
+    border: 1px solid #d5d5d5;
+    border-radius: 10px;
+    font-size: 14px;
+}
+.semi-title{
+    margin-top: 30px;
+    margin-left: 15px;
+}
+#container-2{
+    display: flex;
+    width: 20%;
+    flex-direction: column;
+}
+.bookInfo{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-left: 10px;
+}
+.bookInfo p{
+    margin-bottom: 0px;
+}
+.subFont{
+    font-size: 14px;
+}
+#usageMileage2{
+	display: flex; 
+	justify-content: space-between;
+	width: 90%;
+	margin: 0 auto; 
+	align-items: center;
+}

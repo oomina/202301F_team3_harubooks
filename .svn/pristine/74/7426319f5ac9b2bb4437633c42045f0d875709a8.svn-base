@@ -1,0 +1,18 @@
+package kr.or.ddit.mapper.jhs;
+
+import java.util.List;
+
+import org.apache.ibatis.annotations.Mapper;
+
+import kr.or.ddit.vo.jhs.Chat_RoomVO;
+
+@Mapper
+public interface ChattingMapper {
+
+	int insertChat(Chat_RoomVO vo);
+
+	int insertChatMem(Chat_RoomVO vo);
+
+	List<Chat_RoomVO> getChatList(Chat_RoomVO vo);
+
+}

@@ -1,0 +1,187 @@
+package kr.or.ddit.controller.jhs.haruter;
+
+import java.util.List;
+import java.util.Map;
+
+import javax.inject.Inject;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
+
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import kr.or.ddit.service.jhs.IChattingService;
+import kr.or.ddit.vo.bmk.BoardVO;
+import kr.or.ddit.vo.bmk.ReplyVO;
+import kr.or.ddit.vo.jhs.Chat_MemVO;
+import kr.or.ddit.vo.jhs.Chat_RoomVO;
+
+@Controller
+@RequestMapping("/haruter")
+public class chattingController {
+	
+	@Inject
+	private IChattingService service;
+	
+	// 채팅방으로 이동
+	@PreAuthorize("hasRole('ROLE_MEMBER')")
+	@GetMapping(value="/chatting")
+	public String chattingList(Model model) {	
+		return "haruter/chattingList";
+	}
+	
+	// 채팅방 생성
+	@PreAuthorize("hasRole('ROLE_MEMBER')")
+	@ResponseBody
+	@PostMapping(value="/insertChat")
+	public String insertChat(Chat_RoomVO vo) {
+		return service.insertChat(vo);
+	}
+	
+	//채팅방 가져오기
+	@PreAuthorize("hasRole('ROLE_MEMBER')")
+	@ResponseBody
+	@GetMapping(value="/getChatList")
+	public List<Chat_RoomVO> getChatList(Chat_RoomVO vo) {
+		return service.getChatList(vo);
+	}
+	
+	//채팅방 하나 가져오기
+	@PreAuthorize("hasRole('ROLE_MEMBER')")
+	@ResponseBody
+	@GetMapping(value="/getChatOne")
+	public Chat_RoomVO getChatOne(Chat_RoomVO vo) {
+		return service.getChatOne(vo);
+	}
+	
+	//채팅방 들어가기 및 제한
+	@PreAuthorize("hasRole('ROLE_MEMBER')")
+	@ResponseBody
+	@GetMapping(value="/chattingRoomIn", produces = "text/plain; charset=UTF-8")
+	public String chattingRoomIn(Chat_RoomVO vo) {
+		return service.chattingRoomIn(vo);
+	}
+	
+	//채팅방에 들어가기 / 채팅방 세션에 저장
+	@PreAuthorize("hasRole('ROLE_MEMBER')")
+	@GetMapping(value="/setChattingRoom")
+	public String chattingRoom(Chat_MemVO vo, HttpServletRequest req) {
+		Chat_MemVO cvo = service.getChatMem(vo);
+		
+		HttpSession session = req.getSession();
+		session.setAttribute("member", cvo);
+		
+		return "redirect:/haruter/chattingRoom";
+	}
+
+	//채팅방에 들어가기
+	@PreAuthorize("hasRole('ROLE_MEMBER')")
+	@GetMapping(value="/chattingRoom")
+	public String chattingRoom() {	
+		return "chatting/chattingRoom";
+	}
+	
+	//채팅방에 필요한 목록 가져오기
+	@PreAuthorize("hasRole('ROLE_MEMBER')")
+	@ResponseBody
+	@GetMapping(value="/getChat")
+	public Map<String, Object> getChat(Chat_RoomVO vo) {
+		Map<String, Object> map = service.getChat(vo);
+		return map;
+	}
+	
+	//채팅방 삭제하기
+	@PreAuthorize("hasRole('ROLE_MEMBER')")
+	@ResponseBody
+	@GetMapping(value="/deleteChatRoom")
+	public String deleteChatRoom(Chat_RoomVO vo) {
+		String status = service.deleteChatRoom(vo);
+		return status;
+	}
+	
+	//채팅방 수정하기
+	@PreAuthorize("hasRole('ROLE_MEMBER')")
+	@ResponseBody
+	@GetMapping(value="/updateChatRoom")
+	public String updateChatRoom(Chat_RoomVO vo) {
+		String status = service.updateChatRoom(vo);
+		return status;
+	}
+	
+	//사용자 강퇴
+	@PreAuthorize("hasRole('ROLE_MEMBER')")
+	@ResponseBody
+	@GetMapping(value="/outUser")
+	public String outUser(Chat_MemVO vo) {
+		String status = service.outUser(vo);
+		return status;
+	}
+	
+	//채팅방 나가기
+	@PreAuthorize("hasRole('ROLE_MEMBER')")
+	@ResponseBody
+	@GetMapping(value="/outChatRoom")
+	public String outChatRoom(Chat_MemVO vo) {
+		String status = service.outChatRoom(vo);
+		return status;
+	}
+	
+	// 모집게시판 들어가기
+	@PreAuthorize("hasRole('ROLE_MEMBER')")
+	@GetMapping(value="/chattingBoard")
+	public String chattingBoard(Model model) {	
+		return "haruter/chattingBoard";
+	}
+	
+	// 내가 개설한 채팅방 가져오기
+	@PreAuthorize("hasRole('ROLE_MEMBER')")
+	@ResponseBody
+	@GetMapping(value="/getChatRoomNo")
+	public List<Chat_RoomVO> getChatRoomNo(String ae_id) {
+		List<Chat_RoomVO> lvo = service.getChatRoomNo(ae_id);
+		return lvo;
+	}
+
+	// 모임게시판 생성
+	@PreAuthorize("hasRole('ROLE_MEMBER')")
+	@ResponseBody
+	@PostMapping(value="/createChatBoard")
+	public String createChatBoard(BoardVO bvo) {
+		String status = service.createChatBoard(bvo);
+		return status;
+	}
+	
+	// 모임게시판 리스트 불러오기
+	@PreAuthorize("hasRole('ROLE_MEMBER')")
+	@ResponseBody
+	@GetMapping(value="/getChatBoardList")
+	public List<BoardVO> getChatBoardList(BoardVO bvo) {
+		List<BoardVO> lvo= service.getChatBoardList(bvo);
+		return lvo;
+	}
+
+	// 모임게시판 상세 불러오기
+	@PreAuthorize("hasRole('ROLE_MEMBER')")
+	@ResponseBody
+	@GetMapping(value="/getChatBoardOne")
+	public BoardVO getChatBoardOne(BoardVO bvo) {
+		BoardVO vo= service.getChatBoardOne(bvo);
+		return vo;
+	}
+	
+	// 모임게시판 댓글 부러오기
+	@PreAuthorize("hasRole('ROLE_MEMBER')")
+	@ResponseBody
+	@GetMapping(value="/getChatBoardReplyList")
+	public List<ReplyVO> getChatBoardReplyList(BoardVO bvo) {
+		List<ReplyVO> vo= service.getChatBoardReplyList(bvo);
+		return vo;
+	}
+	
+	
+}

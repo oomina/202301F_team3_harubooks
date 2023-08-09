@@ -1,0 +1,16 @@
+package kr.or.ddit.vo.jhs;
+
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
+
+@Getter
+@Setter
+@ToString
+public class Chat_MemVO {
+	private String cr_no;
+	private String ae_id;
+	private String cn_cntn_yn;
+	private String cm_master_yn;
+	private String cm_join_ymd;
+}

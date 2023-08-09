@@ -1,0 +1,42 @@
+package kr.or.ddit.service.omn.books;
+
+import java.util.List;
+
+import javax.inject.Inject;
+
+import org.springframework.stereotype.Service;
+
+import kr.or.ddit.mapper.omn.books.MngCategoryMapper;
+import kr.or.ddit.vo.omn.MngCategoryVO;
+
+@Service
+public class MngCategoryServiceImpl implements IMngCategoryService{
+	
+	@Inject
+	private MngCategoryMapper mapper;
+	
+	@Override
+	public List<MngCategoryVO> categoryMainList() {
+		return mapper.categoryMainList();
+	}
+	
+	@Override
+	public List<MngCategoryVO> categoryMidList() {
+		return mapper.categoryMidList();
+	}
+
+	@Override
+	public int categoryInsert(MngCategoryVO mngCategoryVO) {
+		return mapper.categoryInsert(mngCategoryVO);
+	}
+
+	@Override
+	public int categoryUpdate(MngCategoryVO mngCategoryVO) {
+		return mapper.categoryUpdate(mngCategoryVO);
+	}
+
+	@Override
+	public int categoryDelete(MngCategoryVO mngCategoryVO) {
+		return mapper.categoryDelete(mngCategoryVO);
+	}
+}

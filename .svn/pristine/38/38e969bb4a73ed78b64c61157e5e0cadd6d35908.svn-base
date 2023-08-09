@@ -1,0 +1,45 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+	<!-- content wrapper -->
+	<div class="content-wrapper" style="padding : 10px;">
+		<div class="row" style=" padding : 10px;">
+			<div class="col-lg-12 grid-margin stretch-card">
+				<div class="card">
+					<div class="card-body">
+						<div class="card-title-wrapper">
+							<h4 class="card-title">발주 내역</h4>
+						</div>
+						<div class="table-responsive">
+							<table class="table table-hover">
+								<thead>
+									<tr class="table-primary">
+										<th>번호</th>
+										<th>카테고리</th>
+										<th>책제목</th>
+										<th>저자</th>
+										<th>출판사</th>
+										<th>발주물량</th>
+										<th>승인여부</th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr>
+										<td>200</td>
+										<td>소설</td>
+										<td>메리골드 마음 세탁소</td>
+										<td>윤정은</td>
+										<td>북로망스</td>
+										<td>60</td>
+										<td>대기</td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+<script>
+</script>
+	<!-- content wrapper End-->

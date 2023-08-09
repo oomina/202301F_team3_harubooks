@@ -1,0 +1,139 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+<div class="content-wrapper" style="padding : 10px;">
+	<div class="row" style=" padding : 10px;">
+		<div class="col-lg-12 grid-margin stretch-card">
+			<div class="card">
+				<div class="card-body">
+					<h4 class="card-title" style="font-size:1.25rem; font-family: 'Nunito', sans-serif;">공지사항 상세</h4>
+					<div class="table-responsive pt-3">
+						<table class="table table-bordered" style="font-size : 0.875rem;">
+							<thead>
+								<tr>
+									<th class="table-primary" style="width:10%;">번호</th>
+									<td id="notice_no"></td>
+									<th class="table-primary" style="width:10%;">작성자</th>
+									<td id="ae_id">관리자</td>
+									<th class="table-primary" style="width:10%;">작성일</th>
+									<td id="notice_writer_ymd"></td>
+									<th class="table-primary" style="width:10%;">조회수</th>
+									<td id="notice_inq_cnt"></td>
+								</tr>
+							</thead>
+							<tbody>
+								<tr>
+									<th class="table-primary" style="width:10%;">제목</th>
+									<td colspan="7"><input type="text" id="notice_title" style="width : 80%;"></td>
+								</tr>
+								<tr>
+									<th class="table-primary" style="width:10%;">내용</th>
+									<td colspan="7" style="height : 250px;" >
+										<textarea rows="10" cols="100" id="notice_content"></textarea>
+									</td>
+								</tr>
+								<tr>
+									<th class="table-primary" style="width:10%;">파일</th>
+									<td colspan="3" id="ua_no">
+									</td>
+									<td colspan="4" id="newFile" style="border-left: 1px solid white ;">
+										<input type="file" id="nFile" name="notice_file">
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<div class="row" style="padding-left : 30px; margin-top : 20px; ">
+						<button type="button" class="btn btn-primary" id="nUpdateBtn">수정</button>&nbsp;&nbsp;
+						<a href="/mng/notice"><button type="button" class="btn btn-outline-primary" id="noticeBtn">목록</button></a>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<script>
+	const url = document.location.href;
+	const urlArr = url.split("/");
+	const no_no = urlArr[urlArr.length-1];
+
+	const notice_no = document.querySelector("#notice_no");
+	const ae_id = document.querySelector("#ae_id");
+	const notice_inq_cnt = document.querySelector("#notice_inq_cnt");
+	const notice_writer_ymd = document.querySelector("#notice_writer_ymd");
+	const notice_title = document.querySelector("#notice_title");
+	const notice_content = document.querySelector("#notice_content");
+	const notice_ua_no = document.querySelector("#ua_no");
+	const notice_file = document.querySelector("#nFile");
+
+	const nUpdateBtn = document.querySelector("#nUpdateBtn");
+
+	function fNoticeOne(no_no){
+		let xhr = new XMLHttpRequest();
+		xhr.open("get", "/mng/board/notice/" + no_no , true);
+		xhr.onreadystatechange = function(){
+			if(xhr.readyState == 4 && xhr.status == 200){
+				let noOne = JSON.parse(xhr.responseText);
+				console.log(noOne);
+				notice_no.innerHTML = noOne.notice_no;
+				notice_inq_cnt.innerHTML = noOne.notice_inq_cnt;
+				notice_writer_ymd.innerHTML = noOne.notice_writer_ymd;
+				notice_title.value = noOne.notice_title;
+				notice_content.innerHTML = noOne.notice_content;
+				fFileList(noOne.ua_no);
+			}
+		}
+		xhr.send();
+	}
+	
+	function fFileList(ua_no){
+		let xhr = new XMLHttpRequest();
+		xhr.open("get", "/mng/board/notice/fileList/" + ua_no, true);
+		xhr.onreadystatechange = function(){
+			if(xhr.readyState == 4 && xhr.status == 200){
+				let fileList = JSON.parse(xhr.responseText);
+				console.log(fileList);
+				let aTag = document.createElement("a");
+				aTag.innerHTML = fileList[0].ua_nm;
+                aTag.href = "/upload/files/" + fileList[0].ua_stre_nm;	// 첨부파일이라 files 이용 
+				aTag.download = fileList[0].ua_nm;
+				notice_ua_no.appendChild(aTag);
+			}
+		}
+		xhr.send();
+	}
+	fNoticeOne(no_no);
+	
+	nUpdateBtn.onclick = function(){
+		console.log(notice_no.innerHTML);
+		let formData = new FormData();
+		formData.append("notice_no",notice_no.innerHTML);
+        formData.append("notice_title", notice_title.value);
+        formData.append("notice_content", notice_content.value);
+		console.log(notice_file.files[0]);
+		if(notice_file.files[0] != undefined){
+			formData.append("notice_file", notice_file.files[0]);
+		}
+		console.log( notice_no.innerHTML, notice_title.value,notice_content.value, notice_file.files[0])
+		$.ajax({
+        	type : "put",
+			url : "/mng/board/notice",
+			beforeSend : function(xhr){
+				xhr.setRequestHeader("${_csrf.headerName}", "${_csrf.token}");
+			},
+			data : formData,
+			dataType : "text",
+			processData : false,
+			contentType : false,
+			success : function(res){
+				if(res == "fail"){
+					alert("수정 실패하였습니다. 다시 시도해주세요.");
+				} else {
+					alert("수정되었습니다.");
+					location.href="/mng/notice/"+res;
+				}
+			}
+        });
+
+	}
+
+</script>

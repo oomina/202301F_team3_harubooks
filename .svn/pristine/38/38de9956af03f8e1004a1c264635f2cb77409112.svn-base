@@ -1,0 +1,9 @@
+package kr.or.ddit.service.omn.books;
+
+import java.util.List;
+
+import kr.or.ddit.vo.omn.NewBookRequestVO;
+
+public interface IPubBookRequestService {
+	public List<NewBookRequestVO> requestList();
+}

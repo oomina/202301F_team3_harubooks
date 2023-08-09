@@ -1,0 +1,16 @@
+package kr.or.ddit.vo.ljy;
+
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
+
+@Getter
+@Setter
+@ToString
+public class InquiryReplyVO {
+	private String ir_no;		// 문의요청 답글 번호
+	private String ir_content;	// 문의 요청 답글 내용
+	private String user_id;		// 사용자 아이디	?? vo 지우나??
+	private String inquiry_no;	// 문의요청 번호
+	private String ae_id;		// 사용자 id
+}

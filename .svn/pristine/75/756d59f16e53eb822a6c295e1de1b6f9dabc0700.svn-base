@@ -1,0 +1,11 @@
+package kr.or.ddit.mapper.ljy;
+
+import java.util.List;
+
+import kr.or.ddit.vo.ljy.RemainMngVO;
+
+public interface RemainMngMapper {
+
+	public List<RemainMngVO> remainList();
+
+}

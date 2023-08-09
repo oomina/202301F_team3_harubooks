@@ -1,0 +1,98 @@
+package kr.or.ddit.service.jhs;
+
+import java.util.List;
+
+import javax.inject.Inject;
+
+import org.springframework.stereotype.Service;
+
+import kr.or.ddit.mapper.jhs.ChattingMapper;
+import kr.or.ddit.vo.jhs.Chat_MemVO;
+import kr.or.ddit.vo.jhs.Chat_RoomVO;
+
+@Service
+public class ChattingServiceImpl implements IChattingService{
+
+	@Inject
+	private ChattingMapper mapper;
+	
+	@Override
+	public String insertChat(Chat_RoomVO vo) {
+		if(vo.getCcg_r003().trim().equals("false")) {
+			vo.setCcg_r003("비공개");
+		}else {
+			vo.setCcg_r003("공개");			
+		}
+		
+		int result1 = mapper.insertChat(vo);
+		int result2 = mapper.insertChatMem(vo);
+		
+		String status = null;
+		if(result1 > 0 && result2 > 0) {
+			status = "OK";
+		}else{
+			status = "FAIL";			
+		}
+		return status;
+	}
+
+	@Override
+	public List<Chat_RoomVO> getChatList(Chat_RoomVO vo) {
+		return mapper.getChatList(vo);
+	}
+
+	@Override
+	public Chat_RoomVO getChatOne(Chat_RoomVO vo) {
+		Chat_RoomVO cvo = mapper.getChatOne(vo);
+		return cvo;
+	}
+
+	@Override
+	public String chattingRoomIn(Chat_RoomVO vo) {
+		String statue = "";
+		String crNo = mapper.checkUser(vo);
+		
+		// 해당 인원이 이미 채팅방에 있으면 바로 들어갈 수 있다
+		if(crNo!=null) {
+			statue = "OK";
+			return statue;
+		}
+		
+		// 채팅방 인원이 모두 차면 못 들어가게 막는다
+		if(vo.getCr_cntn_nope() >= vo.getCr_max_nope()) {
+			statue = "채팅방 인원이 모두 찼습니다!";
+			return statue;
+		}
+		
+		// 비밀번호가 틀리면 못 들어가게 막는다
+		if(vo.getCcg_r003().equals("비공개")) {
+			crNo = mapper.checkPw(vo);
+			if(crNo==null || crNo.equals("")) {
+				statue = "비밀번호가 틀렸습니다!";
+				return statue;
+			}
+		}
+		
+		// 채팅방의 채팅인원이 추가된다.
+		int result = mapper.chattingRoomIn(vo);
+		
+		if(result < 0) {
+			statue = "서버 에러! 채팅방 가입에 실패했습니다!";
+		}else {
+			// 채팅방에 현재 가입 인원의 수가 증가한다.
+			int result2 = mapper.addChatNope(vo);
+			if(result2 < 0) {
+				statue = "서버 에러! 채팅방 가입에 실패했습니다!";				
+			}else {
+				statue = "OK";				
+			}
+		}
+		return statue;
+	}
+
+	@Override
+	public Chat_MemVO getChatMem(Chat_MemVO vo) {
+		return mapper.getChatMem(vo);
+	}
+
+}

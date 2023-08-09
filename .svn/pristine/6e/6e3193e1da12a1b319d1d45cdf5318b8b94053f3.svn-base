@@ -1,0 +1,189 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+<mapper namespace="kr.or.ddit.mapper.ljy.PoMngMapper">
+	<insert id="poOne" parameterType="poMngVO">
+		<selectKey keyProperty="br_no" order="BEFORE" resultType="String">
+			SELECT 'BR' || LPAD(seq_br.nextval, 10, '0') FROM dual 
+		</selectKey>
+		INSERT INTO book_request(
+		    br_no               -- 발주요청번호
+		    , book_no           -- 책번호
+		    , ae_id             -- 출판사 id
+		    , book_qty          -- 요청 수량
+		    , br_ymd            -- 요청 일자
+		    , book_amt      	-- 책가격
+		    , ccg_p001          -- 1. 자동발주, 2. 수동발주
+		    , ccg_r001          -- 1. 요청대기, 2. 요청수락, 3. 요청거절
+		) VALUES (
+		    #{br_no}
+		    ,#{book_no}
+		    , (
+				SELECT 
+	            	ae_id
+		        FROM
+		            publisher
+		        WHERE 
+		            pub_nm = #{pub_nm}		    
+		    )
+		    , #{book_qty}
+		    , TO_CHAR(sysdate, 'YYYY/MM/DD')
+		    , (
+		    	SELECT 
+		            CASE WHEN b.ccg_b001 = '종이책' THEN pb.book_amt ELSE eb.book_amt END AS book_amt
+		        FROM
+		            books b
+		            LEFT JOIN paper_book pb ON b.book_no = pb.book_no
+		            LEFT JOIN ebook eb ON b.book_no = eb.book_no
+		        WHERE 
+		            b.book_no = #{book_no}
+		    )
+		    , '수동발주'
+		    , '요청대기'
+		)        
+	</insert>
+	<insert id="poAuto" parameterType="poMngVO">
+		<selectKey keyProperty="br_no" order="BEFORE" resultType="String">
+			SELECT 'BR' || LPAD(seq_br.nextval, 10, '0') FROM dual 
+		</selectKey>
+		INSERT INTO book_request(
+		    br_no               -- 발주요청번호
+		    , book_no           -- 책번호
+		    , ae_id             -- 출판사 id
+		    , book_qty          -- 요청 수량
+		    , br_ymd            -- 요청 일자
+		    , book_amt      	-- 책가격
+		    , ccg_p001          -- 1. 자동발주, 2. 수동발주
+		    , ccg_r001          -- 1. 요청대기, 2. 요청수락, 3. 요청거절
+		) VALUES (
+		    #{br_no}
+		    ,#{book_no}
+		    , (
+				SELECT 
+	            	ae_id
+		        FROM
+		            publisher
+		        WHERE 
+		            pub_nm = #{pub_nm}		    
+		    )
+		    , #{book_qty}
+		    , TO_CHAR(sysdate, 'YYYY/MM/DD')
+		    , (
+		    	SELECT 
+		            CASE WHEN b.ccg_b001 = '종이책' THEN pb.book_amt ELSE eb.book_amt END AS book_amt
+		        FROM
+		            books b
+		            LEFT JOIN paper_book pb ON b.book_no = pb.book_no
+		            LEFT JOIN ebook eb ON b.book_no = eb.book_no
+		        WHERE 
+		            b.book_no = #{book_no}
+		    )
+		    , '자동발주'
+		    , '요청대기'
+		)        
+	</insert>
+	<select id="poListCnt" resultType="int">
+		SELECT 
+			count(*)
+		FROM 
+			book_request
+	</select>
+	
+	<select id="poList" parameterType="mngPaginationInfoVO" resultType="poMngVO">
+		<include refid="commonMapper.pagingHeader"/>
+			SELECT 
+			    br. br_no
+			    , br.book_no
+			    , b.book_title
+			    , br.ae_id
+			    , p.pub_nm
+			    , br.book_qty
+			    , br.br_ymd
+			    , br.brd_accept_ymd
+			    , br.book_amt
+			    , br.ccg_p001
+			    , br.ccg_r001
+			FROM 
+			    book_request br
+			    INNER JOIN publisher p ON br.ae_id = p.ae_id
+			    INNER JOIN books b ON b.book_no = br.book_no
+			ORDER BY br.br_no desc
+		<include refid="commonMapper.pagingFooter"/>
+	</select>
+	
+	<select id="poWaitingList" resultType="poMngVO">
+		SELECT 
+		    br. br_no
+		    , br.book_no
+		    , b.book_title
+		    , br.ae_id
+		    , p.pub_nm
+		    , br.book_qty
+		    , br.br_ymd
+		    , br.brd_accept_ymd
+		    , br.book_amt
+		    , br.ccg_p001
+		    , br.ccg_r001
+		FROM 
+		    book_request br
+		    INNER JOIN publisher p ON br.ae_id = p.ae_id
+		    INNER JOIN books b ON b.book_no = br.book_no
+		WHERE
+		    ccg_r001 = '요청대기'
+	</select>
+	
+	<select id="poPubList" parameterType="poMngVO" resultType="poMngVO">
+		<include refid="commonMapper.pagingHeader"/>
+		SELECT 
+		    br. br_no
+		    , br.book_no
+		    , b.book_title
+		    , br.ae_id
+		    , p.pub_nm
+		    , br.book_qty
+		    , br.br_ymd
+		    , br.brd_accept_ymd
+		    , br.book_amt
+		    , br.ccg_p001
+		    , br.ccg_r001
+		FROM 
+		    book_request br
+		    INNER JOIN publisher p ON br.ae_id = p.ae_id
+		    INNER JOIN books b ON b.book_no = br.book_no
+        WHERE
+            p.pub_nm = (
+                            SELECT 
+                                pub_nm
+                            FROM 
+                                publisher
+                            WHERE
+                                ae_id = #{ae_id}
+                        )
+		ORDER BY br.br_no desc
+		<include refid="commonMapper.pagingFooter"/>
+	</select>
+	
+	<update id="updatePoReqPub" parameterType="poMngVO">
+		UPDATE book_request
+		SET 
+		    ccg_r001 = '요청수락'
+		    , brd_accept_ymd = TO_CHAR(sysdate, 'YYYY/MM/DD')
+		WHERE
+		    ae_id = #{ae_id}
+		    AND book_no = #{book_no}
+		    AND br_no = #{br_no}
+	</update>
+	
+	<update id="updatePoRejPub" parameterType="poMngVO">
+		UPDATE book_request
+		SET 
+		    ccg_r001 = '요청거절'
+		    , brd_accept_ymd = TO_CHAR(sysdate, 'YYYY/MM/DD')
+		WHERE
+		    ae_id = #{ae_id}
+		    AND book_no = #{book_no}
+		    AND br_no = #{br_no}
+	</update>
+</mapper>

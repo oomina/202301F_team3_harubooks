@@ -1,0 +1,8 @@
+/**
+ * 
+ */
+// 리뷰 버튼 클릭시 이벤트
+let reviewBtn = document.querySelector('#reviewBtn');
+reviewBtn.addEventListener('click',function(){
+    alert('click');
+})

@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+<mapper namespace="kr.or.ddit.mapper.omn.books.MngCategoryMapper">
+	
+	<!-- 카테고리 대분류 조회 -->
+	<select id="categoryMainList" resultType="map">
+		select ccg_code
+			 , cc_nm
+			 , cc_yn
+		from cmmn_code
+		where ccg_code = 'B002'
+	</select>
+	
+	<!-- 카테고리 소분류 조회 -->
+	<select id="categoryMidList" resultType="map">
+		select ccg_code
+			 , cc_nm
+			 , cc_yn
+		from cmmn_code
+		where ccg_code = 'B003'
+	</select>
+	
+	<!-- 카테고리 추가 -->
+	<insert id="categoryInsert" parameterType="mngCategoryVO">
+		INSERT INTO cmmn_code (
+			ccg_code
+		  , cc_nm
+		  , cc_yn
+		)
+		VALUES (
+			#{ccg_code}
+		  , #{cc_nm}
+		  , 'Y'
+		)
+	</insert>
+	
+	<!-- 카테고리 수정 -->
+	<update id="categoryUpdate" parameterType="mngCategoryVO">
+		UPDATE cmmn_code
+		SET
+			cc_nm = #{new_cc_nm}
+		WHERE cc_nm = #{cc_nm}
+	</update>
+	
+	<!-- 카테고리 삭제 -->
+	<delete id="categoryDelete" parameterType="mngCategoryVO">
+		DELETE 
+		FROM cmmn_code
+		WHERE cc_nm = #{cc_nm}
+	</delete>
+	
+</mapper>

@@ -1,0 +1,123 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+<!-- content wrapper -->
+<div class="content-wrapper" style="padding : 10px;">
+	<div class="row" style=" padding : 10px;">
+		<div class="col-lg-12 grid-margin stretch-card">
+			<div class="card">
+				<div class="card-body">
+					<div class="card-title-wrapper">
+						<h4 class="card-title" style="font-size:1.25rem; font-family: 'orbit', sans-serif;">발주 내역</h4>
+						<div style="float:left;">
+							<p class="card-description">
+								전체 <code id="total"></code>건
+							</p>
+						</div>
+					</div>
+					<div class="table-responsive">
+						<table class="table table-hover">
+							<thead>
+								<tr class="table-primary">
+									<th>번호</th>
+									<th>발주분류</th>
+									<th>발주일자</th>
+									<th style="padding-left : 5px;">출판사</th>
+									<th>상품번호</th>
+									<th style="padding-left : 5px;">도서명</th>
+									<th style="padding-left : 5px;">발주물량</th>
+									<th>승인여부</th>
+									<th style="width : 35px;"><input type="checkbox" id="chkAll"></th>
+								</tr>
+							</thead>
+							<tbody id="tblDisp">
+							<!-- 	<tr>
+									<td>200</td>
+									<td>소설</td>
+									<td>메리골드 마음 세탁소</td>
+									<td>윤정은</td>
+									<td>북로망스</td>
+									<td>60</td>
+									<td>대기</td>
+								</tr> -->
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<div>
+					<div class="row" style="float:right; margin-right: 30px; margin-bottom: 18px">
+						<button type="button" class="btn btn-primary mr-2" id="downBtn">출력</button>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<script>
+const tblDisp = document.querySelector("#tblDisp");
+let page = 1;
+$(function(){
+	fPoList();
+	
+	// 전체 체크
+	$(document).on("click", "#chkAll", function(){
+		if($(this).is(":checked")){ //전체 체크
+			// if($(".chkSub").prop("diabled", true)){
+			// 	$(".chkSub").attr("checked", true);	
+			// } else {
+				$(".chkSub").attr("checked", true);
+			// }
+		}else{ //전체 해제
+			$(".chkSub").attr("checked", false);
+		}	
+	});
+})
+
+function fPoList(){
+	$.ajax({
+		url : "/mng/remain/polist",
+		type : "get",
+		data : {
+			page : page,
+		},
+		success : function(res){
+			console.log(res);
+			let tblstr = "";
+			console.log(res);
+			//tblstr += '<button type="button" class="close" aria-label="Close" onclick="fSearchClose()" style="float:right;"><span float:right; aria-hidden="true">&times;</span></button>';
+			//tblstr += "<table class='table table-hover' style='max-width : 600px; table-layout: fixed;'>"
+			if(res.mngPaginationInfoVO.dataList.length == 0){
+				tblstr += "<tr><td colspan='7' style='text-align : center;'>발주내역이 존재하지 않습니다.</td></tr>"
+			} else {
+				for(let i= 0; i<res.mngPaginationInfoVO.dataList.length; i++){
+					tblstr += `<tr onclick="">`
+					tblstr += 	`<td style="width : 40px;">\${res.mngPaginationInfoVO.startRow + i}</td>`
+					tblstr += 	`<td style="width : 80px; ">\${res.mngPaginationInfoVO.dataList[i].ccg_p001}</td>` 
+					tblstr += 	`<td style="width : 100px; ">\${res.mngPaginationInfoVO.dataList[i].br_ymd}</td>` 
+					tblstr += 	`<td style="width : 150px; padding : 3px; word-wrap: break-word; white-space: pre-wrap;">\${res.mngPaginationInfoVO.dataList[i].pub_nm}</td>`
+					tblstr += 	`<td style="width : 180px;">\${res.mngPaginationInfoVO.dataList[i].book_no}</td>` 
+					tblstr += 	`<td style="width : 300px; padding : 3px; word-wrap: break-word; white-space: pre-wrap; height : auto;">\${res.mngPaginationInfoVO.dataList[i].book_title}</td>` 
+					tblstr += 	`<td style="width : 40px; padding : 5px;">\${res.mngPaginationInfoVO.dataList[i].book_qty}</td>`
+					if(res.mngPaginationInfoVO.dataList[i].ccg_r001 == '요청대기'){
+						tblstr += 	`<td style=""><label class="badge badge-warning">\${res.mngPaginationInfoVO.dataList[i].ccg_r001}</label></td>`
+					} else {
+						tblstr += 	`<td style=""><label class="badge badge-info">\${res.mngPaginationInfoVO.dataList[i].ccg_r001}</label></td>`
+					}
+					tblstr +=		'<td style="width : 2%; text-align : center">';
+					if(res.mngPaginationInfoVO.dataList[i].ccg_r001 == '요청수락'){
+						tblstr +=			'<input type="checkbox" class="chkSub">';
+					} else {
+						tblstr += 			'<input type="checkbox" class="chkSub" disabled>';
+					}
+					tblstr += 		'</td>'
+					tblstr += "</tr>";
+				}
+			}
+			tblDisp.innerHTML = tblstr;
+			let total = document.querySelector("#total");
+			total.innerText = res.mngPaginationInfoVO.totalRecord;
+		}
+		
+	})
+}
+</script>
+	<!-- content wrapper End-->

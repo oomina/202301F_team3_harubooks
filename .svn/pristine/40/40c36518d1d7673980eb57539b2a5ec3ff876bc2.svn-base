@@ -1,0 +1,183 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+<mapper namespace="kr.or.ddit.mapper.omn.books.MngBooksMapper">
+	
+	<sql id="booksSearch">
+		<if test="searchType != null and searchType == 'title'">
+			and (book_title like '%'||#{searchWord}||'%')
+		</if>
+		<if test="searchType != null and searchType == 'author'">
+			and (book_author like '%'||#{searchWord}||'%')
+		</if>
+		<if test="searchType != null and searchType == 'publisher'">
+			and (pub_nm like '%'||#{searchWord}||'%')
+		</if>
+	</sql>
+	
+	<select id="booksAllCount" parameterType="string" resultType="int">
+		SELECT count(book_no)
+		FROM books
+		WHERE 1=1
+	</select>
+	
+	<select id="booksCount" parameterType="mngPaginationInfoVO" resultType="int">
+		SELECT count(book_no)
+		FROM books
+		WHERE 1=1
+		<include refid="booksSearch"/>
+	</select>
+	
+	<!-- 도서 정보 리스트 -->
+	<select id="selectBooksList" parameterType="mngPaginationInfoVO" resultType="mngBooksVO">
+		SELECT b.book_no
+			 , b.book_title
+			 , b.book_spmt_ymd
+			 , b.book_author
+			 , b.pub_nm
+			 , b.book_mileage
+			 , b.ccg_b001
+			 , b.ccg_b002
+			 , b.ccg_b003
+			 , b.rnum
+		FROM(
+			SELECT
+				a.*, row_number() over (order by a.book_no) rnum
+			FROM(
+				SELECT c.book_no
+					 , c.book_title
+					 , c.book_spmt_ymd
+					 , c.book_author
+					 , c.pub_nm
+					 , c.book_mileage
+					 , c.ccg_b001
+					 , c.ccg_b002
+					 , c.ccg_b003
+				FROM books c
+				WHERE 1=1
+				<include refid="booksSearch"/>
+				ORDER BY c.book_no
+			) a
+		) b
+		<![CDATA[
+			WHERE b.rnum >= #{startRow} and b.rnum <= #{endRow}
+		]]>
+	</select>
+	
+	<!-- 도서 정보 리스트 -->
+	<select id="booksList" parameterType="string" resultType="map">
+		SELECT book_no
+			 , book_title
+			 , book_content
+			 , book_cover
+			 , book_spmt_ymd
+			 , book_author
+			 , pub_nm
+			 , book_talt
+			 , book_margin
+			 , book_mileage
+			 , ccg_b001
+			 , ccg_b002
+			 , ccg_b003
+		FROM books
+		WHERE book_no = #{book_no}
+	</select>
+	
+	<!-- 도서 상세 정보 -->
+	<select id="booksInfo" parameterType="mngBooksVO" resultType="mngBooksVO">
+		SELECT a.book_no
+			 , a.book_title
+			 , a.book_content
+			 , a.book_cover
+			 , a.book_spmt_ymd
+			 , a.book_author
+			 , a.pub_nm
+			 , a.book_talt
+			 , a.book_margin
+			 , a.book_mileage
+			 , a.ccg_b001
+			 , a.ccg_b002
+			 , a.ccg_b003
+			 , b.book_no
+			 , b.book_page_cnt
+			 , b.book_amt
+			 , b.book_discount
+			 , b.book_ntsl_amt
+			 , b.book_isbn
+		FROM books a
+			 <if test="ccg_b001 == '종이책'">
+			 	INNER JOIN paper_book b ON a.book_no = b.book_no
+			 </if>
+			 <if test="ccg_b001 == 'E북'">
+			 	INNER JOIN ebook b ON a.book_no = b.book_no
+			 </if>
+		WHERE a.book_no = #{book_no}
+	</select>
+	
+	<!-- 도서 정보 수정 -->
+	<update id="booksUpdate" parameterType="mngBooksVO">
+		UPDATE books
+		SET
+			book_title = #{book_title}
+			 , book_content = #{book_content}
+			 , book_cover = #{book_cover}
+			 , book_spmt_ymd = #{book_spmt_ymd}
+			 , book_author = #{book_author}
+			 , pub_nm = #{pub_nm}
+			 , book_talt = #{book_talt}
+			 , book_margin = #{book_margin}
+			 , book_mileage = #{book_mileage}
+			 , ccg_b001 = #{ccg_b001}
+			 , ccg_b002 = #{ccg_b002}
+			 , ccg_b003 = #{ccg_b003}
+		WHERE book_no = #{book_no}
+	</update>
+	
+	<!-- 종이책 수정 -->
+	<update id="paperBookUpdate" parameterType="mngBooksVO">
+		UPDATE paper_book
+		SET
+			book_page_cnt = #{book_page_cnt}
+			 , book_amt = #{book_amt}
+			 , book_discount = #{book_discount}
+			 , book_ntsl_amt = #{book_ntsl_amt}
+			 , book_isbn = #{book_isbn}
+		WHERE book_no = #{book_no}
+	</update>
+	
+	<!-- E북 수정 -->
+	<update id="ebookUpdate" parameterType="mngBooksVO">
+		UPDATE ebook
+		SET
+			book_page_cnt = #{book_page_cnt}
+			 , book_amt = #{book_amt}
+			 , book_discount = #{book_discount}
+			 , book_ntsl_amt = #{book_ntsl_amt}
+			 , book_isbn = #{book_isbn}
+		WHERE book_no = #{book_no}
+	</update>
+	
+	<!-- 도서 정보 삭제 -->
+	<delete id="booksDelete" parameterType="mngBooksVO">
+		DELETE 
+		FROM books
+		WHERE book_no = #{book_no}
+	</delete>
+	
+	<!-- 종이책 삭제 -->
+	<delete id="paperBookDelete" parameterType="mngBooksVO">
+		DELETE 
+		FROM paper_book
+		WHERE book_no = #{book_no}
+	</delete>
+	
+	<!-- E북 삭제 -->
+	<delete id="ebookDelete" parameterType="mngBooksVO">
+		DELETE 
+		FROM ebook
+		WHERE book_no = #{book_no}
+	</delete>
+	
+</mapper>

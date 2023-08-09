@@ -1,0 +1,20 @@
+package kr.or.ddit.controller.kmw.harubooks;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+
+@Controller
+@RequestMapping("/harubooks")
+public class HaruBooksController {
+	
+	@GetMapping("/")
+	public String firstPage() {
+		return "bookstore/harufirst";
+	}
+	
+	@GetMapping("/main")
+	public String mainPage() {
+		return "bookstore/home/home";
+	}
+}

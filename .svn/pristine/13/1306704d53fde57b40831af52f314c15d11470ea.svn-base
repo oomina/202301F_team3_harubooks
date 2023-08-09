@@ -1,0 +1,106 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+<!-- content wrapper -->
+<div class="content-wrapper" style="padding : 10px;">
+	<div class="row" style=" padding : 10px;">
+		<div class="col-lg-12 grid-margin stretch-card">
+			<div class="card">
+				<div class="card-body">
+					<div class="card-title-wrapper">
+						<h4 class="card-title" style="font-size:1.25rem; font-family: 'orbit', sans-serif;">발주서 조회</h4>
+						
+					</div>
+					<div style="display : flex; border : 1px solid black; box-shadow: 2px 2px 3px rgba(0, 0, 0, 0.08);">
+						<div class="table-responsive col-9" >
+							<table border="1">
+								<tr>
+									<th>발급 기간</th>
+								</tr>
+								<tr>
+									<td>시작일자 : <input type="date" id="startDay" value="" max="today"> ~ 종료일자 : <input type="date" id="endDay" value=""></td>
+								</tr>
+							</table>
+						</div>
+						<div class="col-3" style=" margin-right: 10px; margin-bottom: 18px">
+							<button type="button" class="btn btn-outline-success mr-2" id="downBtn">검색</button>
+							<button type="button" class="btn btn-outline-danger mr-2" id="resetBtn">초기화</button>
+						</div>
+					</div>
+					<div style="height : 50px;"></div>
+					<div class="card-title-wrapper">
+						<h4 class="card-title" style="font-size:1.25rem; font-family: 'orbit', sans-serif;">발주서 목록</h4>
+						<div style="float:left;">
+							<p class="card-description">
+								전체 <code id="total"></code>건
+							</p>
+						</div>
+					</div>
+					<div style="border : 1px solid black; clear : both;" >
+						<div class="col-md-12">
+							<div style="display : grid; grid-template-columns: repeat(auto-fit,minmax(150px, auto)); margin-left: 20px;">
+								<div class="card poFile mr-2" style="width : 150px; height : auto; border : 1px solid black; text-align : center;">
+									<img src="/resources/mng/images/icon-excel.png" alt="" style="width : 100px; height : 100px; margin : 0 auto;">
+									<p><a>파일 이름 => 다운</a></p>
+								</div>
+								<div class="card poFile mr-2" style="width : 150px; height : auto; border : 1px solid black; text-align : center;">
+								
+								</div>
+								<div class="card poFile mr-2" style="width : 150px; height : auto; border : 1px solid black; text-align : center;">
+								
+								</div>
+								<div class="card poFile mr-2" style="width : 150px; height : auto; border : 1px solid black; text-align : center;">
+								
+								</div>
+								<div class="card poFile mr-2" style="width : 150px; height : auto; border : 1px solid black; text-align : center;">
+								
+								</div>
+								<div class="card poFile mr-2" style="width : 150px; height : auto; border : 1px solid black; text-align : center;">
+								
+								</div>
+								<div class="card poFile mr-2" style="width : 150px; height : auto; border : 1px solid black; text-align : center;">
+								
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div id="pagingArea" style="margin-bottom: 20px; z-index : 0;"></div>
+				<div>
+					<div class="row" style="float:right; margin-right: 30px; margin-bottom: 18px">
+						<button type="button" class="btn btn-outline-primary mr-2" id="downBtn">출력</button>
+					</div>
+					
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<script>
+const startDay = document.querySelector("#startDay");
+const endDay = document.querySelector("#endDay");
+
+$(function(){
+	fpoFileList();
+	
+	// 발급 기간 출력
+	let today = new Date();
+	today = today.toISOString().slice(0, 10);
+	startDay.value= today;
+	endDay.value = today;
+	startDay.setAttribute("max", today);
+	endDay.setAttribute("max", today);
+});
+
+
+// 파일 리스트 가져오기
+function fpoFileList(){
+	$.ajax({
+		url : "/pub/remain/poFileList",
+		type : "get",
+		success : function(res){
+			console.log(res);
+		}
+	
+	});
+}
+</script>

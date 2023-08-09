@@ -1,0 +1,23 @@
+package kr.or.ddit.mapper.bmk;
+
+import java.util.List;
+
+import org.apache.ibatis.annotations.Mapper;
+
+import kr.or.ddit.vo.FileVO;
+import kr.or.ddit.vo.bmk.BoardVO;
+
+@Mapper
+public interface HarustroyMapper {
+
+	public List<BoardVO> boardList(BoardVO vo);
+
+	public int storyInsert(BoardVO boardVO);
+
+	public BoardVO boardOne(int board_no);
+
+	public BoardVO boardOne(String board_no);
+
+	public int storyUpdate(BoardVO boardVO);
+	
+}

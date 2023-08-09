@@ -1,0 +1,16 @@
+package kr.or.ddit.mapper.kmw;
+
+import java.util.List;
+
+import kr.or.ddit.vo.kmw.BookInfoVO;
+import kr.or.ddit.vo.kmw.PaginationVO;
+
+public interface BookMapper {
+
+	List<BookInfoVO> bookInfo(BookInfoVO vo);
+
+	int bookCount(PaginationVO<BookInfoVO> pagingVO);
+
+	List<BookInfoVO> selectBookList(PaginationVO<BookInfoVO> pagingVO);
+
+}

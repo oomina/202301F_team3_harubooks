@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+<mapper namespace="kr.or.ddit.mapper.ljy.NoticeMapper">
+	
+	<!-- 공지 목록 조회 -->
+	<select id="noticeList" resultType="noticeVO">
+		SELECT
+			notice_no
+			, notice_title
+			, notice_content
+			, notice_writer_ymd
+			, notice_mdfcn_ymd
+			, notice_inq_cnt
+			, ua_no
+		FROM 
+			notice
+		ORDER BY 
+			notice_no desc
+	</select>
+	<!-- 공지 상세 조회 -->
+	<select id="noticeOne" parameterType="String" resultType="noticeVO">
+		SELECT
+			notice_no
+			, notice_title
+			, notice_content
+			, notice_writer_ymd
+			, notice_mdfcn_ymd
+			, notice_inq_cnt
+			, ua_no
+		FROM 
+			notice
+		WHERE
+			notice_no = #{notice_no}
+	</select>
+	
+	<!-- 공지 등록 -->
+	<insert id="noticeInsert" parameterType="noticeVO">
+		<selectKey keyProperty="notice_no" resultType="String" order="BEFORE">
+			select 'NO' || LPAD(seq_no.nextval, 10, '0') from dual
+		</selectKey>
+		INSERT INTO notice(
+			notice_no
+			, notice_title
+			, notice_content
+			, notice_writer_ymd
+			, notice_mdfcn_ymd
+			, notice_inq_cnt
+			, ua_no
+		)
+		VALUES (
+			#{notice_no}
+			, #{notice_title}
+			, #{notice_content}
+			, TO_CHAR(sysdate, 'YYYY/MM/DD')
+			, 0
+			, 0
+			, #{ua_no} 
+			
+		)
+	</insert>
+	<!-- 공지 수정 -->
+	<update id="noticeUpdate" parameterType="noticeVO">
+		UPDATE 
+		    notice
+		SET 
+		    notice_title = #{notice_title},
+		    notice_content= #{notice_content},
+		    notice_mdfcn_ymd = TO_CHAR(sysdate, 'YYYY/MM/DD'),
+		    ua_no = #{ua_no}
+		WHERE
+		    notice_no = #{notice_no}
+	</update>
+	
+	<!-- 조회수 증가 -->
+	<update id="incrementHit" parameterType="String">
+		UPDATE 
+		    notice
+		SET 
+		    notice_inq_cnt = notice_inq_cnt + 1
+		WHERE
+		    notice_no = #{notice_no}
+	</update>
+	<delete id="noticeDelete" parameterType="String">
+		DELETE 
+		FROM 
+			notice
+		WHERE 
+			notice_no = #{notice_no}
+	</delete>
+	
+	<!-- 공지사항 페이징 -->
+	<select id="noticeListPaging" resultType="noticeVO" parameterType="int">
+		SELECT notice_no, notice_title, notice_content, notice_writer_ymd, notice_mdfcn_ymd, notice_inq_cnt, ua_no
+		FROM (
+		  SELECT notice_no, notice_title, notice_content, notice_writer_ymd, notice_mdfcn_ymd, notice_inq_cnt, ua_no,
+		         ROW_NUMBER() OVER (ORDER BY notice_no DESC) as row_num
+		  FROM notice
+		) notice_with_row_number
+		<![CDATA[
+		WHERE row_num <= (#{curPage} - 1) * 10 + 10 AND row_num > (#{curPage} - 1) * 10
+		]]>
+	</select>
+	
+	<!-- 공지사항 개수 -->
+	<select id="noticeCnt" resultType="int">
+		select count(*)
+		from notice
+	</select>
+</mapper>

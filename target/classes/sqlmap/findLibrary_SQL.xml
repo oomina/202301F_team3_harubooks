@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+ <mapper namespace="kr.or.ddit.mapper.bmk.FindLibraryMapper">
+ 	
+ 	<select id="getAddress" parameterType="string" resultType="findLibraryVO">
+ 		select 
+ 			  mbr_addr
+ 			, mbr_daddr
+    	from 
+    		member
+    	where 
+    		ae_id = #{ae_id}
+ 	</select>
+ 	
+ 	<select id="getAllLibraryInfo" resultType="findLibraryVO">
+ 		select 
+		      lib_no
+		    , lib_nm
+		    , lib_ctgry
+		    , lib_tcbiz
+		    , lib_start_time
+		    , lib_end_time
+		    , lib_seat
+		    , lib_data
+		    , lib_loan_cnt
+		    , lib_addr
+		    , lib_call
+		    , lib_lat
+		    , lib_lot
+		from
+		    library
+ 	</select>
+ 	
+ 	<select id="getLibraryInfo" parameterType="string" resultType="findLibraryVO">
+ 		select 
+		      lib_no
+		    , lib_nm
+		    , lib_ctgry
+		    , lib_tcbiz
+		    , lib_start_time
+		    , lib_end_time
+		    , lib_seat
+		    , lib_data
+		    , lib_loan_cnt
+		    , lib_addr
+		    , lib_call
+		    , lib_lat
+		    , lib_lot
+		from
+		    library
+		where
+			lib_nm = #{lib_nm}
+ 	</select>
+ </mapper>

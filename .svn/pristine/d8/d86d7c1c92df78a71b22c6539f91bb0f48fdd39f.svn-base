@@ -1,0 +1,103 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+ <div class="sidebar">
+        <div id="logo-box">
+            <a href="#" class="logo">
+                <img src="/resources/asset/image/logo1.png">
+            </a>
+            <span id="title-1">독서인의 쉼터</span><span id="title-2">하루터</span>
+            
+        </div>
+        
+        <!--프로필 이미지-->
+        <div class="profile">
+            <div class="profile-img">
+                <img src="/resources/asset/image/profile.jpg">
+            </div>
+            <div class="name">
+                <h1>haruBooks</h1> 
+                <i class="ri-checkbox-circle-line"></i>
+            </div>
+            <span>@harubooks</span>
+        </div>
+        <div class="about">
+            <!--box1-->
+            <div class="box">
+                <h3>54</h3>
+                <span>게시물</span>
+            </div>
+            <!--box2-->
+            <div class="box">
+                <h3>15</h3>
+                <span>팔로우</span>
+            </div>
+            <!--box3-->
+            <div class="box">
+                <h3>14</h3>
+                <span>팔로워</span>
+            </div>
+        </div>
+        <!--메뉴바-->
+        <div class="menu">
+            <a href="#" class="active">
+                <span class="icon">
+                    <i class="ri-function-line"></i>
+                </span>
+                하루스토리
+            </a>
+            <a href="#">
+                <span class="icon">
+                    <i class="ri-search-line"></i>
+                </span>
+                검색
+            </a>
+            <a href="#">
+                <span class="icon">
+                    <i class="ri-notification-4-line"></i>
+                </span>
+                알람
+            </a>
+            <a href="#">
+                <span class="icon">
+                    <i class="ri-message-2-line"></i>
+                </span>
+                메시지
+            </a>
+            <a href="#">
+                <span class="icon">
+                    <i class="ri-clipboard-line"></i>
+                </span>
+                자유 게시판
+            </a>
+            <a href="#">
+                <span class="icon">
+                    <i class="ri-send-plane-line"></i>
+                </span>
+                홍보 게시판
+            </a>
+            <a href="#">
+                <span class="icon">
+                    <i class="ri-book-line"></i>
+                </span>
+                독서 토론방
+            </a>
+            <a href="#">
+                <span class="icon">
+                    <i class="ri-service-line"></i>
+                </span>
+                작가와의 만남
+            </a>
+            <a href="#">
+                <span class="icon">
+                    <i class="ri-account-pin-box-line"></i>
+                </span>
+                나의 정보
+            </a>
+            <a href="#">
+                <span class="icon">
+                    <i class="ri-logout-box-r-line"></i>
+                </span>
+                로그아웃
+            </a>
+        </div>
+    </div>

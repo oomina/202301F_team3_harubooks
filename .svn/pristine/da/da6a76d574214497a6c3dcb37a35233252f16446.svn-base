@@ -1,0 +1,21 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+<div id="sidebar">
+	<div class="profile">
+           <div class="profile-img">
+               <img src="/resources/asset/image/profile.jpg">
+           </div>
+           <div class="name">
+               <h1>배루키님 환영합니다!</h1>
+          </div>
+          <span>beluki@naver.com</span>
+          <div id="side-btns">
+           <a href="#">
+	           <div class="side-btn">로그아웃</div>        
+           </a>
+           <a href="#">
+	           <div class="side-btn">정보수정</div>        
+           </a>
+          </div>
+     </div>
+</div>

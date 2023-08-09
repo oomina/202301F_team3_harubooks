@@ -1,0 +1,263 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+<div class="content-wrapper">
+	<div class="row" style="padding: 20px;">
+		<div class="col-lg-12 grid-margin stretch-card">
+			<div class="card">
+				<div class="card-body">
+					<h4 class="card-title">판매 관리</h4>
+					<div class="row">
+						<div class="col-md-12 grid-margin stretch-card">
+							<div class="card position-relative">
+								<div class="card-body">
+									<div id="detailedReports" class="carousel slide detailed-report-carousel position-static pt-2" data-ride="carousel">
+										<div class="carousel-inner">
+											<div class="carousel-item active">
+												<div class="row">
+													<div class="col-md-12 col-xl-2 d-flex flex-column justify-content-start">
+														<div class="ml-xl-4 mt-3">
+															<p class="card-title">매출액</p>
+															<h2 class="text-primary">Best 5</h2>
+															<h4 class="font-weight-500 mb-xl-4 text-primary">출판사</h4>
+														</div>  
+													</div>
+													<div class="col-md-12 col-xl-10">
+														<div class="row">
+															<div class="col-md-6 mt-3">
+																<div id="" style="width: 400px; height: 400px;">
+																	<canvas id="myChart1" width="300" height="300"></canvas>
+																</div>
+															</div>
+															<div class="col-md-6 mt-3">
+																<div id="" style="width: 400px; height: 400px;">
+																	<canvas id="myChart2" width="300" height="300"></canvas>
+																</div>
+															</div>
+														</div>
+													</div>
+												</div>
+											</div>
+											<div class="carousel-item">
+												<div class="row">
+													<div class="col-md-12 col-xl-2 d-flex flex-column justify-content-start">
+														<div class="ml-xl-4 mt-3">
+															<p class="card-title">판매량</p>
+															<h2 class="text-primary">Best 5</h2>
+															<h4 class="font-weight-500 mb-xl-4 text-primary">도서</h4>
+														</div>  
+													</div>
+													<div class="col-md-12 col-xl-10">
+														<div class="row">
+															<div class="col-md-6 mt-3">
+																<div id="" style="width: 400px; height: 400px;">
+																	<canvas id="myChart3" width="300" height="300"></canvas>
+																</div>
+															</div>
+															<div class="col-md-6 mt-3">
+																<div id="" style="width: 400px; height: 400px;">
+																	<canvas id="myChart4" width="300" height="300"></canvas>
+																</div>
+															</div>
+														</div>
+													</div>
+												</div>
+											</div>
+										</div>
+										<a class="carousel-control-prev" href="#detailedReports" role="button" data-slide="prev">
+											<span class="carousel-control-prev-icon" aria-hidden="true"></span>
+											<span class="sr-only">Previous</span>
+										</a>
+										<a class="carousel-control-next" href="#detailedReports" role="button" data-slide="next">
+											<span class="carousel-control-next-icon" aria-hidden="true"></span>
+											<span class="sr-only">Next</span>
+										</a>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="col-lg-12">
+						<div class="row dropdown" style="float:right; margin-bottom: 5px;">
+							<select style="width: 100px; border: 1px solid lightgray;">
+								<option value="book">도서명</option>
+								<option value="pub">출판사</option>
+							</select>
+							<ul class="navbar-nav mr-lg-2">
+								<li class="nav-item nav-search d-none d-lg-block">
+									<div class="input-group">
+										<input type="text" class="form-control" id="navbar-search-input" placeholder="검색" aria-label="search" aria-describedby="search"/>
+										<div class="input-group-prepend hover-cursor" id="navbar-search-icon">
+											<span class="input-group-text" id="search">
+												<i class="icon-search"></i>
+											</span>
+										</div>
+									</div>
+								</li>
+							</ul>
+						</div>
+					</div>
+					<p class="card-description">전체 <code>1024</code>건</p>
+					<div class="table-responsive">
+						<table class="table table-hover">
+							<thead>
+								<tr class="table-primary">
+									<th>번호</th>
+									<th>주문번호</th>
+									<th>주문일자</th>
+									<th>도서명</th>
+									<th>출판사</th>
+									<th>매출액</th>
+									<th>판매량</th>
+								</tr>
+							</thead>
+							<tbody>
+							</tbody>
+						</table>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@3.7.1/dist/chart.min.js"></script>
+<script type="text/javascript">
+window.onload = function(){
+	$.ajax({
+		type : "get",
+		url : "sales/salesList",
+		data : "",
+		contentType : "application/json; charset=utf-8",
+		success : function(result){
+			console.log("result : " + result);
+			console.log(JSON.stringify(result));
+			var html = "";
+			for (var i = 0; i < result.length; i++) {
+				console.log(result[i].BOOK_TITLE);
+				html += "<tr>"
+				html += "<td>"+ (i+1) +"</td>"
+				html += "<td>"+ result[i].ORDER_NO +"</td>"
+				html += "<td>"+ result[i].ORDER_YMD +"</td>"
+				html += "<td>"+ result[i].BOOK_TITLE +"</td>"
+				html += "<td>"+ result[i].PUB_NM +"</td>"
+				html += "<td>"+ result[i].PL_PRCHS_AMT +"</td>"
+				html += "<td>"+ result[i].PL_CNT +"</td>"
+				html += "</tr>"
+			}
+			$("table tbody").append(html);
+			
+			const ctx1 = document.getElementById('myChart1').getContext('2d');
+			const myChart1 = new Chart(ctx1, {
+				type: 'doughnut',
+				data: {
+					labels: ['메리골드 마음 세탁소', '마당이 있는 집', '불편한 편의점', '죽고 싶지만 떡볶이는 먹고 싶어', '아버지의 해방일지'],
+					datasets: [{
+						label: '# of Votes',
+						data: [100, 200, 500, 320, 160],
+						backgroundColor: [
+							'rgba(255, 99, 132, 0.2)',
+							'rgba(54, 162, 235, 0.2)',
+							'rgba(255, 206, 86, 0.2)',
+							'rgba(75, 192, 192, 0.2)',
+							'rgba(153, 102, 255, 0.2)',
+							'rgba(255, 159, 64, 0.2)'
+						],
+						borderColor: [
+							'rgba(255, 99, 132, 1)',
+							'rgba(54, 162, 235, 1)',
+							'rgba(255, 206, 86, 1)',
+							'rgba(75, 192, 192, 1)',
+							'rgba(153, 102, 255, 1)',
+							'rgba(255, 159, 64, 1)'
+						],
+						borderWidth: 1
+					}]
+				},
+			});
+		}
+	});
+}
+const ctx2 = document.getElementById('myChart2').getContext('2d');
+const myChart2 = new Chart(ctx2, {
+	type: 'bar',
+	data: {
+		labels: ['1월', '2월', '3월', '4월', '5월', '6월', '7월', '8월', '9월', '10월', '11월', '12월'],
+		datasets: [{
+			label: '매출액',
+			data: [500000, 600000, 350000, 490000, 700000, 648000, 600000, 350000, 490000, 700000, 648000],
+			backgroundColor: [
+				'rgba(255, 99, 132, 0.2)',
+				'rgba(54, 162, 235, 0.2)',
+				'rgba(255, 206, 86, 0.2)',
+				'rgba(75, 192, 192, 0.2)',
+				'rgba(153, 102, 255, 0.2)',
+				'rgba(255, 159, 64, 0.2)'
+			],
+			borderColor: [
+				'rgba(255, 99, 132, 1)',
+				'rgba(54, 162, 235, 1)',
+				'rgba(255, 206, 86, 1)',
+				'rgba(75, 192, 192, 1)',
+				'rgba(153, 102, 255, 1)',
+				'rgba(255, 159, 64, 1)'
+			],
+			borderWidth: 1
+		}]
+	},
+});
+const ctx3 = document.getElementById('myChart3').getContext('2d');
+const myChart3 = new Chart(ctx3, {
+	type: 'doughnut',
+	data: {
+		labels: ['메리골드 마음 세탁소', '마당이 있는 집', '불편한 편의점', '죽고 싶지만 떡볶이는 먹고 싶어', '아버지의 해방일지'],
+		datasets: [{
+			label: '# of Votes',
+			data: [100, 200, 500, 320, 160],
+			backgroundColor: [
+				'rgba(255, 99, 132, 0.2)',
+				'rgba(54, 162, 235, 0.2)',
+				'rgba(255, 206, 86, 0.2)',
+				'rgba(75, 192, 192, 0.2)',
+				'rgba(153, 102, 255, 0.2)',
+				'rgba(255, 159, 64, 0.2)'
+			],
+			borderColor: [
+				'rgba(255, 99, 132, 1)',
+				'rgba(54, 162, 235, 1)',
+				'rgba(255, 206, 86, 1)',
+				'rgba(75, 192, 192, 1)',
+				'rgba(153, 102, 255, 1)',
+				'rgba(255, 159, 64, 1)'
+			],
+			borderWidth: 1
+		}]
+	},
+});
+const ctx4 = document.getElementById('myChart4').getContext('2d');
+const myChart4 = new Chart(ctx4, {
+	type: 'bar',
+	data: {
+		labels: ['1월', '2월', '3월', '4월', '5월', '6월', '7월', '8월', '9월', '10월', '11월', '12월'],
+		datasets: [{
+			label: '판매량',
+			data: [100, 200, 500, 370, 850, 630, 509, 370, 850, 630, 509],
+			backgroundColor: [
+				'rgba(255, 99, 132, 0.2)',
+				'rgba(54, 162, 235, 0.2)',
+				'rgba(255, 206, 86, 0.2)',
+				'rgba(75, 192, 192, 0.2)',
+				'rgba(153, 102, 255, 0.2)',
+				'rgba(255, 159, 64, 0.2)'
+			],
+			borderColor: [
+				'rgba(255, 99, 132, 1)',
+				'rgba(54, 162, 235, 1)',
+				'rgba(255, 206, 86, 1)',
+				'rgba(75, 192, 192, 1)',
+				'rgba(153, 102, 255, 1)',
+				'rgba(255, 159, 64, 1)'
+			],
+			borderWidth: 1
+		}]
+	},
+});
+</script>

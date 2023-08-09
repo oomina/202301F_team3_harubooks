@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+ <mapper namespace="kr.or.ddit.mapper.kmw.RefundMapper">
+ 	<insert id="insertRefund" parameterType="refundVO">
+ 		insert into refund_request
+ 		(order_no,book_no,ae_id,rr_actno, rr_ymd, rr_content, ua_no, rr_bank, ccg_i001)
+ 		values (#{order_no},#{book_no},#{ae_id},#{rr_actno},sysdate,#{rr_content},#{ua_no},#{rr_bank},'대기')
+ 	</insert>
+ 	
+ 	<select id="refundOne" parameterType="refundVO" resultType="refundVO">
+ 		select order_no, book_no, ae_id, rr_actno, rr_ymd, rr_content, ua_no, rr_bank, ccg_i001
+		from refund_request
+		where order_no = #{order_no} and book_no = #{book_no}
+ 	</select>
+ 	
+ 	<!-- 환불내용의 사진 가져오기 -->
+ 	<select id="refundImg" parameterType="String" resultType="fileVO">
+ 		select *
+		from unity_atchmnfl
+		where ua_no = #{ua_no}
+ 	</select>
+ </mapper>

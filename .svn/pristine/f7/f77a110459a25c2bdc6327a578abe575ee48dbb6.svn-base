@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+<mapper namespace="kr.or.ddit.mapper.ljy.NoticeMapper">
+	<!-- noticeList 조회 -->
+	<select id="noticeList" resultType="noticeVO">
+		SELECT
+			notice_no
+			, notice_title
+			, notice_content
+			, notice_writer_ymd
+			, notice_mdfcn_ymd
+			, notice_inq_cnt
+			, ua_no
+		FROM 
+			notice
+	</select>
+	
+	<select id="noticeOne" parameterType="String" resultType="noticeVO">
+		SELECT
+			notice_no
+			, notice_title
+			, notice_content
+			, notice_writer_ymd
+			, notice_mdfcn_ymd
+			, notice_inq_cnt
+			, ua_no
+		FROM 
+			notice
+		WHERE
+			notice_no = #{notice_no}
+	</select>
+	
+	<insert id="noticeInsert" parameterType="noticeVO">
+		<selectKey keyProperty="notice_no" resultType="int" order="BEFORE">
+			select seq_no.nextval from dual
+		</selectKey>
+		INSERT INTO notice(
+			notice_no
+			, notice_title
+			, notice_content
+			, notice_writer_ymd
+			, notice_mdfcn_ymd
+			, notice_inq_cnt
+			, ua_no
+		)
+		VALUES (
+			#{notice_no}
+			, #{notice_title}
+			, #{notice_content}
+			, sysdate
+			, 0
+			, 0
+			, 0 <!-- 파일 올릴 때... 바뀔 부분 -->
+		)
+	</insert>
+</mapper>

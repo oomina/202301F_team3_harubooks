@@ -1,0 +1,194 @@
+package kr.or.ddit.controller.ljy.mng;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.List;
+
+import javax.annotation.Resource;
+
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.multipart.MultipartFile;
+
+import kr.or.ddit.controller.file.UploadFileUtils;
+import kr.or.ddit.service.FileService;
+import kr.or.ddit.service.ljy.InquiryService;
+import kr.or.ddit.service.ljy.NoticeService;
+import kr.or.ddit.vo.FileVO;
+import kr.or.ddit.vo.ljy.InquiryVO;
+import kr.or.ddit.vo.ljy.NoticeVO;
+import lombok.extern.slf4j.Slf4j;
+
+@Controller
+@RequestMapping("/mng/board")
+@Slf4j
+public class BoardRestController {
+	
+	// 첨부 파일 저장 경로 - root-context.xml에 설정
+	@Resource(name="uploadFiles")
+	private String uploadPath;
+	
+	@Autowired
+	private NoticeService noticeService;
+	@Autowired
+	private InquiryService inquiryService;
+	@Autowired
+	private FileService fileService;
+	
+	// 공지 리스트 notice list
+	@ResponseBody
+	@GetMapping(value="/notice", produces = "application/json;charset=utf-8")
+	public List<NoticeVO> noticeList(){
+		log.debug("noticeList controller 도착");
+		return noticeService.noticeList();
+	}
+	
+	// 공지 1개 조회
+	@ResponseBody
+	@GetMapping(value = "/notice/{no_no}", produces = "application/json;charset=utf-8")
+	public NoticeVO noticeOne(@PathVariable("no_no") String notice_no) {
+		return noticeService.noticeOne(notice_no);
+	}
+	
+	// 첨부파일 리스트 가져오기
+	@ResponseBody
+	@GetMapping(value = "/notice/fileList/{ua_no}", produces = "application/json;charset=utf-8")
+	public List<FileVO> fileList(@PathVariable("ua_no") String ua_no){
+		return fileService.fileList(ua_no);
+	}
+	
+	// 공지사항 등록(비동기로 파일 업로드) 1개 업로드
+	@ResponseBody
+	@PostMapping(value="/notice", produces = "text/plain; charset=utf-8")
+	public String noticeInsert(NoticeVO noticeVO) throws IOException {
+		log.info("noticeInsert controller 도착");
+
+		String uploadrslt = "";
+		if(noticeVO.getNotice_file() != null) {
+			MultipartFile nFile = noticeVO.getNotice_file();
+			log.info("file.name" + nFile.getOriginalFilename());	// 파일 이름
+			String uploadedFileName = UploadFileUtils.uploadFile(uploadPath, nFile.getOriginalFilename(), nFile.getBytes());
+			String savedName = uploadedFileName.substring(uploadedFileName.lastIndexOf("/") + 1) ;
+			log.info("savedName" + savedName);	// 저장 이름 : uuid_파일 이름
+			log.info("uploadedFileName : " + uploadedFileName);	// 저장 경로 + 저장 이름 : /unityUpload/files/10f82e57-018c-4eb2-a884-1349792f2d4e_406호 최종프로젝트 일정.jpg
+			log.info("uploadPath : " + uploadPath);
+			String destPath = uploadedFileName;   
+			log.info("destPath : " + destPath);
+			String fileType = nFile.getOriginalFilename().substring(nFile.getOriginalFilename().lastIndexOf(".") + 1);// 확장자
+			log.info("fileType : " + fileType);                   
+			nFile.transferTo(new File(destPath));
+			log.info(FilenameUtils.getExtension(nFile.getOriginalFilename()));	// 확장자 추출하는 방법
+			log.info("파일 복사 성공");
+			// 파일 업로드
+			FileVO fileVO = new FileVO();
+			fileVO.setUa_sn("1");
+			fileVO.setUa_type("NOTICE");
+			fileVO.setUa_path(destPath);
+			fileVO.setUa_nm(nFile.getOriginalFilename());
+			fileVO.setUa_stre_nm(savedName);
+			fileVO.setUa_file_type(fileType);
+			fileVO.setUa_size(nFile.getSize());
+			fileVO.setUa_regist_id("yolo");	// 나중에 등록자 id로 바꿀 부분
+			int cnt = fileService.fileInsert(fileVO);
+			
+			if(cnt > 0) {// 파일 등록 성공
+				noticeVO.setUa_no(fileVO.getUa_no());
+			} 
+		} else {// 파일 없을 때
+			noticeVO.setUa_no("0");
+		}
+		
+		// 공지사항 등록
+		int rslt = noticeService.noticeInsert(noticeVO);
+		if (rslt > 0) {
+			uploadrslt = noticeVO.getNotice_no();
+		} else {
+			uploadrslt = "fail";
+		}
+		return uploadrslt;
+	}
+
+	// 공지사항 수정
+	@ResponseBody
+	@PutMapping(value="/notice", produces = "text/plain; charset=utf-8")
+	public String noticeUpdate(NoticeVO newNoticeVO) throws IOException {
+		log.info("noticeupdate 컨트롤러 넘어옴");
+		NoticeVO updateNoticeVO = noticeService.noticeOne(newNoticeVO.getNotice_no());
+		updateNoticeVO.setNotice_title(newNoticeVO.getNotice_title());
+		updateNoticeVO.setNotice_content(newNoticeVO.getNotice_content());
+		
+		// 수정한 파일 업로드
+		if(newNoticeVO.getNotice_file() != null) {
+			MultipartFile nFile = newNoticeVO.getNotice_file();
+			String uploadedFileName = UploadFileUtils.uploadFile(uploadPath, nFile.getOriginalFilename(), nFile.getBytes());
+			String savedName = uploadedFileName.substring(uploadedFileName.lastIndexOf("/") + 1) ;
+			String destPath = uploadedFileName;
+			String fileType = nFile.getOriginalFilename().substring(nFile.getOriginalFilename().lastIndexOf(".") + 1);// 확장자
+			nFile.transferTo(new File(destPath));
+			
+			FileVO fileVO = new FileVO();
+			fileVO.setUa_sn("1");
+			fileVO.setUa_type("NOTICE");
+			fileVO.setUa_path(destPath);
+			fileVO.setUa_nm(nFile.getOriginalFilename());
+			fileVO.setUa_stre_nm(savedName);
+			fileVO.setUa_file_type(fileType);
+			fileVO.setUa_size(nFile.getSize());
+			fileVO.setUa_regist_id("yolo");	// 나중에 등록자 id로 바꿀 부분
+			int cnt = fileService.fileInsert(fileVO);
+			if(cnt > 0) {// 파일 등록 성공
+				updateNoticeVO.setUa_no(fileVO.getUa_no());
+			}
+		} 
+		
+		int cnt = noticeService.noticeUpdate(updateNoticeVO);
+		String updaterslt = "";
+		if(cnt > 0) {
+			updaterslt = updateNoticeVO.getNotice_no();
+		} else {
+			updaterslt = "fail";
+		}
+		return updaterslt;
+	}
+
+	
+	// 문의 리스트 inquiry list
+	@ResponseBody
+	@GetMapping(value = "/inquiry", produces = "application/json;charset=utf-8")
+	public List<InquiryVO> inquiryList(){
+		log.debug("inquiryList controller 도착");
+		return inquiryService.inquiryList();
+	}
+	
+	// 문의 1개 조회
+	@ResponseBody
+	@GetMapping(value = "/inquiry/{inq_no}", produces = "application/json;charset=utf-8")
+	public InquiryVO inquiryOne(@PathVariable("inq_no") String inquiry_no){
+		log.debug("inquiryOne controller 도착");
+		return inquiryService.inquiryOne(inquiry_no);
+	}
+	
+	// 문의 댓글 등록
+	@ResponseBody
+	@PostMapping(value = "/inquiry/rep")
+	public String inqRepInsert(@RequestBody InquiryVO inquiryVO) {
+		log.debug("inqRepInsert controller 도착");
+		int cnt = inquiryService.inqRepUpdate(inquiryVO);
+		String rslt = "";
+		if(cnt > 0) {
+			rslt = "success";
+		} else {
+			rslt = "fail";
+		}
+		return rslt;
+	}
+}

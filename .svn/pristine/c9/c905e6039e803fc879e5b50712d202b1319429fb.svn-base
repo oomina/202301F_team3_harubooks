@@ -1,0 +1,9 @@
+package kr.or.ddit.service.bmk;
+
+import kr.or.ddit.vo.bmk.FindLibraryVO;
+
+public interface IFindLibraryService {
+
+	public FindLibraryVO getAddress(String ae_id);
+
+}

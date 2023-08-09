@@ -1,0 +1,31 @@
+package kr.or.ddit.mapper.jhs;
+
+import java.util.List;
+
+import org.apache.ibatis.annotations.Mapper;
+
+import kr.or.ddit.vo.jhs.Com_MemberVO;
+import kr.or.ddit.vo.jhs.Ebook_ManagerVO;
+import kr.or.ddit.vo.jhs.Ebook_PageVO;
+
+@Mapper
+public interface MyLibraryMapper {
+
+	public List<Ebook_ManagerVO> getEbookList(Ebook_PageVO<Ebook_ManagerVO> evo);
+
+	public Ebook_ManagerVO getEbookDetailList(String book_no);
+
+	public int selectEbookListCount(Ebook_PageVO<Ebook_ManagerVO> evo);
+
+	public int selectAllRecord(String id);
+
+	public Com_MemberVO callComMember(String id);
+
+	public Ebook_ManagerVO getEbookManager(Ebook_ManagerVO vo);
+
+	public int updateReadPage(Ebook_ManagerVO vo);
+
+	public int insertBookRecode(Ebook_ManagerVO vo);
+
+	public List<Integer> getEbookRecode(Ebook_ManagerVO evo);
+}

@@ -1,0 +1,145 @@
+package kr.or.ddit.service.jhs;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.List;
+import java.util.UUID;
+
+import javax.annotation.Resource;
+import javax.inject.Inject;
+import javax.servlet.http.HttpServletRequest;
+
+import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+
+import kr.or.ddit.mapper.jhs.MyLibraryMapper;
+import kr.or.ddit.vo.jhs.Com_MemberVO;
+import kr.or.ddit.vo.jhs.Ebook_ManagerVO;
+import kr.or.ddit.vo.jhs.Ebook_MemoVO;
+import kr.or.ddit.vo.jhs.Ebook_PageVO;
+import kr.or.ddit.vo.jhs.Ebook_RecodeVO;
+
+@Service	
+public class MyLibraryServiceImpl implements IMyLibraryService {
+	
+	@Resource(name="uploadImg")
+	private String uploadImg;
+	
+	@Inject
+	private MyLibraryMapper mapper;
+	
+	@Override
+	public List<Ebook_ManagerVO> getEbookList(Ebook_PageVO<Ebook_ManagerVO> evo) {
+		List<Ebook_ManagerVO> vo = mapper.getEbookList(evo);
+	
+		return vo;
+	}
+
+	@Override
+	public int selectEbookListCount(Ebook_PageVO<Ebook_ManagerVO> evo) {
+		return mapper.selectEbookListCount(evo);
+	}
+
+	@Override
+	public int selectAllRecord(String id) {
+		return mapper.selectAllRecord(id);
+	}
+
+	@Override
+	public Com_MemberVO callComMember(String id) {
+		return mapper.callComMember(id);
+	}
+
+	@Override
+	public Ebook_ManagerVO getEbookManager(Ebook_ManagerVO vo) {
+		Ebook_ManagerVO evo = mapper.getEbookManager(vo);
+		mapper.updateReadYmd(vo);
+		return evo; 
+	}
+
+	@Override
+	public int updateReadPage(Ebook_ManagerVO vo) {
+		return mapper.updateReadPage(vo);
+	}
+
+	@Override
+	public int insertBookRecode(Ebook_ManagerVO vo) {
+		return mapper.insertBookRecode(vo);
+	}
+
+	@Override
+	public String checkBookRecode(Ebook_RecodeVO vo) {
+		return mapper.checkBookRecode(vo);
+	}
+
+	@Override
+	public int deleteBookRecode(Ebook_ManagerVO vo) {
+		return mapper.deleteBookRecode(vo);
+	}
+
+	@Override
+	public List<String> getBookMarkList(Ebook_RecodeVO vo) {
+		return mapper.getBookMarkList(vo);
+	}
+
+	@Override
+	public int insertOrUpdateEbookMemo(Ebook_MemoVO vo) {
+		String page = mapper.ebookMemoCheck(vo);
+		int result;
+		if(page!=null) {
+			result = mapper.ebookUpdate(vo);
+		}else {
+			result = mapper.ebookInsert(vo);
+		}
+		
+		return result;
+	}
+
+	@Override
+	public Ebook_MemoVO getEbookMemo(Ebook_MemoVO vo) {
+		return mapper.getEbookMemo(vo);
+	}
+
+	@Override
+	public String updateUser(HttpServletRequest req, Com_MemberVO vo) {
+		
+		String result = null;
+		String uploadPath = uploadImg;
+
+		File file = new File(uploadPath);
+		if(!file.exists()) {
+			file.mkdirs();
+		}
+		if(vo.getImgFile()!=null) {
+			
+			String profileImg = "";
+			MultipartFile profileImgFile =vo.getImgFile();
+			
+			if(profileImgFile.getOriginalFilename() != null && !profileImgFile.getOriginalFilename().equals("")) {
+				String fileName = UUID.randomUUID().toString();
+				fileName += "_" + profileImgFile.getOriginalFilename();
+				uploadPath += "/" + fileName;
+				try {
+					profileImgFile.transferTo(new File(uploadPath));	// 파일 복사
+				} catch (IllegalStateException | IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}	// 파일 복사
+				profileImg =  fileName;
+			}
+			
+			vo.setMem_profile(profileImg);
+		}
+		
+		int status = mapper.updateUser(vo);
+		
+		if(status > 0) {
+			result = "OK";
+		}{
+			result = "FAIL";
+		}
+		
+		return result;
+	}
+	
+}

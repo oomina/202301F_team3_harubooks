@@ -1,0 +1,28 @@
+package kr.or.ddit.service.ljy.impl;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import kr.or.ddit.mapper.ljy.InquiryReplyMapper;
+import kr.or.ddit.service.ljy.InquiryReplyService;
+import kr.or.ddit.vo.ljy.InquiryReplyVO;
+
+@Service
+public class InquiryReplyServiceImpl implements InquiryReplyService {
+	
+	@Autowired
+	private InquiryReplyMapper inqRepMapper;
+	
+	@Override
+	public List<InquiryReplyVO> inqRepList() {
+		return inqRepMapper.inqRepList();
+	}
+
+	@Override
+	public int inqRepInsert(InquiryReplyVO inqRepVO) {
+		return inqRepMapper.inqRepInsert(inqRepVO);
+	}
+
+}

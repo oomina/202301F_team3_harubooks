@@ -1,0 +1,20 @@
+package kr.or.ddit.controller.jhs.myHaru;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+
+
+@Controller
+@RequestMapping("/myHaru")
+public class MyHaruCotroller {
+
+	// 하루피드 폼으로 이동
+//	@GetMapping("/myHaruMain")
+//	public String signinForm(Model model) {
+//		
+//		return "myHaru/myLibrary";
+//	}
+
+}

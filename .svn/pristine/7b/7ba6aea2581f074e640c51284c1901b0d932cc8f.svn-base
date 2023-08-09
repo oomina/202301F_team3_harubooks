@@ -1,0 +1,52 @@
+package kr.or.ddit.service.ljy;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import kr.or.ddit.mapper.ljy.PoMngMapper;
+import kr.or.ddit.mapper.ljy.RemainMngMapper;
+import kr.or.ddit.vo.ljy.PoMngVO;
+import kr.or.ddit.vo.ljy.RemainMngVO;
+import kr.or.ddit.vo.omn.MngPaginationInfoVO;
+
+@Service
+public class RemainMngServiceImpl implements RemainMngService {
+	
+	@Autowired
+	private RemainMngMapper remainMapper;
+	@Autowired
+	private PoMngMapper poMapper;
+	
+	@Override
+	public List<RemainMngVO> remainList(MngPaginationInfoVO<RemainMngVO> mngPaginationInfoVO) {
+		return remainMapper.remainList(mngPaginationInfoVO);
+	}
+
+	@Override
+	public int remainListCnt(MngPaginationInfoVO<RemainMngVO> mngPaginationInfoVO) {
+		return remainMapper.remainListCnt(mngPaginationInfoVO);
+	}
+
+	@Override
+	public int poOne(PoMngVO poMngVO) {
+		return poMapper.poOne(poMngVO);
+	}
+
+	@Override
+	public RemainMngVO remainOne(String book_no) {
+		return remainMapper.remainOne(book_no);
+	}
+
+	@Override
+	public int poListCnt(MngPaginationInfoVO<PoMngVO> mngPaginationInfoVO) {
+		return poMapper.poListCnt(mngPaginationInfoVO);
+	}
+
+	@Override
+	public List<PoMngVO> poList(MngPaginationInfoVO<PoMngVO> mngPaginationInfoVO) {
+		return poMapper.poList(mngPaginationInfoVO);
+	}
+
+}

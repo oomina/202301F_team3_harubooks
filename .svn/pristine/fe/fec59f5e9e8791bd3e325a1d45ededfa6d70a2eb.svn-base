@@ -1,0 +1,14 @@
+package kr.or.ddit.vo.jhs;
+
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
+
+@Getter
+@Setter
+@ToString
+public class Com_MemberVO {
+	private String ae_id;
+	private String mem_profile;
+	private String mem_nicknm;
+}

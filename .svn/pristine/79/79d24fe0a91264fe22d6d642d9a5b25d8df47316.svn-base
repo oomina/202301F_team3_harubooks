@@ -1,0 +1,431 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+ <mapper namespace="kr.or.ddit.mapper.jhs.ChattingMapper">
+ 
+  	<!-- 채팅방 타입 -->
+  	<sql id="chatType">
+		<if test="searchType != null and searchType == 'order-inq'">
+			order by c.cr_no
+		</if>
+		<if test="searchType != null and searchType == 'order-recent'">
+			order by c.cr_no desc
+		</if>
+	</sql>
+	
+	<!--  채팅방 검색 -->
+	<sql id="chatSearch">
+		<if test="searchWord != null and searchSelect == 'chatting_no'">
+			where  a.cr_no like '%${searchWord}%'
+		</if>
+		<if test="searchWord != null and searchSelect == 'chatting_title'">
+			where  a.cr_nm like '%${searchWord}%'
+		</if>
+	</sql>
+ 
+ 	<!-- 채팅방 리스트 가져오기 -->
+ 	<select id="getChatList" resultType="chatRoomVO" parameterType="chatRoomVO">
+		   select
+	 			  cr_no
+	 			, cr_estbl_ymd
+	 			, cr_last_actvtn_ymd
+	 			, cr_pw
+	 			, cr_nm
+	 			, cr_info
+				, cr_max_nope
+				, cr_nope
+				, cr_cntn_nope
+				, ccg_r003
+				, ae_id
+				, cr_temp_no
+			from (
+			    select
+			        c.*,
+			        row_number() over ( <include refid="chatType"/>) rnum
+			    from (
+			        select
+			 			  cr_no
+			 			, cr_estbl_ymd
+			 			, cr_last_actvtn_ymd
+			 			, cr_pw
+			 			, cr_nm
+			 			, cr_info
+						, cr_max_nope
+						, cr_nope
+						, cr_cntn_nope
+						, ccg_r003
+						, ae_id
+						, cr_temp_no
+			        from chat_room a
+
+			        <include refid="chatSearch"/>
+			    ) c
+			) d
+			<![CDATA[
+			where 
+				d.rnum >= (#{currentPage} * #{screenSize}) - (#{screenSize} - 1) and d.rnum <= (#{currentPage} * #{screenSize}) 	
+			]]>
+ 	</select>
+ 
+ 	<!-- 채팅방 하나 가져오기 -->
+ 	<select id="getChatOne" parameterType="chatRoomVO" resultType="chatRoomVO">
+ 		select
+			  cr_no
+ 			, cr_estbl_ymd
+ 			, cr_last_actvtn_ymd
+ 			, cr_pw
+ 			, cr_nm
+ 			, cr_info
+			, cr_max_nope
+			, cr_nope
+			, cr_cntn_nope
+			, ccg_r003
+			, ae_id
+			, cr_temp_no
+		from
+			chat_room
+		where
+			cr_no = #{cr_no}	
+ 	</select>
+ 
+ 	<!-- 채팅방 생성 -->
+ 	<insert id="insertChat" parameterType="chatRoomVO">
+ 	 	<selectKey keyProperty="cr_no" resultType="string" order="BEFORE"> 
+	 		select 'CR' || lpad(seq_cr.nextval, 10,'0') from dual
+	 	</selectKey>
+ 		insert into chat_room(
+ 			  cr_no
+ 			, cr_estbl_ymd
+ 			, cr_last_actvtn_ymd
+ 			, cr_pw
+ 			, cr_nm
+ 			, cr_info
+			, cr_max_nope
+			, cr_nope
+			, cr_cntn_nope
+			, ccg_r003
+			, ae_id
+			, cr_temp_no
+ 		)values(
+ 			  #{cr_no}
+ 			, sysdate
+ 			, '0'
+ 			, #{cr_pw}
+ 			, #{cr_nm}
+ 			, #{cr_info}
+ 			, #{cr_max_nope}
+ 			, 1
+ 			, 0
+ 			, #{ccg_r003}
+ 			, #{ae_id}
+ 			, seq_cr.currval
+ 		)
+ 	</insert>
+ 	
+ 	<!-- 채팅 멤버 방장 넣기 -->
+ 	<insert id="insertChatMem" parameterType="chatRoomVO">
+ 		insert into chat_mem(
+ 			  cr_no
+			, ae_id
+			, cn_cntn_yn
+			, cm_master_yn
+			, cm_out_yn
+			, cm_join_ymd
+		)values(
+			  #{cr_no}
+			, #{ae_id}
+			, 'N'
+			, 'Y'
+			, 'N'
+			, to_char(sysdate, 'yy/mm/dd hh24:mi:ss')
+		)	
+ 	</insert>
+ 	
+ 	<!-- 비밀번호 확인 -->
+ 	<select id="checkPw" parameterType="chatRoomVO" resultType="string">
+ 		select 
+		    cr_no
+		from
+		    chat_room
+		where
+		    cr_no = #{cr_no}
+		and
+		    cr_pw = #{cr_pw}
+ 	</select>
+ 	
+ 	<!-- 채팅방 사용자인지 확인 -->
+ 	<select id="checkUser" parameterType="chatRoomVO" resultType="chatMemVO">
+	 	select 
+		   cr_no
+		 , ae_id
+		 , cn_cntn_yn
+		 , cm_master_yn
+		 , cm_join_ymd
+		 , cm_out_yn
+		from
+		    chat_mem
+		where
+		    cr_no = #{cr_no}
+		and
+		    ae_id = #{ae_id}
+ 	</select>
+ 	
+ 	<!-- 채팅방에 사용자 넣기 -->
+ 	<insert id="chattingRoomIn" parameterType="chatRoomVO">
+ 		insert into chat_mem(
+ 			  cr_no
+			, ae_id
+			, cn_cntn_yn
+			, cm_master_yn
+			, cm_out_yn
+			, cm_join_ymd
+		) values(
+			  #{cr_no}
+			, #{ae_id}
+			, 'N'
+			, 'N'
+			, 'N'
+			, to_char(sysdate, 'yy/mm/dd hh24:mi:ss')
+		)
+ 	</insert>
+ 	
+ 	<!-- 현재 인원 수 증가 -->
+ 	<update id="addChatNope" parameterType="chatRoomVO">
+ 		update chat_room set
+ 			cr_nope = cr_nope + 1
+ 		where 
+ 			cr_no = #{cr_no}
+ 	</update>
+ 	
+ 	<!-- 채팅 사용자 정보 가져오기 -->
+ 	<select id="getChatMem" parameterType="chatMemVO" resultType="chatMemVO">
+ 		select
+ 			  a.cr_no
+ 			, a.ae_id
+ 			, a.cn_cntn_yn
+ 			, a.cm_master_yn
+ 			, a.cm_join_ymd
+ 			, a.cm_out_yn
+ 			, b.mem_profile
+ 			, b.mem_nicknm
+ 		from
+ 			chat_mem a, com_member b
+ 		where
+ 			a.ae_id = b.ae_id
+ 		and
+ 			a.cr_no = #{cr_no}
+ 		and 
+ 			a.ae_id = #{ae_id}
+ 	</select>
+ 	
+ 	<!-- 해당 모든 채팅방의 사용자 정보 가져오기 -->
+ 	<select id="getChatMemList" parameterType="chatMemVO" resultType="chatMemVO">
+ 		select
+ 			  a.cr_no
+ 			, a.ae_id
+ 			, a.cn_cntn_yn
+ 			, a.cm_master_yn
+ 			, a.cm_join_ymd
+ 			, a.cm_out_yn
+ 			, b.mem_profile
+ 			, b.mem_nicknm
+ 		from
+ 			chat_mem a, com_member b
+ 		where
+ 			a.ae_id = b.ae_id
+ 		and
+ 			a.cr_no = #{cr_no}
+ 		and
+ 			a.cm_out_yn = 'N'
+ 	</select>
+ 	
+ 	
+ 	<!-- 채팅 사용자 삭제 -->
+ 	<delete id="deleteChatMem" parameterType="chatRoomVO">
+		delete from
+			chat_mem
+		where
+			cr_no = #{cr_no}
+ 	</delete>
+ 	
+ 	<!-- 채팅방 삭제 -->
+  	<delete id="deleteChatRoom" parameterType="chatRoomVO">
+		delete from
+			chat_room
+		where
+			cr_no = #{cr_no}
+ 	</delete>
+ 	
+ 	<!-- 채팅 내용 삭제 -->
+  	<delete id="deleteChatting" parameterType="chatRoomVO">
+		delete from
+			chatting
+		where
+			cr_no = #{cr_no}
+ 	</delete>
+ 	
+ 	<!-- 채팅방 수정 -->
+ 	<update id="updateChatRoom" parameterType="chatRoomVO">
+ 	 	update chat_room set
+ 			  cr_nm = #{cr_nm}
+ 			, cr_info = #{cr_info}
+ 			, cr_pw = #{cr_pw}
+ 			, cr_max_nope = #{cr_max_nope}
+ 			, ccg_r003 = #{ccg_r003}
+ 		where 
+ 			cr_no = #{cr_no}	
+ 	</update>	
+ 	
+ 	<!-- 채팅 멤버 상태 변경 - 들어가기-->
+ 	<update id="updateChatMemState" parameterType="chatMemVO">
+ 		update chat_mem set
+ 			cn_cntn_yn = 'Y'
+ 		where 
+ 			cr_no = #{cr_no}
+ 		and
+ 			ae_id = #{ae_id}
+ 	</update>
+ 	
+ 	<!-- 채팅방 상태 변경 - 들어가기 -->
+ 	<update id="updateChatRoomState" parameterType="chatMemVO">
+ 		update chat_room set
+ 			cr_cntn_nope = cr_cntn_nope + 1
+ 		where 
+ 			cr_no = #{cr_no}
+ 	</update>
+ 	
+ 	<!-- 채팅 멤버 상태 변경 - 나가기 -->
+ 	<update id="updateChatMemStateDown" parameterType="chatMemVO">
+ 		update chat_mem set
+ 			cn_cntn_yn = 'N'
+ 		where 
+ 			cr_no = #{cr_no}
+ 		and
+ 			ae_id = #{ae_id}
+ 	</update>
+ 	
+ 	 <!-- 채팅방 상태 변경 - 나가기 -->
+ 	<update id="updateChatRoomStateDown" parameterType="chatMemVO">
+ 		update chat_room set
+ 			  cr_cntn_nope = cr_cntn_nope - 1
+ 			, cr_last_actvtn_ymd = sysdate
+ 		where 
+ 			cr_no = #{cr_no}
+ 	</update>
+ 	
+ 	<!-- 해당 채팅방의 500개의 최근 채팅 내용 가져오기 -->
+ 	<select id="getChatting" parameterType="string" resultType="chattingVO"> 	
+		select 
+		    chat_no
+		  , cr_no
+		  , ae_id
+		  , chat_message
+		  , chat_wrt_ymd
+		  , mem_nicknm
+		  , mem_profile
+		  , chat_type
+		  , chat_to
+		  , chat_current_time
+		from(
+		    select
+		    c.*,
+		    row_number() over (order by chat_no desc) rnum
+		from 
+		(
+		    select 
+		         chat_no
+		       , cr_no
+		       , ae_id
+		       , chat_message
+		       , chat_wrt_ymd
+		       , mem_nicknm
+		       , mem_profile
+		       , chat_type
+		       , chat_to
+		       , chat_current_time
+		    from
+		        chatting
+		    where
+		        cr_no = #{cr_no}
+		) c
+		)d
+		where 
+		<![CDATA[
+		    d.rnum >= 1 and d.rnum <= 500
+		]]> 
+ 	</select>
+ 	
+ 	
+ 	<!--  채팅 내용 저장 -->
+ 	<insert id="insertChatInfo" parameterType="chatMemVO">
+ 	 	<selectKey keyProperty="chat_no" resultType="string" order="BEFORE"> 
+	 		select 'CH' || lpad(seq_ch.nextval, 10,'0') from dual
+	 	</selectKey>
+ 	 	insert into chatting(
+			  chat_no
+			, cr_no
+			, ae_id
+	 		, chat_message
+			, chat_wrt_ymd
+			, mem_nicknm
+			, mem_profile
+			, chat_type
+			, chat_to
+			, chat_current_time
+		) values(
+			  #{chat_no}
+			, #{cr_no}
+			, #{ae_id}
+	 		, #{chat_message}
+			, to_char(sysdate, 'yy/mm/dd hh24:mi:ss')
+			, #{mem_nicknm}
+			, #{mem_profile}
+			, #{chat_type}
+			, #{chat_to}
+			, #{chat_current_time}
+		)	
+ 	</insert>
+ 	
+ 	<!-- 사용자 강퇴 및 강퇴한 사용자를 파악하여 또 못들어오게 한다 -->
+ 	<update id="outUser" parameterType="chatMemVO">
+ 		update chat_mem set
+ 			cm_out_yn = 'Y'
+ 		where 
+ 			cr_no = #{cr_no}
+ 		and
+ 			ae_id = #{ae_id}
+ 	</update>
+
+	<!-- 방의 현재 인원 수를 줄인다 -->
+ 	<update id="outRoom" parameterType="chatMemVO">
+ 		update chat_room set
+ 			cr_nope = cr_nope - 1
+ 		where 
+ 			cr_no = #{cr_no} 	
+ 	</update>
+
+ 	<!-- 채팅방에 나간 사용자의 채팅 내용이 사라진다 -->
+ 	<delete id="deleteUserChatting" parameterType="chatMemVO">
+ 		delete from
+			chatting
+		where
+			cr_no = #{cr_no}
+		and
+			ae_id = #{ae_id}
+ 	</delete>
+ 	
+ 	<!-- 채팅방에 나가면 해당 멤버가 채팅 멤버에서 사라진다. -->
+ 	<delete id="deleteUser" parameterType="chatMemVO">
+ 		delete from
+			chat_mem
+		where
+			cr_no = #{cr_no}
+		and
+			ae_id = #{ae_id}
+ 	</delete>
+ 	
+ 	
+ 	
+ </mapper>

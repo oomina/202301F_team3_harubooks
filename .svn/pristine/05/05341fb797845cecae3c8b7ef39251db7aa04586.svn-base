@@ -1,0 +1,199 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core"  prefix="c"%>
+<%@ taglib uri="http://www.springframework.org/security/tags" prefix="sec" %>
+<!DOCTYPE html>
+<html>
+<link rel="stylesheet" href="/resources/assets/css/bookDetail.css">
+                <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+                    integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw=="
+					crossorigin="anonymous" referrerpolicy="no-referrer" />
+                <link href="https://cdn.jsdelivr.net/npm/remixicon@2.2.0/fonts/remixicon.css" rel="stylesheet">
+				<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<head>
+<meta charset="UTF-8">
+<meta name="_csrf_header" id="_csrf_header" content="${_csrf.headerName}">
+<meta name="_csrf" id="_csrf" content="${_csrf.token }"/>
+<title>찜 목록 페이지</title> 
+<style>
+#result{
+	display:inline;
+}
+</style>
+</head>
+<body>
+<h1> 찜 목록 </h1>
+<input type="checkbox" id="allCheck" name="allCheck" onclick="selectAll(this)"/> 찜한 상품<div id="result"></div>
+<input type="button" value="선택삭제" onclick="deleteValue();">
+<input type="button" value="장바구니추가" onclick="insertValue()">
+
+<div>
+<div class="tab-content" id="pills-tabContent">
+       <div class="tab-pane fade show active" id="pills-one-example1" role="tabpanel" aria-labelledby="pills-one-example1-tab">
+           <!-- Mockup Block -->
+           <ul class="products list-unstyled row no-gutters row-cols-2 row-cols-lg-3 row-cols-wd-4 border-top border-left mb-6">
+			<c:set value="${wishList }" var="wishList"/>
+			<c:choose>
+				<c:when test="${empty wishList }">
+			<tr>
+				<td colspan="5">찜한 상품이 존재하지 않습니다.</td>
+			</tr>
+				</c:when>
+			
+				<c:otherwise>
+					<c:forEach items="${wishList }" var="wish">
+   					   <li class="product col">
+                       <div class="product__inner overflow-hidden p-3 p-md-4d875">
+                           <div class="woocommerce-LoopProduct-link woocommerce-loop-product__link d-block position-relative">
+					<div class="woocommerce-loop-product__thumbnail">
+			                                                <a href="/harubooks/detailBook?bookNo=${wish.book_no }&ccg_b002=${pagingVO.ccg_b002 }" class="d-block"><img src="${wish.book_cover }" class="img-fluid d-block mx-auto attachment-shop_catalog size-shop_catalog wp-post-image img-fluid" alt="image-description"></a>
+			                                            </div>
+					<div class="woocommerce-loop-product__body product__body pt-3 bg-white">
+		                                                <div class="text-uppercase font-size-1 mb-1 text-truncate"><a href="/harubooks/detailBook?bookNo=${wish.book_no }&ccg_b002=${pagingVO.ccg_b002 }">${wish.ccg_b001 }</a></div>		                                                
+		                                                <h6>${wish.ccg_b003 }</h6>                                                	                                               
+	                                                <h2 class="woo commerce-loop-product__ti tle product__title h6 text-lh-md mb-1 text-height-2 crop-text-2 h-dark"><a href="/harubooks/detailBook?bookNo=${wish.book_no }&ccg_b002=${pagingVO.ccg_b002 }">${wish.book_title }</a></h2>
+                                                <div class="font-size-2  mb-1 text-truncate"><a href="/harubooks/detailBook?bookNo=${wish.book_no }&ccg_b002=${pagingVO.ccg_b002 }" class="text-gray-700">${wish.book_author }</a></div>
+                                               <div class="price d-flex align-items-center font-weight-medium font-size-3">
+                                              <span class="woocommerce-Price-amount amount"><span class="woocommerce-Price-currencySymbol"></span>${wish.book_amt }원</span>
+                                           </div>
+  				                     <form action="/wish/delete?bookNo=${wish.book_no }" id="wishBtn" method="post">
+										<button type="submit" id="delwishBtn" class="h-p-bg btn btn-outline-primary border-0">
+											<i class="flaticon-heart"></i>
+										</button>
+							
+										<input type="checkbox" name="book" id="book" value="${wish.book_no}" onclick="getCheckedCnt()"/>
+													
+										<input type="hidden" name="book_no" value="${wish.book_no}" id="bookNo"/>
+										<input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}">
+										<input type="hidden" name="ae_id" value="${userId}" id="secId">
+										<input type="hidden" name="book_ntsl_amt" value="${wish.book_ntsl_amt}" id="price"/> <!-- 페이퍼북/amt 원 -->
+										<input type="hidden" name="book_cover" value="${wish.book_cover }" id="cover"/> <!-- 북스/bookcover -->
+										<input type="hidden" name="quantity" value="${wish.cartVO.cart_cnt}" id="cnt"/> <!-- 수량. cartVO.cart_cnt-->
+									  <sec:csrfInput/>
+										</form>
+										<div></div>
+                                        </div>
+                                     </div>
+                                   </div> 
+                                   
+                                  </li>
+							</c:forEach>
+						</c:otherwise>
+					</c:choose>
+				</ul>
+			</div>
+		</div>
+</div>
+<script>
+function selectAll(selectAll) {
+	  const checkboxes = document.querySelectorAll('input[name="book"]');
+	  
+	  checkboxes.forEach(function(checkbox) {
+	    checkbox.checked = selectAll.checked;
+	  });
+	  
+	  getCheckedCnt(); // 선택된 체크박스의 개수 업데이트
+	}
+
+	function getCheckedCnt() {
+	  const checkboxes = document.querySelectorAll('input[name="book"]');
+	  const checkbox = document.querySelector('input[name="book"]');
+	  const selectedElements = document.querySelectorAll('input[name="book"]:checked');
+	  const selectedElementsCnt = selectedElements.length;
+	  const resultElement = document.getElementById('result');
+	  
+	  // console.log(checkbox);
+	  
+	  resultElement.innerText = selectedElementsCnt + ' / ' + checkboxes.length;
+	} 
+
+	// 페이지가 로드될 때 getCheckedCnt() 함수 호출
+	window.addEventListener('DOMContentLoaded', getCheckedCnt);
+	
+	
+	var delwishBtn = document.querySelectorAll("#delwishBtn");
+	var wishBtn = document.querySelector("#wishBtn");
+	var delBtn = document.querySelector("#delBtn");
+    
+	
+	delwishBtn.forEach(function(btn) {
+	  btn.addEventListener('click', function(event) {
+	    console.log("버튼 : " + btn);
+	    if (confirm("정말로 찜을 취소하시겠습니까?")) {
+	      alert("찜이 취소되었습니다.");
+	      wishBtn.submit();
+	    } else {
+	      event.preventDefault();
+	      alert("찜이 취소되지 않았습니다.");
+	    }
+	  });
+	});
+
+	$(function() {
+	  var chkObj = document.getElementsByName("book");
+	  var rowCnt = chkObj.length;
+
+	  $("input[name='allCheck']").click(function() {
+	    var chk_listArr = $("input[name='book']");
+	    for (var i = 0; i < chk_listArr.length; i++) {
+	      chk_listArr[i].checked = this.checked;
+	    }
+	  });
+
+	  $("input[name='book']").click(function() {
+	    if ($("input[name='book']:checked").length == rowCnt) {
+	      $("input[name='allCheck']")[0].checked = true;
+	    } else {
+	      $("input[name='allCheck']")[0].checked = false;
+	    }
+	  });
+	});
+	
+
+	function deleteValue() {
+		  var url = "/wish/delete2";
+		  var valueArr = new Array();
+		  var token = $("meta[name='_csrf']").attr("content");
+		  var header = $("meta[name='_csrf_header']").attr("content");
+		  let secId = document.querySelector('#secId').value;
+		  var list = $("input[name='book']");
+		 	for(var i = 0; i < list.length; i++){
+		 		if(list[i].checked){
+		 			valueArr.push(list[i].value);
+		 		}
+		 	}
+
+		  if (valueArr.length === 0) {
+		    alert("선택된 글이 없습니다.");
+		  } else {
+		    var chk = confirm("정말 삭제하시겠습니까?");
+		    if (chk) {
+		      $.ajax({
+		        url: url,
+		        type: 'POST',
+		        traditional: true,
+		        data: {
+		          valueArr: valueArr,
+		          "ae_id" : secId
+		        },
+		        beforeSend : function(xhr){
+		        	xhr.setRequestHeader(header, token);
+		        },
+		        success: function(jdata) {
+		          if (jdata = 1) {
+		            alert("삭제 성공");
+		            location.replace("/wish/list");
+		          } else {
+		            alert("삭제 실패");
+		          }
+		        },
+		        error: function() {
+		          alert("오류 발생");
+		        }
+		      });
+		    }
+		  }
+		}
+</script>
+</body>
+</html>

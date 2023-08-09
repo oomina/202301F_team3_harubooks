@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+ <mapper namespace="kr.or.ddit.mapper.odh.wishListMapper">
+ 	
+ 	<select id="selectWishList" parameterType="String" resultType="bookVO">
+ 		select
+ 		   c.book_no,
+ 		   c.ae_id,
+ 		   a.book_cover,
+	       a.ccg_b001,
+	       a.ccg_b002,
+	       a.ccg_b003,
+	       a.book_title,
+	       b.book_amt,
+	       b.book_ntsl_amt
+	 	from books a, paper_book b, book_wishlist c
+		   where c.ae_id = #{ae_id}
+		   and a.book_no = b.book_no
+		   and b.book_no = c.book_no
+ 	</select>
+ 	
+ 	<delete id="deleteList" parameterType="String">
+ 		delete from book_wishlist
+    	where book_no = #{book_no} and ae_id = #{ae_id}
+ 	</delete>
+ 	
+
+ </mapper>

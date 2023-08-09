@@ -1,0 +1,19 @@
+package kr.or.ddit.service.kmw;
+
+import javax.inject.Inject;
+
+import org.springframework.stereotype.Service;
+
+import kr.or.ddit.mapper.kmw.RefundMapper;
+import kr.or.ddit.vo.kmw.RefundVO;
+
+@Service
+public class RefundServiceImpl implements RefundService{
+	@Inject
+	private RefundMapper mapper;
+
+	@Override
+	public int insertRefund(RefundVO refundVO) {
+		return mapper.insertRefund(refundVO);
+	}
+}

@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+ <mapper namespace="kr.or.ddit.mapper.LoginMapper">
+ 	<!-- 아이디 채크  -->
+ 	<select id="idCheck" parameterType="String" resultType="int">
+ 		select count(*)
+		from member
+		where ae_id = #{ae_id}
+ 	</select>
+ 	
+ 	<!-- 
+ 		회원가입 로직
+ 		1. 전체사용자테이블 삽입
+ 		2. users테이블 삽입
+ 		3. 회원테이블 삽입
+ 		4. 사용자권한 테이블 삽입 
+ 		총 4테이블을 거쳐 회원가입을 한다.
+ 	 -->
+ 	 
+ 	 <!-- 1. 전체 사용자(ALL_EMPLYR) -->
+ 	 <insert id="insertAllEmplyr" parameterType="userVO">
+ 	 	insert into all_emplyr values (#{ae_id},#{ae_pw},1)
+ 	 </insert>
+ 	 
+ 	 <!-- 2. users테이블 삽입 -->
+ 	 <insert id="insertUsers" parameterType="userVO">
+ 	 	insert into users values (#{ae_id},'회원',#{user_nm})
+ 	 </insert>
+ 	 
+ 	 <!-- 회원테이블 삽입 -->
+ 	 <insert id="insertMember" parameterType="userVO">
+ 	 	insert into MEMBER values(
+ 	 			#{ae_id},0,#{mbr_email},#{mbr_addr},#{mbr_dAddr},#{mbr_zip},#{mbr_telNo},#{mbr_gender},#{mbr_brdt},'브론즈',#{user_nm})
+ 	 </insert>
+ 	 
+ 	 <!-- 사용자 권한 테이블 삽입 -->
+ 	 <insert id="insertAuthor" parameterType="String">
+ 	 	insert into author values(#{ae_id},'ROLE_MEMBER')
+ 	 </insert>
+ 	
+ 	 
+ 	 <!-- 로그인 구현 쿼리 -->
+ 	 
+ 	 <resultMap type="userVO" id="memberMap">
+ 	 	<id property="ae_id" column="ae_id"/>
+ 	 	<result property="ae_pw" column="ae_pw"/>
+ 	 	<result property="user_nm" column="user_nm"/>
+ 	 	<result property="mbr_gender" column="mbr_gender"/>
+ 	 	<result property="mbr_email" column="mbr_email"/>
+ 	 	<result property="mbr_telNo" column="mbr_telno"/>
+ 	 	<result property="mbr_zip" column="mbr_zip"/>
+ 	 	<result property="mbr_addr" column="mbr_addr"/>
+ 	 	<result property="mbr_dAddr" column="mbr_daddr"/>
+ 	 	<result property="rank_name" column="rank_name"/>
+ 	 	<result property="mbr_brdt" column="mbr_brdt"/>
+ 	 	<result property="enabled" column="enabled"/>
+ 	 	<collection property="authList" resultMap="authMap"/>
+ 	 </resultMap>
+ 	 
+ 	 <resultMap type="authVO" id="authMap">
+ 	 	<result property="ae_id" column="ae_id"/>
+ 	 	<result property="auth" column="auth"/>
+ 	 </resultMap>
+ 	 
+ 	 <select id="readByUserId" parameterType="String" resultMap="memberMap">
+ 	 	select
+    		m.ae_id, b.ae_pw, m.user_nm, m.mbr_gender, m.mbr_email,
+    		m.mbr_telno, m.mbr_zip, m.mbr_addr, m.mbr_daddr,
+    		m.rank_name, m.mbr_brdt, b.enabled, a.auth
+		from
+    		member m
+    		INNER JOIN all_emplyr b ON m.ae_id = b.ae_id
+    		INNER JOIN author a ON m.ae_id = a.ae_id
+		where m.ae_id = #{ae_id}
+ 	 </select>
+ 	 
+ 	 
+ 	 <!-- 유저 정보 가져오기 -->
+ 	 <select id="selectUser" parameterType="String" resultType="userVO">
+ 	 	select 
+    		ae_id,mbr_mileage,mbr_email,mbr_addr,mbr_daddr,mbr_zip,mbr_telno,mbr_gender,mbr_brdt,rank_name,user_nm
+		from member
+		where ae_id = #{ae_id}
+ 	 </select>
+ 	 
+ 	 <!-- 아이디 찾기 -->
+ 	 <select id="findId" parameterType="userVO" resultType="String">
+ 	 	select ae_id
+		from member
+		where user_nm = #{user_nm} and mbr_email = #{mbr_email}
+ 	 </select>
+ 	 
+ 	 <!-- 비밀번호 찾기 -->
+ 	 <select id="findPw" parameterType="userVO" resultType="int">
+ 	 	select count(*)
+		from member
+		where user_nm = #{user_nm} and mbr_email = #{mbr_email} and ae_id = #{ae_id}
+ 	 </select>
+ 	 
+ 	 <!-- 비밀번호 초기화시 권한 변경 -->
+ 	 <update id="resetRole" parameterType="String">
+ 	 	update author set auth = 'ROLE_TEMP'
+		where ae_id = #{ae_id}
+ 	 </update>
+ 	 <update id="resetTempRole" parameterType="String">
+ 	 	update author set auth = 'ROLE_MEMBER'
+		where ae_id = #{ae_id}
+ 	 </update>
+ 	 
+ 	 <!-- 임시비밀번호로 비밀번호 초기화 -->
+ 	 <update id="resetPw" parameterType="userVO">
+ 	 	update ALL_EMPLYR set ae_pw = #{ae_pw}
+		where ae_id = #{ae_id}
+ 	 </update>
+ </mapper>

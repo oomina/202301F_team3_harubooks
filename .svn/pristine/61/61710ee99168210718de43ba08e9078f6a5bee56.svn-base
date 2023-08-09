@@ -1,0 +1,282 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+	pageEncoding="UTF-8"%>
+<style>
+	* {margin:0;padding:0;}
+	.section input[id*="slide"] {display:none;}
+	.section .slidewrap {max-width:1200px;margin:0 auto;margin-top:2%}
+	.section .slidelist {white-space:nowrap;font-size:0;overflow:hidden;position:relative;width: 100%;}
+	.section .slidelist > li {display:inline-block;vertical-align:middle;width:100%;transition:all .5s;}
+	.section .slidelist > li > a {display:block;position:relative;}
+	.section .slidelist > li > a img {width:100%;}
+	.section .slidelist label {position:absolute;z-index:10;top:50%;transform:translateY(-50%);padding:50px;cursor:pointer;}
+	.section .slidelist .textbox {position:absolute;z-index:1;top:50%;left:50%;transform:translate(-50%,-50%);line-height:1.6;text-align:center;}
+	.section .slidelist .textbox h3 {font-size:36px;color:#fff;;transform:translateY(30px);transition:all .5s;}
+	.section .slidelist .textbox p {font-size:16px;color:#fff;opacity:0;transform:translateY(30px);transition:all .5s;}
+	
+	/* input에 체크되면 슬라이드 효과 */
+	.section input[id="slide01"]:checked ~ .slidewrap .slidelist > li {transform:translateX(0%);}
+	.section input[id="slide02"]:checked ~ .slidewrap .slidelist > li {transform:translateX(-100%);}
+	.section input[id="slide03"]:checked ~ .slidewrap .slidelist > li {transform:translateX(-200%);}
+
+	/* input에 체크되면 텍스트 효과 */
+	.section input[id="slide01"]:checked ~ .slidewrap li:nth-child(1) .textbox h3 {opacity:1;transform:translateY(0);transition-delay:.2s;}
+	.section input[id="slide01"]:checked ~ .slidewrap li:nth-child(1) .textbox p {opacity:1;transform:translateY(0);transition-delay:.4s;}
+	.section input[id="slide02"]:checked ~ .slidewrap li:nth-child(2) .textbox h3 {opacity:1;transform:translateY(0);transition-delay:.2s;}
+	.section input[id="slide02"]:checked ~ .slidewrap li:nth-child(2) .textbox p {opacity:1;transform:translateY(0);transition-delay:.4s;}
+	.section input[id="slide03"]:checked ~ .slidewrap li:nth-child(3) .textbox h3 {opacity:1;transform:translateY(0);transition-delay:.2s;}
+	.section input[id="slide03"]:checked ~ .slidewrap li:nth-child(3) .textbox p {opacity:1;transform:translateY(0);transition-delay:.4s;}
+
+	/* 좌,우 슬라이드 버튼 */
+	.slide-control > div {display:none;}
+	.section .left {left:-15px;background:url('/resources/asset/image/left.png') center center / 100% no-repeat;}
+	.section .right {right:-15px;background:url('/resources/asset/image/right.png') center center / 100% no-repeat;}
+	.section input[id="slide01"]:checked ~ .slidewrap .slide-control > div:nth-child(1) {display:block;}
+	.section input[id="slide02"]:checked ~ .slidewrap .slide-control > div:nth-child(2) {display:block;}
+	.section input[id="slide03"]:checked ~ .slidewrap .slide-control > div:nth-child(3) {display:block;}
+
+	/* 페이징 */
+	.slide-pagelist {text-align:center;padding:20px;}
+	.slide-pagelist > li {display:inline-block;vertical-align:middle;}
+	.slide-pagelist > li > label {display:block;padding:8px 30px;border-radius:30px;background:#ccc;margin:20px 10px;cursor:pointer;}
+	.section input[id="slide01"]:checked ~ .slidewrap .slide-pagelist > li:nth-child(1) > label {background:#999;}
+	.section input[id="slide02"]:checked ~ .slidewrap .slide-pagelist > li:nth-child(2) > label {background:#999;}
+	.section input[id="slide03"]:checked ~ .slidewrap .slide-pagelist > li:nth-child(3) > label {background:#999;}
+	
+img.slide{
+    height: 340px;
+    border-radius: 52px;
+}
+div#modal{
+  position: absolute;
+  top: 0;
+  left: 0;
+
+  width: 100%;
+  height: 100%;
+
+  display: none;
+  z-index: 100;
+  background-color: rgba(0, 0, 0, 0.7);
+}
+div#modal_body{
+	border: 40px solid #9cc188bf;
+    border-radius: 17px;
+    
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	
+	width: 90%;
+	height: 80%;
+	
+	background-color: rgb(255, 255, 255);
+	border-radius: 10px;
+	box-shadow: 0 2px 3px 0 rgba(34, 36, 38, 0.15);
+	
+	transform: translateX(-50%) translateY(-50%);
+}
+div#title_title{
+	background: #9cc188bf;
+	display: flex;
+	justify-content: space-between;
+}
+</style>	
+<div class="section">
+	<input type="radio" name="slide" id="slide01" checked>
+	<input type="radio" name="slide" id="slide02">
+	<input type="radio" name="slide" id="slide03">
+	<div class="slidewrap">
+		<ul class="slidelist">
+			<!-- 슬라이드 영역 -->
+			<li class="slideitem">
+				<a>
+					<div class="textbox">
+						<h3>첫번째 슬라이드</h3>
+						<p>첫번째 슬라이드 입니다.</p>
+					</div>
+					<img src="/resources/asset/image/post3.jpg" class="slide">
+				</a>
+			</li>
+			<li class="slideitem">
+				<a>
+					<div class="textbox">
+						<h3>두번째 슬라이드</h3>
+						<p>두번째 슬라이드 입니다.</p>
+					</div>
+					<img src="/resources/asset/image/post3.jpg" class="slide">
+				</a>
+			</li>
+			<li class="slideitem">
+				<a>
+					<div class="textbox">
+						<h3>세번째 슬라이드</h3>
+						<p>세번째 슬라이드 입니다.</p>
+					</div>
+					<img src="/resources/asset/image/post3.jpg" class="slide">
+				</a>
+			</li class="slideitem">
+
+			<!-- 좌,우 슬라이드 버튼 -->
+			<div class="slide-control">
+				<div>
+					<label for="slide03" class="left"></label>
+					<label for="slide02" class="right"></label>
+				</div>
+				<div>
+					<label for="slide01" class="left"></label>
+					<label for="slide03" class="right"></label>
+				</div>
+				<div>
+					<label for="slide02" class="left"></label>
+					<label for="slide01" class="right"></label>
+				</div>
+			</div>
+
+		</ul>
+		<!-- 페이징 -->
+		<ul class="slide-pagelist">
+			<li><label for="slide01"></label></li>
+			<li><label for="slide02"></label></li>
+			<li><label for="slide03"></label></li>
+		</ul>
+	</div>
+</div>
+
+
+	<%-- 메타버스 호출 --%>
+	<div id="modal">
+		<div id="modal_body">
+			<div id="title_title">
+				<div id="modal_title">
+					<h2>진현성 작가와의 만남</h2>
+				</div>
+				<div class="close_btn cancle" id="close_btn">X</div>
+			</div>
+			<div style="width:100%; height: 96.5%;" >
+		        <iframe src='https://www.vchatcloud.com/chat-demo/iframe/iframe_metaverse/type_2/index.html?channelKey=QQEZVzdIAT-AKniSxlCjl-20230721142103' allow="camera *;microphone *;display-capture *" frameborder='no' scrolling='no' marginwidth='0' marginheight='0' width='100%' height='100%'></iframe>
+		    </div>
+		</div>
+	</div>
+	<%-- 메타버스 호출  --%>
+	
+	
+	
+	<button type="button" id="openMetabus">오오오오픈</button>
+<div class="content-wrapper" style="padding : 10px;">
+	<div class="row" style=" padding : 10px;">
+		<div class="col-lg-12 grid-margin stretch-card" >
+			<div class="card">
+			    <div class="card-body">
+			        <div class="card-title-wrapper">
+					    <h4 class="card-title" style="font-size:1.25rem; font-family: 'Nunito', sans-serif;">작가와의 만남</h4>
+					    <p class="card-description">
+                			전체 <code>1024</code>건
+               			</p>	
+				    </div>
+				    <div class="table-responsive">
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th style="padding : 5px;">
+                                    	<ul class="nav nav-tabs">
+                                    		<li class="nav-item">
+										    	<a class="nav-link active" href="#" onclick="fprgevt()">진행중인 이벤트</a>
+										 	</li>
+										  	<li class="nav-item">
+										   		<a class="nav-link" href="#" onclick="fendevt()">종료된 이벤트</a>
+										  	</li>
+										</ul> 
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr id="prgevt">
+                                    <td>
+                                        <div style="display : flex;">
+                                            <div class="col-lg-2">
+                                                <img src="/resources/mng/images/harubookslogo1.png" alt="이미지" style="width:100px; height:100px; border-radius: 0%;"/>
+                                            </div>
+                                            <div class="col-lg-10">
+                                                <p>베르나르베르베르와 함께하는 랜선 팬사인회</p>
+                                                <p>작가 : 베르나르베르베르</p>
+                                                <p>일시 : 2023-07-07 19:00 ~ 20:00</p>
+                                                <p>참여인원 : 30명</p>
+                                                <p>한국인이 사랑하는 프랑스 작가와 팬사인회!!</p>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                            	<tr id="searchMeta">
+                            		<td>
+                           				<div class="col-lg-12">
+					                    	<div class="row dropdown" style="float:right;">
+                                                <select style="width: 100px; border: 1px solid #CED4DA;">
+                                                    <option value="year">년</option>
+                                                    <option value="month">월</option>
+                                                    <option value="title">이름</option>
+                                                </select>
+					                        	<ul class="navbar-nav mr-lg-2">
+										          <li class="nav-item nav-search d-none d-lg-block">
+										            <div class="input-group">
+										              <input type="text" class="form-control" id="navbar-search-input" placeholder="검색" aria-label="search" aria-describedby="search">
+										              <div class="input-group-prepend hover-cursor" id="navbar-search-icon">
+										                <span class="input-group-text" id="search">
+										                  <i class="icon-search"></i>
+										                </span>
+										              </div>
+										            </div>
+										          </li>
+										        </ul>
+					                      	</div>
+					                    </div>
+                            		</td>
+                            	</tr>
+                                <tr id="endevt">
+                                    <td>
+                                        <div style="display : flex;">
+                                            <div class="col-lg-2">
+                                                <img src="/resources/mng/images/harubookslogo1.png" alt="이미지" style="width:100px; height:100px; border-radius: 0%;"/>
+                                            </div>
+                                            <div class="col-lg-10">
+                                                <p>베르나르베르베르와 함께하는 랜선 팬사인회</p>
+                                                <p>작가 : 베르나르베르베르</p>
+                                                <p>일시 : 2023-07-07 19:00 ~ 20:00</p>
+                                                <p>참여인원 : 30명</p>
+                                                <p>한국인이 사랑하는 프랑스 작가와 팬사인회!!</p>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+	            </div>
+		    </div>
+	    </div>
+    </div>
+</div>
+<script type="text/javascript">
+document.addEventListener('DOMContentLoaded', function() {
+	
+	var modal = $("#modal");
+	var openBtn = $("#openMetabus");
+	var closeBtn = $("#close_btn");
+	
+	closeBtn.on('click', function () {
+		modalClose();
+	})
+	
+	openBtn.on('click', function () {
+		 modalOpen();
+	})
+	
+	function modalOpen() {
+		modal.css("display", "block");
+		document.body.style.overflowY = "hidden";
+	}
+	
+	function modalClose() {
+		modal.css("display", "none");
+	}
+});
+</script>

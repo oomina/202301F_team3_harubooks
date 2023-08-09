@@ -1,0 +1,263 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.or.ddit.mapper.kmw.OrderMapper">
+	<insert id="insertOrder" parameterType="orderVO">
+		insert into orders (order_no, ae_id, order_ymd, order_dmnd_nocs, ccg_o001,
+		order_mileage)
+		values ('OR'||LPAD(seq_or.nextval,10,'0'), #{ae_id}, TO_CHAR(sysdate,'YYYY/MM/DD'),
+		#{order_dmnd_nocs}, '카드',#{order_mileage})
+	</insert>
+	<insert id="insertPurchs" parameterType="orderVO">
+		insert into purchs_list (order_no, book_no, ae_id, pl_cnt,
+		pl_prchs_amt, book_ntsl_amt, pl_refund_yn,
+		pl_dcsn_yn,expected_mileage)
+		values ((select order_no
+		from (
+		select order_no
+		from orders
+		where ae_id = #{ae_id}
+		order by order_no desc
+		) where rownum = 1),
+		<if test="ccg_b001 == '종이책' and order_mileage == 0">
+			#{book_no},#{ae_id},#{pl_cnt},#{pl_prchs_amt},#{book_ntsl_amt},'환불미정','N',#{expected_mileage})
+		</if>
+		<if test="ccg_b001 == '종이책' and order_mileage != 0">
+			#{book_no},#{ae_id},#{pl_cnt},#{pl_prchs_amt},#{book_ntsl_amt},'환불불가','N',0)
+		</if>
+		<if test="ccg_b001 == 'E북' and order_mileage == 0">
+			#{book_no},#{ae_id},#{pl_cnt},#{pl_prchs_amt},#{book_ntsl_amt},'환불불가','Y',#{expected_mileage})
+		</if>
+		<if test="ccg_b001 == 'E북' and order_mileage != 0">
+			#{book_no},#{ae_id},#{pl_cnt},#{pl_prchs_amt},#{book_ntsl_amt},'환불불가','Y',0)
+		</if>
+	</insert>
+
+	<insert id="insertDelivery" parameterType="orderVO">
+		insert into delivery (order_no, ae_id, user_addr, user_daddr, user_zip,
+		user_telno, user_nm, delivery_end_ymd, ccg_d001,delivery_start_ymd)
+		values ((select order_no
+		from (
+		select order_no
+		from orders
+		where ae_id = #{ae_id}
+		order by order_no desc
+		) where rownum =1),#{ae_id},#{user_addr},#{user_daddr},#{user_zip},#{user_telno},#{user_nm},TO_CHAR(sysdate,'YYYY/MM/DD'),'배송준비',#{delivery_start_ymd})
+		
+	</insert>
+
+	<!-- 마일리지 사용 -->
+	<update id="spendMileage" parameterType="orderVO">
+		update member
+		set
+		mbr_mileage = mbr_mileage - #{order_mileage}
+		where ae_id = #{ae_id}
+	</update>
+
+	<!-- 구매 후 장바구니 목록 지우기 -->
+	<delete id="deleteCart" parameterType="String">
+		delete
+		from cart
+		where ae_id = #{ae_id}
+	</delete>
+
+	<!-- 구매 완료 후 구매 한 목록 보여주기 -->
+	<select id="orderCompleteList" parameterType="String"
+		resultType="orderVO">
+		select
+		a.order_no,a.book_no,a.pl_cnt,a.book_ntsl_amt,b.book_cover,b.book_title,b.ccg_b001
+		from purchs_list a, books b
+		where a.book_no = b.book_no
+		and ae_id = #{ae_id}
+		and order_no = (select order_no
+		from (
+		select order_no
+		from orders
+		where ae_id = #{ae_id}
+		order by order_no desc
+		) where rownum = 1)
+	</select>
+	
+	<!-- 배송완료되기 전 구매 목록 -->
+	<select id="preparedProd" parameterType="String" resultType="orderVO">
+		select pl.order_no,pl.book_no ,pl.pl_cnt,pl.book_ntsl_amt,b.book_cover,b.book_title,b.ccg_b001,d.ccg_d001
+		from purchs_list pl
+		join books b on pl.book_no = b.book_no
+		join delivery d on pl.order_no = d.order_no
+		where (d.ccg_d001 = '배송준비' or d.ccg_d001 = '배송중' or d.ccg_d001 = '-')
+		and pl.ae_id = #{ae_id}
+	</select>
+	
+	<!-- 배송완료된 후 구매확정 전인 목록 -->
+	<select id="completeDeliveryList" parameterType="String" resultType="orderVO">
+		select pl.order_no,pl.book_no,pl.expected_mileage ,pl.pl_refund_yn,pl.pl_cnt,pl.book_ntsl_amt,b.book_cover,b.book_title,b.ccg_b001,d.ccg_d001
+		from purchs_list pl
+		join books b on pl.book_no = b.book_no
+		join delivery d on pl.order_no = d.order_no
+		where d.ccg_d001 = '배송완료'
+        and pl.pl_dcsn_yn = 'N'
+        and (pl.pl_refund_yn = '환불미정' or pl.pl_refund_yn = '환불불가')
+		and pl.ae_id = #{ae_id}
+	</select>
+	
+	<!-- 배송준비 개수 -->
+	<select id="preparedDelivery" parameterType="String" resultType="int">
+		select count(*)
+		from delivery
+		where ae_id = #{ae_id}
+		and ccg_d001 = '배송준비'
+	</select>
+	
+	<!-- 배송중 개수 -->
+	<select id="DeliveringCnt" parameterType="String" resultType="int">
+		select count(*)
+		from delivery
+		where ae_id = #{ae_id}
+		and ccg_d001 = '배송중'
+	</select>
+	
+	<!-- 배송완료 개수 -->
+	<select id="finishDelivery" parameterType="String" resultType="int">
+		select count(*)
+		from delivery
+		where ae_id = #{ae_id}
+		and ccg_d001 = '배송완료'
+	</select>
+	
+	<!-- 환불 여부 개수 -->
+	<select id="refundCnt" parameterType="String" resultType="int">
+		select count(*)
+		from purchs_list
+		where ae_id = #{ae_id}
+		and (pl_refund_yn = '환불대기' or pl_refund_yn = '환불완료')
+	</select>
+	
+	<!-- 배송 목록 리스트 -->
+	<select id="deliveryList" resultType="orderVO">
+		select *
+		from delivery
+	</select>
+	
+	<!-- 시간에 따른 배송 상태 업데이트 -->
+	<update id="updateDeliveryStatus" parameterType="orderVO">
+		update delivery set ccg_d001 = #{ccg_d001}
+		where order_no = #{order_no}
+	</update>
+	
+	<!-- 구매확정시 구매확정여부 변경 -->
+	<update id="decisionPurchase" parameterType="orderVO">
+		update purchs_list set pl_dcsn_yn = 'Y', pl_refund_yn = '환불불가'
+		where book_no = #{book_no}
+		and order_no = #{order_no}
+	</update>
+	<!-- 구매 확정 후 마일리지 적립 -->
+	<update id="updateMileage" parameterType="orderVO">
+		update member 
+		set mbr_mileage = (mbr_mileage + #{expected_mileage}) 
+		where ae_id = #{ae_id}
+	</update>
+	
+	<!-- 구매 확정 후 책 재고 감소 쿼리 -->
+	<update id="decreaseCnt" parameterType="orderVO">
+		update books_manager
+		set bm_cnt = bm_cnt - #{pl_cnt}
+		where book_no = #{book_no}
+	</update>
+	
+	<!-- 환불 신청 후 환불 여부 상태 변환 -->
+	<update id="changeRefundState" parameterType="refundVO">
+		update purchs_list
+		set pl_refund_yn = '환불대기'
+		where order_no = #{order_no}
+		and book_no = #{book_no}
+	</update>
+	
+	<!-- 환불 대기/완료 리스트 -->
+	<select id="refundList" parameterType="String" resultType="orderVO">
+		select pl.order_no,pl.book_no,pl.expected_mileage ,pl.pl_refund_yn,pl.pl_cnt,pl.book_ntsl_amt,b.book_cover,b.book_title,b.ccg_b001,d.ccg_d001
+		from purchs_list pl
+		join books b on pl.book_no = b.book_no
+		join delivery d on pl.order_no = d.order_no
+		where (pl.pl_refund_yn = '환불대기' or pl.pl_refund_yn = '환불완료' or pl.pl_refund_yn = '환불거절')
+		and pl.ae_id = #{ae_id}
+	</select>
+	
+	<!-- 구매확정 리스트 -->
+	<select id="completeList" parameterType="String" resultType="orderVO">
+		select pl.order_no,pl.book_no,pl.expected_mileage ,pl.pl_refund_yn,pl.pl_cnt,pl.book_ntsl_amt,b.book_cover,b.book_title,b.ccg_b001,b.ccg_b002,b.ccg_b003,d.ccg_d001
+		from purchs_list pl
+		join books b on pl.book_no = b.book_no
+		join delivery d on pl.order_no = d.order_no
+		where pl.pl_dcsn_yn = 'Y'
+		and pl.ae_id = #{ae_id}
+	</select>
+	
+	<!-- 구매확정 리스트 -->
+	<select id="pagingComplete" parameterType="pagingExVO" resultType="orderVO">
+		SELECT *
+		FROM (
+		  SELECT pl.order_no
+		       , pl.book_no
+		       , pl.expected_mileage 
+		       , pl.pl_refund_yn
+		       , pl.pl_cnt
+		       , pl.book_ntsl_amt
+		       , b.book_cover
+		       , b.book_title
+		       , b.ccg_b001
+		       , b.ccg_b002
+		       , b.ccg_b003
+		       , d.ccg_d001
+		       , ROW_NUMBER() OVER (ORDER BY pl.order_no desc) AS row_num
+		  FROM purchs_list pl
+		  JOIN books b ON pl.book_no = b.book_no
+		  JOIN delivery d ON pl.order_no = d.order_no
+		  WHERE pl.pl_dcsn_yn = 'Y'
+		  AND pl.ae_id = #{ae_id}
+		) paginated
+		WHERE row_num BETWEEN #{startRow} AND #{endRow}
+		ORDER BY order_no DESC
+	</select>
+	
+	<!-- 구매 확정 리스트 개수 -->
+	<select id="completePurCnt" parameterType="String" resultType="int">
+		select count(*)
+		from purchs_list pl
+		where pl_dcsn_yn = 'Y'
+		and ae_id = #{ae_id}
+	</select>
+	
+	<!-- 환불리스트 개수 -->
+	<select id="refundListCnt" parameterType="String" resultType="int">
+		select count(*)
+		from refund_request
+		where ae_id = #{ae_id}
+	</select>
+	
+	<!-- 환불리슽 페이징 -->
+	<select id="pagingRefundList" parameterType="pagingExVO" resultType="orderVO">
+		select *
+		from (
+		    select pl.order_no
+		       ,pl.book_no
+		       ,pl.expected_mileage 
+		       ,pl.pl_refund_yn
+		       ,pl.pl_cnt
+		       ,pl.book_ntsl_amt
+		       ,b.book_cover
+		       ,b.book_title
+		       ,b.ccg_b001
+		       ,d.ccg_d001
+		       , ROW_NUMBER() OVER (ORDER BY pl.order_no desc) AS row_num
+		       from purchs_list pl
+		       join books b on pl.book_no = b.book_no
+		       join delivery d on pl.order_no = d.order_no
+		       where (pl.pl_refund_yn = '환불대기' or pl.pl_refund_yn = '환불완료' or pl.pl_refund_yn = '환불거절')
+		       and pl.ae_id = #{ae_id}
+		)paginated
+		WHERE row_num BETWEEN #{startRow} AND #{endRow}
+		ORDER BY order_no DESC
+	</select>
+</mapper>

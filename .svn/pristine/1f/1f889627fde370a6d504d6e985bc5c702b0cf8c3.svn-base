@@ -1,0 +1,210 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+<mapper namespace="kr.or.ddit.mapper.omn.books.MngBookRequestMapper">
+	<sql id="requestSearch">
+		<if test="searchType != null and searchType == 'title'">
+			and (nbr_nm like '%'||#{searchWord}||'%')
+		</if>
+		<if test="searchType != null and searchType == 'author'">
+			and (nbr_author like '%'||#{searchWord}||'%')
+		</if>
+		<if test="searchType != null and searchType == 'publisher'">
+			and (pub_nm like '%'||#{searchWord}||'%')
+		</if>
+	</sql>
+	
+	<select id="requestAllCount" parameterType="string" resultType="int">
+		SELECT count(nbr_no)
+		FROM new_book_request
+		WHERE 1=1
+	</select>
+	
+	<select id="requestCount" parameterType="mngPaginationInfoVO" resultType="int">
+		SELECT count(nbr_no)
+		FROM new_book_request
+		WHERE 1=1
+		<include refid="requestSearch"/>
+	</select>
+	
+	<!-- 도서 등록 요청 리스트 -->
+	<select id="selectRequestList" parameterType="mngPaginationInfoVO" resultType="newBookRequestVO">
+		SELECT b.nbr_no
+			 , b.ae_id
+			 , b.nbr_nm
+			 , b.nbr_content
+			 , b.nbr_cover
+			 , b.nbr_spmt_ymd
+			 , b.nbr_author
+			 , b.book_talt
+			 , b.nbr_ymd
+			 , b.pub_nm
+			 , b.book_page_cnt
+			 , b.book_amt
+			 , b.book_isbn
+			 , b.ccg_b001
+			 , b.ccg_b002
+			 , b.ccg_b003
+			 , b.ccg_r001
+			 , b.rnum
+		FROM(
+			SELECT
+				a.*, row_number() over (order by a.nbr_no DESC) rnum
+			FROM(
+				SELECT c.nbr_no
+					 , c.ae_id
+					 , c.nbr_nm
+					 , c.nbr_content
+					 , c.nbr_cover
+					 , c.nbr_spmt_ymd
+					 , c.nbr_author
+					 , c.book_talt
+					 , c.nbr_ymd
+					 , c.pub_nm
+					 , c.book_page_cnt
+					 , c.book_amt
+					 , c.book_isbn
+					 , c.ccg_b001
+					 , c.ccg_b002
+					 , c.ccg_b003
+					 , c.ccg_r001
+				FROM new_book_request c
+				WHERE 1=1
+				<include refid="requestSearch"/>
+				ORDER BY c.nbr_no
+			) a
+		) b
+		<![CDATA[
+			WHERE b.rnum >= #{startRow} and b.rnum <= #{endRow}
+		]]>
+	</select>
+	
+	<!-- 도서 등록 요청 리스트 -->
+	<select id="requestList" parameterType="string" resultType="newBookRequestVO">
+		SELECT nbr_no
+			 , ae_id
+			 , nbr_nm
+			 , nbr_content
+			 , nbr_cover
+			 , nbr_spmt_ymd
+			 , nbr_author
+			 , book_talt
+			 , nbr_ymd
+			 , pub_nm
+			 , book_page_cnt
+			 , book_amt
+			 , book_isbn
+			 , ccg_b001
+			 , ccg_b002
+			 , ccg_b003
+			 , ccg_r001
+		FROM new_book_request
+		WHERE nbr_no = #{nbr_no}
+		ORDER BY nbr_no DESC
+	</select>
+	
+	<!-- 도서 등록 -->
+	<insert id="booksInsert" parameterType="mngBooksVO">
+		<selectKey keyProperty="book_no" resultType="String" order="BEFORE">
+			select 'BK' || LPAD(seq_bk.nextval, 10, '0') from dual
+		</selectKey>
+		INSERT INTO books(
+			book_no
+		  , book_title
+		  , book_content
+		  , book_cover
+		  , book_spmt_ymd
+		  , book_author
+		  , pub_nm
+		  , book_talt
+		  , book_margin
+		  , book_mileage
+		  , ccg_b001
+		  , ccg_b002
+		  , ccg_b003
+		)
+		VALUES (
+			#{book_no}
+		  , #{book_title}
+		  , #{book_content}
+		  , #{book_cover}
+		  , #{book_spmt_ymd}
+		  , #{book_author}
+		  , #{pub_nm}
+		  , 'NO'
+		  , 0.2
+		  , 0.05
+		  , #{ccg_b001}
+		  , #{ccg_b002}
+		  , #{ccg_b003}
+		)
+	</insert>
+	
+	<!-- 종이책 등록 -->
+	<insert id="paperBookInsert" parameterType="mngBooksVO">
+		INSERT INTO paper_book(
+			book_no
+		  , book_page_cnt
+		  , book_amt
+		  , book_discount
+		  , book_ntsl_amt
+		  , book_isbn
+		)
+		VALUES (
+			#{book_no}
+		  , #{book_page_cnt}
+		  , #{book_amt}
+		  , 0
+		  , #{book_amt}
+		  , #{book_isbn}
+		)
+	</insert>
+	
+	<!-- E북 등록 -->
+	<insert id="ebookInsert" parameterType="mngBooksVO">
+		INSERT INTO ebook(
+			book_no
+		  , book_page_cnt
+		  , book_amt
+		  , book_discount
+		  , book_ntsl_amt
+		  , book_isbn
+		)
+		VALUES (
+			#{book_no}
+		  , #{book_page_cnt}
+		  , #{book_amt}
+		  , 0
+		  , #{book_amt}
+		  , #{book_isbn}
+		)
+	</insert>
+	
+	<!-- 도서 등록 요청 승인 -->
+	<update id="requestApproval" parameterType="newBookRequestVO">
+		UPDATE new_book_request
+		SET
+			ccg_r001 = '요청수락'
+		WHERE nbr_no = #{nbr_no}
+	</update>
+	
+	<!-- 도서 등록 요청 거절 -->
+	<update id="requestRefuse" parameterType="newBookRequestVO">
+		UPDATE new_book_request
+		SET
+			ccg_r001 = '요청거절'
+		WHERE nbr_no = #{nbr_no}
+	</update>
+	
+	<!-- 신규 도서 등록 개수 -->
+	<select id="countBookReq" resultType="int">
+		SELECT 
+		    count(nbr_no)
+		FROM
+		    new_book_request
+		WHERE 
+		    ccg_r001 = '요청대기'
+	</select>
+</mapper>

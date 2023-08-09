@@ -1,0 +1,9 @@
+package kr.or.ddit.mapper.omn.books;
+
+import java.util.List;
+
+import kr.or.ddit.vo.omn.NewBookRequestVO;
+
+public interface MngBookRequestMapper {
+	public List<NewBookRequestVO> requestList();
+}

@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+ <mapper namespace="kr.or.ddit.mapper.bmk.MyCalMapper">
+ 
+ 	<!-- 일정 리스트 -->
+ 	<select id="getCal" parameterType="string" resultType="calendarVO">
+	 	select 
+		      cal_no     
+		    , cal_title   
+		    , cal_content
+		    , cal_start_ymd
+		    , cal_end_ymd
+		    , cal_color
+		    , ae_id
+	 	from calendar
+	 	where ae_id = #{ae_id}
+ 	</select>
+ 	
+ 	<!-- 상세 일정 -->
+ 	<select id="getDetailCal" parameterType="string" resultType="calendarVO">
+ 		select 
+		      cal_no     
+		    , cal_title   
+		    , cal_content  
+		    , cal_start_ymd
+		    , cal_end_ymd
+		    , cal_color
+		    , ae_id
+		 from calendar
+		 where cal_no = #{cal_no}
+ 	</select>
+ 	
+ 	<!-- 일정 작성  -->
+ 	<insert id="insertCal" parameterType="calendarVO">
+ 		insert into calendar(
+		      cal_no     
+		    , cal_title   
+		    , cal_content
+		    , cal_start_ymd
+		    , cal_end_ymd
+		    , cal_color
+		    , ae_id
+		 )values( 
+		      'CA' || LPAD(SEQ_CA.NEXTVAL, 10, '0')
+		    , #{cal_title}
+		    , #{cal_content}
+		    , #{cal_start_ymd}
+		    , #{cal_end_ymd}
+		    , #{cal_color}
+		    , #{ae_id}   
+		 )
+ 	</insert>
+ 	
+ 	<update id="updateCal" parameterType="calendarVO">
+ 		update calendar set
+		      cal_title = #{cal_title}
+		    , cal_content = #{cal_content}
+		    , cal_start_ymd = #{cal_start_ymd}
+		    , cal_end_ymd = #{cal_end_ymd}
+		    , cal_color = #{cal_color}
+		 where 
+		      cal_no = #{cal_no}
+ 	</update>
+ 	
+ 	<update id="updateMove" parameterType="calendarVO">
+ 		update calendar set
+		      cal_start_ymd = #{cal_start_ymd}
+		    , cal_end_ymd = #{cal_end_ymd}
+		 where 
+		      cal_no = #{cal_no}
+ 	</update>
+	
+	<delete id="deleteCal" parameterType="string">
+		delete 
+			from calendar 
+		where cal_no = #{cal_no}
+	</delete>
+ </mapper>

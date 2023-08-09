@@ -1,0 +1,26 @@
+package kr.or.ddit.controller.ljy.mng;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import kr.or.ddit.service.ljy.RemainMngService;
+import kr.or.ddit.vo.ljy.RemainMngVO;
+
+@Controller
+@RequestMapping("/mng/remain")
+public class RemainRestController {
+
+	@Autowired
+	private RemainMngService remainService;
+	
+	@ResponseBody
+	@GetMapping("/list")
+	public List<RemainMngVO> remainList(){
+		return remainService.remainList();
+	}
+}

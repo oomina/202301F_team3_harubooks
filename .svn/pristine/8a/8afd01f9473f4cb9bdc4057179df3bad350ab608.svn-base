@@ -1,0 +1,26 @@
+package kr.or.ddit.vo.ljy;
+
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
+
+@Getter
+@Setter
+@ToString
+public class PoMngVO {
+	private String br_no;			// 발주요청번호
+	private String book_no;			// 책번호
+	private String ae_id;			// 아이디(출판사)
+	private String pub_nm;			// 출판사 이름	// 테이블에 없는 값
+	private int book_qty;			// 발주 수량
+	private String br_ymd;			// 발주 요청 일자
+	private String brd_accept_ymd;	// 발주 요청 수락일자
+	private int book_amt;			// 요청 책 가격
+	private String ccg_p001;		// 1. 자동발주, 2. 수동발주 
+	private String ccg_r001;		// 1. 요청대기, 2. 요청수락, 3. 요청거절
+	
+	// 발주 신청 시, 다량의 책번호/출판사/발주수량 값을 받을때 사용할 필드들
+	private String[] book_nos;
+	private String[] pub_nms;			// 출판사 이름	// 테이블에 없는 값
+	private String[] book_qtys;			// 발주 수량
+}

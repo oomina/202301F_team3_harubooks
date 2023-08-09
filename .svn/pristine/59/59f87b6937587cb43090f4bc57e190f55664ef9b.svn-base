@@ -1,0 +1,255 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+	<div class="content-wrapper">
+          <div class="row">
+            <div class="col-md-12 grid-margin">
+              <div class="row">
+                <div class="col-12 col-xl-8 mb-4 mb-xl-0" style="margin-bottom: 1.5rem;">
+                  <h3 class="font-weight-bold" style="font-family: 'orbit', sans-serif;">하루북스 관리자 페이지</h3>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <!-- 카드느낌 -->
+            <div class="col-md-12 grid-margin transparent">
+              <div class="row">
+                <div class="col-md-3 mb-3 stretch-card transparent">
+                  <div class="card card-tale">
+	                <div class="card-body" style="display : flex; align-items: center;">
+	                  <div class="col-md-6" style="padding : 0;">
+		                  <p class="mb-4" style="font-weight: bold;">도서수</p>
+		                  <p id="bookCntDisp" class="fs-30 mb-2" style="font-weight: bold;"></p>
+	                  </div>
+	                  <div class="col-md-6" style="text-align : right; padding : 0;">
+	                  	<i class="ri-book-2-line" style="font-size: 80px;"></i>
+	                  </div>
+	                </div>
+                  </div>
+                </div>
+                <div class="col-md-3 mb-3 stretch-card transparent">
+                  <div class="card card-dark-blue">
+                    <div class="card-body" style="display : flex; align-items: center;">
+                      <div class="col-md-6" style="padding : 0;">
+                        <p class="mb-4" style="font-weight: bold;">주문</p>
+                        <p id="orderCntDisp" class="fs-30 mb-2" style="font-weight: bold;"></p>
+                      </div>
+                      <div class="col-md-6" style="text-align : right; padding : 0;">
+	                    <i class="ri-shopping-bag-2-line" style="font-size: 80px;"></i>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-3 mb-3 stretch-card transparent">
+                  <div class="card card-light-blue">
+                    <div class="card-body" style="display : flex; align-items: center;">
+                       <div class="col-md-6" style="padding : 0;">
+	                      <p class="mb-4" style="font-weight: bold;">매출</p>
+	                      <p class="fs-30 mb-2" style="font-size: 22px; font-weight: bold;">1,000,000</p>
+	                   </div>   
+                       <div class="col-md-6" style="text-align : right; padding : 0;">
+	                     <i class="ri-bar-chart-2-line" style="font-size: 80px;"></i>
+	                   </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-3  mb-3 stretch-card transparent">
+                  <div class="card card-light-danger">
+                  	<div class="card-body" style="display : flex; align-items: center;">
+	                  <div class="col-md-6" style="padding : 0;">
+		                  <p class="mb-4" style="font-weight: bold;">출판사</p>
+		                  <p class="fs-30 mb-2" style="font-weight: bold;">20</p>
+	                  </div>
+	                  <div class="col-md-6" style="text-align : right; padding : 0;">
+	                    <i class="ri-store-2-line" style="font-size: 80px;"></i>
+	                  </div>
+	                </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+          <!-- 좌우로 이동  -->
+            <div class="col-lg-6 grid-margin stretch-card" style="height: 330px;">
+              <div class="card"> <!--  position-relative -->
+                <div class="card-body">
+                  <div id="detailedReports" class="carousel slide detailed-report-carousel position-static pt-2" data-ride="carousel">
+				    <a class="carousel-control-prev" href="#detailedReports" role="button" data-slide="prev">
+	                  <span class="carousel-control-prev-icon position-static" aria-hidden="true"></span>
+	                  <span class="sr-only">Previous</span>
+	                </a>
+	                <a class="carousel-control-next" href="#detailedReports" role="button" data-slide="next">
+	                  <span class="carousel-control-next-icon position-static" aria-hidden="true"></span>
+	                  <span class="sr-only">Next</span>
+	                </a>
+                    <div class="carousel-inner">
+                      <div class="carousel-item active">
+                          <div class="col-md-12 mt-1" >
+	                          <!-- -------------- --> 
+		                        <div class="charts-data">
+		                         <p class="card-title" style="font-family: 'orbit', sans-serif;">재고 내역</p>
+		                        	<div class="mt-3">
+		                            <p class="mb-0">위험</p>
+		                            <div class="d-flex justify-content-between align-items-center">
+		                              <div class="progress progress-md flex-grow-1 mr-4">
+		                                <div class="progress-bar bg-danger" role="progressbar" style="width: 35%" aria-valuenow="35" aria-valuemin="0" aria-valuemax="100"></div>
+		                              </div>
+		                              <p class="mb-0" id="dangerDisp">1k</p>
+		                            </div>
+		                          </div>
+		                          <div class="mt-3">
+		                            <p class="mb-0">경고</p>
+		                            <div class="d-flex justify-content-between align-items-center">
+		                              <div class="progress progress-md flex-grow-1 mr-4">
+		                                <div class="progress-bar bg-warning" role="progressbar" style="width: 95%" aria-valuenow="95" aria-valuemin="0" aria-valuemax="100"></div>
+		                              </div>
+		                              <p class="mb-0" id="warnigDisp">5k</p>
+		                            </div>
+		                        </div>
+	                         </div>
+                          </div>
+                      </div>
+                      <div class="carousel-item">
+                        <div class="row col-md-6 mt-1">
+                          <!-- <div class="col-md-4 col-xl-3"> --><!--  d-flex flex-column justify-content-start -->
+                          	왜 안나오는 것이냐냐냐
+                        <!-- </div> -->
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- 좌우로 이동 END -->
+          <!-- ToDoList -->
+	      <div class="col-lg-6 grid-margin stretch-card" style="height: 330px;">
+          <div class="card">
+            <div class="card-body">
+              <h4 class="card-title" style="margin-bottom: 0.2rem; font-family: 'orbit', sans-serif;">하루 할 일</h4>
+              <div class="list-wrapper pt-2" style="overflow : hidden;">
+                <ul class="d-flex flex-column-reverse todo-list todo-list-custom">
+                  <!--to do ㅣist 1개-->
+                  <li style='height: 20px;margin-bottom: 0.2rem;'>
+                    <div class="form-check form-check-flat">
+                      <label class="form-check-label">
+                        <input class="checkbox" type="checkbox">요청글 확인
+                      </label>
+                    </div>
+                    <i class="remove ti-close"></i>
+                  </li>
+                  <!--to do list 2개 class="completed" -->
+                  <li style='height: 20px;margin-bottom: 0.2rem;'>
+                    <div class="form-check form-check-flat">
+                      <label class="form-check-label">
+                        <input class="checkbox" type="checkbox">도서 신청글 확인
+                      </label>
+                    </div>
+                    <i class="remove ti-close"></i>
+                  </li>
+                </ul>
+                <div class="add-items d-flex mb-0 mt-2">
+                  <input type="text" class="form-control todo-list-input"  placeholder="&nbsp;할 일을 입력해주세요." style="border : 1px solid #CED4DA; height: 20px;">
+                  <button class="add btn btn-icon text-primary todo-list-add-btn bg-transparent" style="width : auto; height: auto;"><i class="icon-circle-plus"></i></button>
+                </div>
+              </div>
+            </div>
+           </div>
+	      </div>
+          <!-- ToDoList END -->
+         </div>
+       </div>  
+<script>
+const bookCntDisp = document.querySelector("#bookCntDisp");
+const orderCntDisp = document.querySelector("#orderCntDisp");
+const warnigDisp = document.querySelector("#warnigDisp");
+const dangerDisp = document.querySelector("#dangerDisp");
+let totalCnt = 0;
+let warnigCnt = 0;
+let dangerCnt = 0;
+
+$(document).ready(function(){
+	// ToDoList 저장
+	$(".icon-circle-plus").on("click", function(){
+	//let task = prompt("ToDoList 내용을 입력하세요.");
+	//console.log(task);
+	//alert("add 체킁");
+	});
+    
+	// 재고 내역 가져오기
+	fRemainCnt();
+	fRemainWarnigCnt();
+	fRemainDangerCnt();
+	fOrderCnt()
+	// 프로그래스바 퍼센트 설정
+	/* if(totalCnt > 0 ){
+		let warnigPercnet = warnigCnt*100 / totalCnt;
+		let dangerPercnet = dangerCnt*100 / totalCnt;
+		console.log(warnigPercnet, dangerPercnet )
+		//$(".bg-warning").style.width = warnigPercnet;
+		$(".bg-warning").css("width" , warnigPercnet);
+		$(".bg-danger").css("width" , dangerPercnet);
+	} */
+  
+});
+
+function fRemainWarnigCnt(){
+	$.ajax({
+		url : "/mng/remain/list/2",
+		type : "get",
+		success : function(res){
+			warnigCnt = res.mngPaginationInfoVO.totalRecord;
+			warnigDisp.innerText = warnigCnt;
+			console.log(res);
+		}
+	});
+}
+
+function fRemainDangerCnt(){
+	$.ajax({
+		url : "/mng/remain/list/1",
+		type : "get",
+		success : function(res){
+			dangerCnt = res.mngPaginationInfoVO.totalRecord;
+			dangerDisp.innerText = dangerCnt;
+			/* <i class="ri-book-2-line" style="font-size: 80px;"></i> */
+			let iTag = document.createElement("i");
+			let dangerZone = document.querySelector(".bg-danger");
+			iTag.setAttribute("class", "ri-book-2-line");
+			//iTag.style.fontSize = 20 + "px";
+			//iTag.style.color = "#FF4747";
+			for(let i = 1; i<= dangerCnt; i++){
+				dangerZone.appendChild(iTag);
+			}
+			//iTag.style("font-size", "16px)
+			console.log("totalRecord", totalCnt);
+			console.log(res);
+		}
+	});
+}
+function fRemainCnt(){
+	$.ajax({
+		url : "/mng/remain/list",
+		type : "get",
+		success : function(res){
+			totalCnt = res.mngPaginationInfoVO.totalRecord;
+			bookCntDisp.innerText = totalCnt;
+			console.log(res);
+	
+		}
+	});
+}
+
+function fOrderCnt(){
+	$.ajax({
+		url : "/mng/order/today",
+		type : "get",
+		success : function(res){
+			orderCntDisp.innerText = res;
+			console.log(res);
+			
+		}
+	}); 
+}
+</script>

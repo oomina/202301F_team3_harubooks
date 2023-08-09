@@ -1,0 +1,107 @@
+package kr.or.ddit.service.kmw;
+
+import java.util.List;
+
+import javax.inject.Inject;
+
+import org.springframework.stereotype.Service;
+
+import kr.or.ddit.mapper.kmw.OrderMapper;
+import kr.or.ddit.vo.kmw.OrderVO;
+import kr.or.ddit.vo.kmw.PagingVO;
+
+@Service
+public class OrderServiceImpl implements OrderService{
+	@Inject
+	private OrderMapper mapper;
+
+	@Override
+	public int insertOrder(OrderVO orderVO) {	
+		return mapper.insertOrder(orderVO);
+	}
+
+	@Override
+	public int insertPurchs(OrderVO orderVO) {
+		return mapper.insertPurchs(orderVO);
+	}
+
+	@Override
+	public int insertDelivery(OrderVO orderVO) {
+		return mapper.insertDelivery(orderVO);
+	}
+
+	@Override
+	public void spendMileage(OrderVO orderVO) {
+		mapper.spendMileage(orderVO);
+		
+	}
+
+	@Override
+	public void deleteCart(String ae_id) {
+		mapper.deleteCart(ae_id);
+		
+	}
+
+	@Override
+	public List<OrderVO> orderCompleteList(String ae_id) {
+		return mapper.orderCompleteList(ae_id);
+	}
+
+	@Override
+	public List<OrderVO> preparedProd(String ae_id) {
+		return mapper.preparedProd(ae_id);
+	}
+
+	@Override
+	public int preparedDelivery(String ae_id) {
+		return mapper.preparedDelivery(ae_id);
+	}
+
+	@Override
+	public int DeliveringCnt(String ae_id) {
+		return mapper.DeliveringCnt(ae_id);
+	}
+
+	@Override
+	public int finishDelivery(String ae_id) {
+		return mapper.finishDelivery(ae_id);
+	}
+
+	@Override
+	public int refundCnt(String ae_id) {
+		return mapper.refundCnt(ae_id);
+	}
+
+	@Override
+	public List<OrderVO> completeDeliveryList(String ae_id) {
+		return mapper.completeDeliveryList(ae_id);
+	}
+
+	@Override
+	public int decisionPurchase(OrderVO vo) {
+		int res1 = mapper.decisionPurchase(vo);
+		int res2 = mapper.updateMileage(vo);
+		int res3 = mapper.decreaseCnt(vo);
+		return res1;
+	}
+
+	@Override
+	public List<OrderVO> refundList(String ae_id) {
+		return mapper.refundList(ae_id);
+	}
+
+	@Override
+	public List<OrderVO> completeList(String ae_id) {
+		return mapper.completeList(ae_id);
+	}
+
+	@Override
+	public int completePurCnt(String ae_id) {
+		return mapper.completePurCnt(ae_id);
+	}
+
+	@Override
+	public List<OrderVO> pagingComplete(PagingVO<OrderVO> pagingVO) {
+		return mapper.pagingComplete(pagingVO);
+	}
+}

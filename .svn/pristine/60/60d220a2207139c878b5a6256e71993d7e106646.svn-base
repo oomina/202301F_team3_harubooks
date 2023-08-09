@@ -1,0 +1,18 @@
+package kr.or.ddit.vo.jhs;
+
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
+
+@Getter
+@Setter
+@ToString
+public class ChattingVO {
+	private String chat_no;
+	private String cr_no;
+	private String ae_id;
+	private String char_content;
+	private String char_wrt_ymd;
+	private String ua_no;
+	private String mem_nicknm;
+}

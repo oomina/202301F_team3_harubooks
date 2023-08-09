@@ -1,0 +1,29 @@
+package kr.or.ddit.mapper.ljy;
+
+import java.util.List;
+
+import kr.or.ddit.vo.ljy.PoMngVO;
+import kr.or.ddit.vo.ljy.RemainMngVO;
+import kr.or.ddit.vo.omn.MngPaginationInfoVO;
+
+public interface PoMngMapper {
+
+	public int poOne(PoMngVO poMngVO);
+
+	public int poListCnt(MngPaginationInfoVO<PoMngVO> mngPaginationInfoVO);
+
+	public List<PoMngVO> poList(MngPaginationInfoVO<PoMngVO> mngPaginationInfoVO);
+
+	public List<PoMngVO> poWaitingList();
+
+	public void poAuto(PoMngVO poMngVO);
+
+	public List<PoMngVO> poPubList(PoMngVO poMngVO);
+
+	public int updatePoReqPub(PoMngVO poMngVO);
+
+	public int updatePoRejPub(PoMngVO poMngVO);
+
+	public PoMngVO getPo(String string);
+
+}

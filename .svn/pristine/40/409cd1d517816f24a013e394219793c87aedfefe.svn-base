@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+<mapper namespace="kr.or.ddit.mapper.ljy.InquiryMapper">
+	<select id="inquiryList" resultType="inquiryVO">
+		SELECT
+			inquiry_no
+			, ae_id
+			, inquiry_title
+			, inquiry_content
+			, inquiry_ymd
+			, ua_no
+			, ccg_i001
+			, inquiry_reply
+		FROM 
+			inquiry
+		ORDER BY 
+			ccg_i001
+	</select>
+	<select id="inquiryOne" parameterType="String" resultType="inquiryVO">
+		SELECT
+			inquiry_no
+			, ae_id
+			, inquiry_title
+			, inquiry_content
+			, inquiry_ymd
+			, ua_no
+			, ccg_i001
+			, inquiry_reply
+		FROM 
+			inquiry
+		WHERE 
+			inquiry_no = #{inquiry_no}
+	</select>
+	
+	<update id="inqRepUpdate" parameterType="InquiryVO">
+		UPDATE 
+			inquiry
+		SET
+			inquiry_reply = #{inquiry_reply}
+		WHERE 
+			inquiry_no = #{inquiry_no}
+	</update>
+	
+	<update id="inqStatUpdate" parameterType="String">
+		UPDATE 
+			inquiry
+		SET
+			ccg_i001 = '문의완료'
+		WHERE 
+			inquiry_no = #{inquiry_no}
+	</update>
+</mapper>

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+<mapper namespace="kr.or.ddit.mapper.omn.books.MngBookRequestMapper">
+	<select id="requestList" resultType="map">
+		select nbr_no
+			 , ae_id
+			 , nbr_nm
+			 , nbr_content
+			 , bbr_cover
+			 , nbr_spmt_ymd
+			 , nbr_author
+			 , book_talt
+			 , nbr_file
+			 , nbr_coment
+			 , nbr_ymd
+			 , pub_nm
+			 , book_page_cnt
+			 , book_amt
+			 , book_isbn
+			 , ccg_b001
+			 , ccg_r001
+		from new_book_request
+	</select>
+</mapper>

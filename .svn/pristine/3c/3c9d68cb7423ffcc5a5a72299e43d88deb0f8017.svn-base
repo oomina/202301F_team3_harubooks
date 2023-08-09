@@ -1,0 +1,283 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@200&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Nanum+Pen+Script&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Jua&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Nanum+Gothic&display=swap');
+#modal,#dModal,#mModal {
+	position: fixed; /* 위치 고정 */
+	left: 0px;
+	top: 0px;
+	width: 100vw; /* 사이즈 고정 */
+	height: 100vh;
+	background-color: rgb(57 56 56 / 50%);;
+	z-index: 100; /* 클 수록 앞으로 나옴 */
+	display: none; /* 처음엔 안 보여야 함 */
+}
+
+.mcontainer, .modcontainer {
+	display: grid;
+	padding: 5px;
+	width: 40%; /* 부모 기준 */
+	height: 75%;
+	margin: 70px auto; /* 수평 중앙 정렬 */
+	background-color: white;
+	border-radius: 20px;
+	position: relative;
+	transition: width 0.5s ease;
+}
+
+#mheader{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 0.1rem;
+    text-align: center;
+    padding: 0px 40px;
+}
+
+#mheader-before{
+	display: none;
+	font-weight: bold;
+	cursor: pointer;
+	margin-right: 10px;
+}
+
+#mheader-text {
+	justify-content: space-between;
+	font-size: 17px;
+	text-align: center;
+	font-weight: bold;
+	margin: 7px;
+}
+
+#mheader-next{
+	display: none;
+	font-weight: bold;
+	cursor: pointer;
+}
+
+.mheader-btns{
+	font-size: 17px;
+	color:#64af46;
+}
+
+#img-filter-div{
+	display: flex;
+}
+
+#mimages-div{
+	margin: 80px auto;
+    text-align: center;
+}
+#mimages-div img{
+	margin-bottom: 20px;
+}
+
+#mimages-div h2{
+	color: #64af46;
+	font-size: 27px;
+	margin-bottom: 20px;
+	font-weight: bold;
+}
+
+#mimages-select{
+    width: 180px;
+    height: 30px;
+    border: none;
+    background-color: #64af46;
+    color: white;
+    font-size: 17px;
+    font-weight: bold;
+    margin-top: 20px;
+    transition: transform 0.5s ease-in-out, box-shadow 0.5s ease-in-out;
+    cursor: pointer;
+}
+
+#mimages-select:hover{
+	transform: translateY(-8px);
+	box-shadow: 0 0 10px rgba(100, 175, 70, 0.7); 
+}
+
+#img-select-div{
+	flex:65;
+	width: 100%;
+	height: 430px;
+	margin-top: 15px;
+	position: relative;
+}
+
+#img-select-before-div, #img-select-next-div{
+	display: none;
+}
+
+#img-select-div2{
+	width: 95%;
+    height: 90%;
+    margin: 8px auto;
+    overflow: hidden;
+}
+
+#img-select {
+	width: 100%;
+	height: 100%;
+	object-fit: scale-down;
+}
+
+#img-select-next-div{
+    position: absolute;
+    top: 90%;
+    right: 6px;
+    cursor: pointer;
+    font-size: 50px;
+}
+
+
+#img-select-before-div{
+	position: absolute;
+    top: 90%;
+    left: 6px;
+    cursor: pointer;
+    font-size: 50px;
+}
+
+
+#img-filter{
+	flex:35;
+	width: 100%;
+    height: 430px;
+    margin: 0px auto
+}
+
+.img-filters-row {
+  display: flex;
+
+}
+
+.img-filters-div {
+    flex: 1;
+    padding: 10px;
+    text-align: center;
+    height: 100px;
+    margin-right: 5px;
+    margin-top: 35px;
+    display: box;
+}
+
+.img-filters {
+  max-width: 100%;
+  height: 80px;
+  object-fit: fill;
+  cursor: pointer;
+}
+
+.img-filters-h3{
+   font-family: 'Nanum Gothic', sans-serif;
+   font-size: 12px;
+}
+
+
+.grayscale {
+  filter: grayscale(50);
+    -webkit-filter: grayscale(50);
+    -moz-filter: grayscale(50);
+}
+
+.sepia {
+  filter: sepia(1);
+    -webkit-filter: sepia(1); 
+    -moz-filter: sepia(1)
+}
+
+.saturate {
+   filter: saturate(2);
+    -webkit-filter: saturate(2); 
+    -moz-filter: saturate(2)
+}
+
+.contrast {
+   filter: contrast(2);
+    -webkit-filter: contrast(2); 
+    -moz-filter: contrast(2)
+}
+
+.brightness {
+   filter: brightness(2);
+    -webkit-filter: brightness(2); 
+    -moz-filter: brightness(2)
+}
+
+
+.ruby {
+   filter: brightness(1) contrast(1) hue-rotate(30deg);
+    -webkit-filter: brightness(1) contrast(1) hue-rotate(30deg);
+    -moz-filter: brightness(1) contrast(1) hue-rotate(30deg);
+}
+
+.emerald {
+   filter: brightness(1) contrast(2) hue-rotate(305deg) saturate(1);
+    -webkit-filter: brightness(1) contrast(2) hue-rotate(305deg) saturate(1);
+    -moz-filter: brightness(1) contrast(2) hue-rotate(305deg) saturate(1);
+}
+
+.aquamarine{
+	filter: brightness(1) contrast(2) hue-rotate(328deg)  saturate(2);
+    -webkit-filter: brightness(1) contrast(2) hue-rotate(328deg)  saturate(2);
+    -moz-filter: brightness(1) contrast(2) hue-rotate(328deg)  saturate(2);
+}
+
+.hue-rotate {
+   filter: hue-rotate(15deg);
+    -webkit-filter: hue-rotate(15deg); 
+    -moz-filter: hue-rotate(15deg)
+}
+
+#mcontent {
+	text-align: left;
+	margin: 20px;
+}
+
+#mtitle, #mcontent, #mbtn{
+	display: none;
+}
+
+#mimages-file{
+	display: none;
+}
+
+#img-filter-div{
+	display: none;
+}
+
+#text-div{
+	display: none;
+	flex: 35;
+}
+
+.mbtn {
+	background: no-repeat;
+    border: none;
+    font-size: 55px;
+    color: white;
+    float: right;
+    margin: 0px;
+    margin-right: 70px;
+    cursor: pointer;
+}
+.dproimg{
+    width: 45px;
+    border-radius: 50%;
+    border: 2px solid #4dac27;
+}
+.dimg{
+	width: 100%;
+	height: 320px;
+}
+.dcontent{
+	height : 190px;
+	max-height: 190px;
+	overflow: auto;
+}
+
+#dprofile{
+	display : flex;
+    align-items: center;
+}

@@ -1,0 +1,687 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+	pageEncoding="UTF-8"%>
+	<!-- ====== 메인컨텐츠 ====== -->
+	<section class="space-bottom-3">
+		<div class="bg-gray-200 space-2 space-lg-0 bg-img-hero"
+			style="background-image: url(/resources/assets/img/1920x588/img1.jpg);">
+			<div class="container">
+				<div class="js-slick-carousel u-slick"
+					data-pagi-classes="text-center u-slick__pagination position-absolute right-0 left-0 mb-n8 mb-lg-4 bottom-0">
+					<div class="js-slide">
+						<div class="hero row min-height-588 align-items-center">
+							<div class="col-lg-7 col-wd-6 mb-4 mb-lg-0">
+								<div class="media-body mr-wd-4 align-self-center mb-4 mb-md-0">
+									<p
+										class="hero__pretitle text-uppercase font-weight-bold text-gray-400 mb-2"
+										data-scs-animation-in="fadeInUp"
+										data-scs-animation-delay="200" style="color: red; font-size: 1.2em">HOT!</p>
+									<h2 class="hero__title font-size-14 mb-4"
+										data-scs-animation-in="fadeInUp"
+										data-scs-animation-delay="300">
+										<span class="hero__title-line-1 d-block">비욘드 더 스토리</span> <span
+											class="hero__title-line-2 font-weight-bold d-block" style="font-size: 20px">2013년 6월 13일 세상에 첫발을 내디딘 후, 2023년 6월 데뷔 10주년을 맞이하는 방탄소년단. 더 이상의 수식어가 불필요할 만큼 글로벌 아티스트이자 아이콘으로 정점에 올라 또 하나의 챕터를 써내려간다.</span>
+									</h2>
+									<a href="../shop/v1.html"
+										class="btn btn-success btn-wide rounded-0 hero__btn"
+										data-scs-animation-in="fadeInLeft"
+										data-scs-animation-delay="400" style="color: white; font-weight: bold">구매하러가기</a>
+								</div>
+							</div>
+							<div class="col-lg-5 col-wd-6"
+								data-scs-animation-in="fadeInRight"
+								data-scs-animation-delay="500">
+								<img class="img-fluid" src="https://contents.kyobobook.co.kr/sih/fit-in/300x0/pdt/9791198320902.jpg" style="margin:0 auto"
+									alt="image-description">
+							</div>
+						</div>
+					</div>
+
+					<div class="js-slide">
+						<div class="hero row min-height-588 align-items-center">
+							<div class="col-lg-7 col-wd-6 mb-4 mb-lg-0">
+								<div class="media-body mr-wd-4 align-self-center mb-4 mb-md-0">
+									<p
+										class="hero__pretitle text-uppercase font-weight-bold text-gray-400 mb-2"
+										data-scs-animation-in="fadeInUp"
+										data-scs-animation-delay="200" style="color: gold;font-size: 1.2em">베스트 셀러</p>
+									<h2 class="hero__title font-size-14 mb-4"
+										data-scs-animation-in="fadeInUp"
+										data-scs-animation-delay="300">
+										<span class="hero__title-line-1 font-weight-regular d-block">세이노의 가르침</span> <span class="hero__title-line-2 font-weight-bold d-block" style="font-size: 20px">2000년부터 발표된 그의 주옥같은 글들. 독자들이 자발적으로 만든 제본서는 물론, 전자책과 앱까지 나왔던 《세이노의 가르침》이 드디어 전국 서점에서 독자들을 마주한다.</span>
+									</h2>
+									<a href="../shop/v1.html"
+										class="btn btn-success btn-wide rounded-0 hero__btn"
+										data-scs-animation-in="fadeInLeft"
+										data-scs-animation-delay="400" style="color: white; font-weight: bold">구매하러가기</a>
+								</div>
+							</div>
+							<div class="col-lg-5 col-wd-6"
+								data-scs-animation-in="fadeInRight"
+								data-scs-animation-delay="500">
+								<img class="img-fluid" src="https://contents.kyobobook.co.kr/sih/fit-in/300x0/pdt/9791168473690.jpg" style="margin:0 auto"
+									alt="image-description">
+							</div>
+						</div>
+					</div>
+
+					<div class="js-slide">
+						<div class="hero row min-height-588 align-items-center">
+							<div class="col-lg-7 col-wd-6 mb-4 mb-lg-0">
+								<div class="media-body mr-wd-4 align-self-center mb-4 mb-md-0">
+									<p
+										class="hero__pretitle text-uppercase font-weight-bold text-gray-400 mb-2"
+										data-scs-animation-in="fadeInUp"
+										data-scs-animation-delay="200"style="color: skyblue">NEW</p>
+									<h2 class="hero__title font-size-14 mb-4"
+										data-scs-animation-in="fadeInUp"
+										data-scs-animation-delay="300">
+										<span class="hero__title-line-1 font-weight-regular d-block">모든 삶은 흐른다</span>
+										<span class="hero__title-line-2 font-weight-bold d-block" style="font-size: 20px">“이 책은 흐르는 삶 속에서 ‘자기 자신’이라는 유일한 섬이 되는 길을 안내한다. 삶은 내가 내 의지대로 살아가는 게 아니라 그저 흘러가며 살아지는 것이다.”</span>
+									</h2>
+									<a href="../shop/v1.html"
+										class="btn btn-success btn-wide rounded-0 hero__btn"
+										data-scs-animation-in="fadeInLeft"
+										data-scs-animation-delay="400" style="color: white; font-weight: bold">구매하러가기</a>
+								</div>
+							</div>
+							<div class="col-lg-5 col-wd-6"
+								data-scs-animation-in="fadeInRight"
+								data-scs-animation-delay="500">
+								<img class="img-fluid" src="https://contents.kyobobook.co.kr/sih/fit-in/300x0/pdt/9791190299770.jpg" style="margin:0 auto"
+									alt="image-description">
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</section>
+	<section class="space-bottom-3">
+		<div class="container">
+			<header
+				class="mb-5 d-md-flex justify-content-between align-items-center">
+				<h2 class="font-size-7 mb-3 mb-md-0">도서 분류</h2>
+				<a href="../shop/v1.html" class="h-primary d-block">더 보기 <i
+					class="glyph-icon flaticon-next"></i></a>
+			</header>
+			<ul
+				class="list-unstyled my-0 row row-cols-md-2 row-cols-lg-3 row-cols-xl-4 row-cols-wd-5">
+				<li class="product-category col mb-4 mb-xl-0">
+					<div class="product-category__inner bg-indigo-light px-6 py-5 m-2">
+						<div
+							class="product-category__icon font-size-12 text-primary-indigo">
+							<i class="glyph-icon flaticon-gallery"></i>
+						</div>
+						<div class="product-category__body">
+							<h3 class="text-truncate font-size-3">소설</h3>
+							<a href="/harubooks/category?ccg_b002=국내도서&ccg_b003=소설" class="stretched-link text-dark">바로가기</a>
+						</div>
+					</div>
+				</li>
+
+				<li class="product-category col mb-4 mb-xl-0">
+					<div class="product-category__inner bg-indigo-light px-6 py-5 m-2">
+						<div
+							class="product-category__icon font-size-12 text-primary-indigo">
+							<i class="glyph-icon flaticon-gallery"></i>
+						</div>
+						<div class="product-category__body">
+							<h3 class="text-truncate font-size-3">시/에세이</h3>
+							<a href="/harubooks/category?ccg_b002=국내도서&ccg_b003=시/에세이" class="stretched-link text-dark">바로가기</a>
+						</div>
+					</div>
+				</li>
+				<li class="product-category col mb-4 mb-xl-0">
+					<div class="product-category__inner bg-indigo-light px-6 py-5 m-2">
+						<div
+							class="product-category__icon font-size-12 text-primary-indigo">
+							<i class="glyph-icon flaticon-gallery"></i>
+						</div>
+						<div class="product-category__body">
+							<h3 class="text-truncate font-size-3">인문</h3>
+							<a href="/harubooks/category?ccg_b002=국내도서&ccg_b003=인문" class="stretched-link text-dark">바로가기</a>
+						</div>
+					</div>
+				</li>
+				<li class="product-category col mb-4 mb-xl-0">
+					<div class="product-category__inner bg-indigo-light px-6 py-5 m-2">
+						<div
+							class="product-category__icon font-size-12 text-primary-indigo">
+							<i class="glyph-icon flaticon-gallery"></i>
+						</div>
+						<div class="product-category__body">
+							<h3 class="text-truncate font-size-3">경제/경영</h3>
+							<a href="/harubooks/category?ccg_b002=국내도서&ccg_b003=경제/경영" class="stretched-link text-dark">바로가기</a>
+						</div>
+					</div>
+				</li>
+				<li class="product-category col mb-4 mb-xl-0">
+					<div class="product-category__inner bg-indigo-light px-6 py-5 m-2">
+						<div
+							class="product-category__icon font-size-12 text-primary-indigo">
+							<i class="glyph-icon flaticon-gallery"></i>
+						</div>
+						<div class="product-category__body">
+							<h3 class="text-truncate font-size-3">정치/사회</h3>
+							<a href="/harubooks/category?ccg_b002=국내도서&ccg_b003=정치/사회" class="stretched-link text-dark">바로가기</a>
+						</div>
+					</div>
+				</li>
+				<li class="product-category col mb-4 mb-xl-0">
+					<div class="product-category__inner bg-indigo-light px-6 py-5 m-2">
+						<div
+							class="product-category__icon font-size-12 text-primary-indigo">
+							<i class="glyph-icon flaticon-gallery"></i>
+						</div>
+						<div class="product-category__body">
+							<h3 class="text-truncate font-size-3">컴퓨터/IT</h3>
+							<a href="/harubooks/category?ccg_b002=국내도서&ccg_b003=컴퓨터/IT" class="stretched-link text-dark">바로가기</a>
+						</div>
+					</div>
+				</li>
+				<li class="product-category col mb-4 mb-xl-0">
+					<div class="product-category__inner bg-tangerine-light px-6 py-5 m-2">
+						<div class="product-category__icon font-size-12 text-tangerine">
+							<i class="glyph-icon flaticon-cook"></i>
+						</div>
+						<div class="product-category__body">
+							<h3 class="text-truncate font-size-3">요리</h3>
+							<a href="/harubooks/category?ccg_b002=국내도서&ccg_b003=요리" class="stretched-link text-dark">바로가기</a>
+						</div>
+					</div>
+				</li>
+				<li class="product-category col mb-4 mb-xl-0">
+					<div class="product-category__inner bg-chili-light px-6 py-5 m-2">
+						<div class="product-category__icon font-size-12 text-chili">
+							<i class="glyph-icon flaticon-like"></i>
+						</div>
+						<div class="product-category__body">
+							<h3 class="text-truncate font-size-3">과학</h3>
+							<a href="/harubooks/category?ccg_b002=국내도서&ccg_b003=과학" class="stretched-link text-dark">바로가기</a>
+						</div>
+					</div>
+				</li>
+				<li class="product-category col mb-4 mb-xl-0">
+					<div class="product-category__inner bg-carolina-light px-6 py-5 m-2">
+						<div class="product-category__icon font-size-12 text-carolina">
+							<i class="glyph-icon flaticon-doctor"></i>
+						</div>
+						<div class="product-category__body">
+							<h3 class="text-truncate font-size-3">건강/스포츠</h3>
+							<a href="/harubooks/category?ccg_b002=국내도서&ccg_b003=건강/스포츠" class="stretched-link text-dark">바로가기</a>
+						</div>
+					</div>
+				</li>
+				<li class="product-category col mb-4 mb-xl-0 d-xl-none d-wd-block">
+					<div class="product-category__inner bg-punch-light px-6 py-5 m-2">
+						<div class="product-category__icon font-size-12 text-punch">
+							<i class="glyph-icon flaticon-resume"></i>
+						</div>
+						<div class="product-category__body">
+							<h3 class="text-truncate font-size-3">외국어</h3>
+							<a href="/harubooks/category?ccg_b002=국내도서&ccg_b003=외국어" class="stretched-link text-dark">바로가기</a>
+						</div>
+					</div>
+				</li>
+			</ul>
+		</div>
+	</section>
+	<section class="space-bottom-3">
+		<div class="container">
+			<header
+				class="mb-5 d-md-flex justify-content-between align-items-center">
+				<h2 class="font-size-7 mb-3 mb-md-0">베스트셀러</h2>
+				<a href="../shop/v1.html" class="h-primary d-block">View All <i
+					class="glyph-icon flaticon-next"></i></a>
+			</header>
+
+			<div
+				class="js-slick-carousel products no-gutters border-top border-left border-right"
+				data-pagi-classes="d-xl-none text-center position-absolute right-0 left-0 u-slick__pagination mt-4 mb-0"
+				data-arrows-classes="d-none d-xl-block u-slick__arrow u-slick__arrow-centered--y"
+				data-arrow-left-classes="fas fa-chevron-left u-slick__arrow-inner u-slick__arrow-inner--left ml-lg-n10"
+				data-arrow-right-classes="fas fa-chevron-right u-slick__arrow-inner u-slick__arrow-inner--right mr-lg-n10"
+				data-slides-show="5"
+				data-responsive='[{
+                   "breakpoint": 1500,
+                   "settings": {
+                     "slidesToShow": 4
+                   }
+                },{
+                   "breakpoint": 1199,
+                   "settings": {
+                     "slidesToShow": 3
+                   }
+                },{
+                   "breakpoint": 992,
+                   "settings": {
+                     "slidesToShow": 2
+                   }
+                }, {
+                   "breakpoint": 768,
+                   "settings": {
+                     "slidesToShow": 1
+                   }
+                }, {
+                   "breakpoint": 554,
+                   "settings": {
+                     "slidesToShow": 1
+                   }
+                }]'>
+				<div class="product">
+					<div class="product__inner overflow-hidden p-3 p-md-4d875">
+						<div
+							class="woocommerce-LoopProduct-link woocommerce-loop-product__link d-block position-relative">
+							<div class="woocommerce-loop-product__thumbnail">
+								<a href="../shop/single-product-v1.html" class="d-block"><img
+									src="https://placehold.it/150x226"
+									class="img-fluid d-block mx-auto attachment-shop_catalog size-shop_catalog wp-post-image img-fluid"
+									alt="image-description"></a>
+							</div>
+							<div
+								class="woocommerce-loop-product__body product__body pt-3 bg-white">
+								<div class="text-uppercase font-size-1 mb-1 text-truncate">
+									<a href="../shop/single-product-v1.html">Paperback</a>
+								</div>
+								<h2
+									class="woocommerce-loop-product__title product__title h6 text-lh-md mb-1 text-height-2 crop-text-2 h-dark">
+									<a href="../shop/single-product-v1.html">Think Like a Monk:
+										Train Your Mind for Peace and Purpose Everyday</a>
+								</h2>
+								<div class="font-size-2  mb-1 text-truncate">
+									<a href="../others/authors-single.html" class="text-gray-700">Jay
+										Shetty</a>
+								</div>
+								<div
+									class="price d-flex align-items-center font-weight-medium font-size-3">
+									<span class="woocommerce-Price-amount amount"><span
+										class="woocommerce-Price-currencySymbol">$</span>29</span>
+								</div>
+							</div>
+							<div class="product__hover d-flex align-items-center">
+								<a href="../shop/single-product-v1.html"
+									class="text-uppercase text-dark h-dark font-weight-medium mr-auto">
+									<span class="product__add-to-cart">ADD TO CART</span> <span
+									class="product__add-to-cart-icon font-size-4"><i
+										class="flaticon-icon-126515"></i></span>
+								</a> <a href="../shop/single-product-v1.html"
+									class="mr-1 h-p-bg btn btn-outline-primary border-0"> <i
+									class="flaticon-switch"></i>
+								</a> <a href="../shop/single-product-v1.html"
+									class="h-p-bg btn btn-outline-primary border-0"> <i
+									class="flaticon-heart"></i>
+								</a>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</section>
+	<section class="space-bottom-3">
+		<header class="mb-4 container">
+			<h2 class="font-size-7 text-center">화재의 신상</h2>
+		</header>
+		<div class="container">
+			<ul
+				class="nav justify-content-md-center nav-gray-700 mb-5 flex-nowrap flex-md-wrap overflow-auto overflow-md-visible"
+				id="featuredBooks" role="tablist">
+				<li class="nav-item mx-5 mb-1 flex-shrink-0 flex-md-shrink-1">
+					<a class="nav-link px-0 active" id="featured-tab" data-toggle="tab"
+					href="#featured" role="tab" aria-controls="featured"
+					aria-selected="true">국내 도서</a>
+				</li>
+				<li class="nav-item mx-5 mb-1 flex-shrink-0 flex-md-shrink-1">
+					<a class="nav-link px-0" id="onsale-tab" data-toggle="tab"
+					href="#onsale" role="tab" aria-controls="onsale"
+					aria-selected="false">외국 도서</a>
+				</li>
+				<li class="nav-item mx-5 mb-1 flex-shrink-0 flex-md-shrink-1">
+					<a class="nav-link px-0" id="mostviewed-tab" data-toggle="tab"
+					href="#mostviewed" role="tab" aria-controls="mostviewed"
+					aria-selected="false">e-Book</a>
+				</li>
+			</ul>
+			<!--화재의 신작 (국내도서)책 들어가는 부분-->
+			<div class="tab-content" id="featuredBooksContent">
+				<div class="tab-pane fade show active" id="featured" role="tabpanel"
+					aria-labelledby="featured-tab">
+					<ul
+						class="products list-unstyled row no-gutters row-cols-2 row-cols-md-3 row-cols-lg-4 row-cols-wd-6 border-top border-left my-0">
+						<li class="product col">
+							<div class="product__inner overflow-hidden p-3 p-md-4d875">
+								<div
+									class="woocommerce-LoopProduct-link woocommerce-loop-product__link d-block position-relative">
+									<div class="woocommerce-loop-product__thumbnail">
+										<a href="../shop/single-product-v1.html" class="d-block"><img
+											src="https://placehold.it/120x180"
+											class="img-fluid d-block mx-auto attachment-shop_catalog size-shop_catalog wp-post-image img-fluid"
+											alt="image-description"></a>
+									</div>
+									<div
+										class="woocommerce-loop-product__body product__body pt-3 bg-white">
+										<div class="text-uppercase font-size-1 mb-1 text-truncate">
+											<a href="../shop/single-product-v1.html">국내도서</a>
+										</div>
+										<h2
+											class="woocommerce-loop-product__title product__title h6 text-lh-md mb-1 text-height-2 crop-text-2 h-dark">
+											<a href="../shop/single-product-v1.html">안녕</a>
+										</h2>
+										<div class="font-size-2  mb-1 text-truncate">
+											<a href="others/authors-single.html" class="text-gray-700">정훈</a>
+										</div>
+										<div
+											class="price d-flex align-items-center font-weight-medium font-size-3">
+											<span class="woocommerce-Price-amount amount"><span
+												class="woocommerce-Price-currencySymbol"></span>29000원</span>
+										</div>
+									</div>
+									<div class="product__hover d-flex align-items-center">
+										<a href="../shop/single-product-v1.html"
+											class="text-uppercase text-dark h-dark font-weight-medium mr-auto"
+											data-toggle="tooltip" data-placement="right"
+											title="ADD TO CART"> <span class="product__add-to-cart">ADD
+												TO CART</span> <span class="product__add-to-cart-icon font-size-4"><i
+												class="flaticon-icon-126515"></i></span>
+										</a> <a href="../shop/single-product-v1.html"
+											class="mr-1 h-p-bg btn btn-outline-primary border-0"> <i
+											class="flaticon-switch"></i>
+										</a> <a href="../shop/single-product-v1.html"
+											class="h-p-bg btn btn-outline-primary border-0"> <i
+											class="flaticon-heart"></i>
+										</a>
+									</div>
+								</div>
+							</div>
+						</li>
+					</ul>
+				</div>
+				<!--화재의 신상 (외국 도서 )들어가는부분-->
+				<div class="tab-pane fade" id="onsale" role="tabpanel"
+					aria-labelledby="onsale-tab">
+					<ul
+						class="products list-unstyled row no-gutters row-cols-2 row-cols-md-3 row-cols-lg-4 row-cols-wd-6 border-top border-left my-0">
+						<li class="product col">
+							<div class="product__inner overflow-hidden p-3 p-md-4d875">
+								<div
+									class="woocommerce-LoopProduct-link woocommerce-loop-product__link d-block position-relative">
+									<div class="woocommerce-loop-product__thumbnail">
+										<a href="../shop/single-product-v1.html" class="d-block"><img
+											src="https://placehold.it/120x180"
+											class="img-fluid d-block mx-auto attachment-shop_catalog size-shop_catalog wp-post-image img-fluid"
+											alt="image-description"></a>
+									</div>
+									<div
+										class="woocommerce-loop-product__body product__body pt-3 bg-white">
+										<div class="text-uppercase font-size-1 mb-1 text-truncate">
+											<a href="../shop/single-product-v1.html">Paperback</a>
+										</div>
+										<h2
+											class="woocommerce-loop-product__title product__title h6 text-lh-md mb-1 text-height-2 crop-text-2 h-dark">
+											<a href="../shop/single-product-v1.html">Think Like a
+												Monk: Train Your Mind for Peace and Purpose Everyday</a>
+										</h2>
+										<div class="font-size-2  mb-1 text-truncate">
+											<a href="others/authors-single.html" class="text-gray-700">Jay
+												Shetty</a>
+										</div>
+										<div
+											class="price d-flex align-items-center font-weight-medium font-size-3">
+											<span class="woocommerce-Price-amount amount"><span
+												class="woocommerce-Price-currencySymbol">$</span>29</span>
+										</div>
+									</div>
+									<div class="product__hover d-flex align-items-center">
+										<a href="../shop/single-product-v1.html"
+											class="text-uppercase text-dark h-dark font-weight-medium mr-auto"
+											data-toggle="tooltip" data-placement="right"
+											title="ADD TO CART"> <span class="product__add-to-cart">ADD
+												TO CART</span> <span class="product__add-to-cart-icon font-size-4"><i
+												class="flaticon-icon-126515"></i></span>
+										</a> <a href="../shop/single-product-v1.html"
+											class="mr-1 h-p-bg btn btn-outline-primary border-0"> <i
+											class="flaticon-switch"></i>
+										</a> <a href="../shop/single-product-v1.html"
+											class="h-p-bg btn btn-outline-primary border-0"> <i
+											class="flaticon-heart"></i>
+										</a>
+									</div>
+								</div>
+							</div>
+						</li>
+					</ul>
+				</div>
+				<!-- 화재의 신상 (e-Book)들어 가는부분-->
+				<div class="tab-pane fade" id="mostviewed" role="tabpanel"
+					aria-labelledby="mostviewed-tab">
+					<ul
+						class="products list-unstyled row no-gutters row-cols-2 row-cols-md-3 row-cols-lg-4 row-cols-wd-6 border-top border-left my-0">
+						<li class="product col">
+							<div class="product__inner overflow-hidden p-3 p-md-4d875">
+								<div
+									class="woocommerce-LoopProduct-link woocommerce-loop-product__link d-block position-relative">
+									<div class="woocommerce-loop-product__thumbnail">
+										<a href="../shop/single-product-v1.html" class="d-block"><img
+											src="https://placehold.it/120x180"
+											class="img-fluid d-block mx-auto attachment-shop_catalog size-shop_catalog wp-post-image img-fluid"
+											alt="image-description"></a>
+									</div>
+									<div
+										class="woocommerce-loop-product__body product__body pt-3 bg-white">
+										<div class="text-uppercase font-size-1 mb-1 text-truncate">
+											<a href="../shop/single-product-v1.html">Paperback</a>
+										</div>
+										<h2
+											class="woocommerce-loop-product__title product__title h6 text-lh-md mb-1 text-height-2 crop-text-2 h-dark">
+											<a href="../shop/single-product-v1.html">Think Like a
+												Monk: Train Your Mind for Peace and Purpose Everyday</a>
+										</h2>
+										<div class="font-size-2  mb-1 text-truncate">
+											<a href="others/authors-single.html" class="text-gray-700">Jay
+												Shetty</a>
+										</div>
+										<div
+											class="price d-flex align-items-center font-weight-medium font-size-3">
+											<span class="woocommerce-Price-amount amount"><span
+												class="woocommerce-Price-currencySymbol">$</span>29</span>
+										</div>
+									</div>
+									<div class="product__hover d-flex align-items-center">
+										<a href="../shop/single-product-v1.html"
+											class="text-uppercase text-dark h-dark font-weight-medium mr-auto"
+											data-toggle="tooltip" data-placement="right"
+											title="ADD TO CART"> <span class="product__add-to-cart">ADD
+												TO CART</span> <span class="product__add-to-cart-icon font-size-4"><i
+												class="flaticon-icon-126515"></i></span>
+										</a> <a href="../shop/single-product-v1.html"
+											class="mr-1 h-p-bg btn btn-outline-primary border-0"> <i
+											class="flaticon-switch"></i>
+										</a> <a href="../shop/single-product-v1.html"
+											class="h-p-bg btn btn-outline-primary border-0"> <i
+											class="flaticon-heart"></i>
+										</a>
+									</div>
+								</div>
+							</div>
+						</li>
+					</ul>
+				</div>
+			</div>
+		</div>
+	</section>
+	<section class="space-bottom-3">
+		<div class="space-top-3 space-bottom-4 bg-gray-200">
+			<div class="container">
+				<header
+					class="mb-5 d-md-flex justify-content-between align-items-center">
+					<h2 class="font-size-7 mb-3 mb-md-0">특가 도서</h2>
+					<a href="#" class="h-primary d-block">View All <i
+						class="glyph-icon flaticon-next"></i></a>
+				</header>
+				<div
+					class="js-slick-carousel u-slick products border bg-white no-gutters"
+					data-arrows-classes="u-slick__arrow u-slick__arrow-centered--y"
+					data-arrow-left-classes="fas fa-chevron-left u-slick__arrow-inner u-slick__arrow-inner--left ml-lg-n10"
+					data-arrow-right-classes="fas fa-chevron-right u-slick__arrow-inner u-slick__arrow-inner--right mr-lg-n10"
+					data-pagi-classes="text-center u-slick__pagination u-slick__pagination mt-6 mb-0 position-absolute right-0 left-0"
+					data-slides-show="2"
+					data-responsive='[{
+                       "breakpoint": 1199,
+                       "settings": {
+                         "slidesToShow": 1
+                       }
+                    }, {
+                       "breakpoint": 768,
+                       "settings": {
+                         "slidesToShow": 1
+                       }
+                    }, {
+                       "breakpoint": 554,
+                       "settings": {
+                         "slidesToShow": 1
+                       }
+                    }]'>
+					<!--특가 도서 책넣는곳-->
+					<div class="product product__card border-right">
+						<div class="media p-md-6 p-4 d-block d-md-flex">
+							<div class="woocommerce-loop-product__thumbnail mb-4 mb-md-0">
+								<a href="../shop/single-product-v1.html" class="d-block"><img
+									src="https://placehold.it/200x327"
+									class="attachment-shop_catalog size-shop_catalog wp-post-image d-block mx-auto"
+									alt="image-description"></a>
+							</div>
+							<div class="woocommerce-loop-product__body media-body ml-md-5d25">
+								<div class="mb-3">
+									<div class="text-uppercase font-size-1 mb-1 text-truncate">
+										<a href="../shop/single-product-v1.html">Kindle Edition</a>
+									</div>
+									<h2
+										class="woocommerce-loop-product__title font-size-3 text-lh-md mb-2 text-height-2 crop-text-2 h-dark">
+										<a href="../shop/single-product-v1.html">Dark in Death: An
+											Eve Dallas Novel (In Death, Book 46)</a>
+									</h2>
+									<div class="font-size-2 text-gray-700 mb-1 text-truncate">
+										<a href="../others/authors-single.html" class="text-gray-700">Nora
+											Roberts</a>
+									</div>
+									<div
+										class="price d-flex align-items-center font-weight-medium font-size-3">
+										<ins class="text-decoration-none mr-2">
+											<span class="woocommerce-Price-amount amount"><span
+												class="woocommerce-Price-currencySymbol">$</span>79</span>
+										</ins>
+										<del class="font-size-1 font-weight-regular text-gray-700">
+											<span class="woocommerce-Price-amount amount"><span
+												class="woocommerce-Price-currencySymbol">$</span>99</span>
+										</del>
+									</div>
+								</div>
+								<div class="countdown-timer mb-5">
+									<h5
+										class="countdown-timer__title font-size-3 mb-3 font-weight-bold">
+										Hurry Up! <span class="font-weight-regular">Offer ends
+											in:</span>
+									</h5>
+									<div class="d-flex align-items-stretch justify-content-between">
+										<div class="py-2d75">
+											<span class="font-weight-medium font-size-3">114</span> <span
+												class="font-size-2 ml-md-2 ml-xl-0 ml-wd-2 d-xl-block d-wd-inline">Days</span>
+										</div>
+										<div class="border-left pr-3 pr-md-0">&nbsp;</div>
+										<div class="py-2d75">
+											<span class="font-weight-medium font-size-3">03</span> <span
+												class="font-size-2 ml-md-2 ml-xl-0 ml-wd-2 d-xl-block d-wd-inline">Hours</span>
+										</div>
+										<div class="border-left pr-3 pr-md-0">&nbsp;</div>
+										<div class="py-2d75">
+											<span class="font-weight-medium font-size-3">60</span> <span
+												class="font-size-2 ml-md-2 ml-xl-0 ml-wd-2 d-xl-block d-wd-inline">Mins</span>
+										</div>
+										<div class="border-left pr-3 pr-md-0">&nbsp;</div>
+										<div class="py-2d75">
+											<span class="font-weight-medium font-size-3">25</span> <span
+												class="font-size-2 ml-md-2 ml-xl-0 ml-wd-2 d-xl-block d-wd-inline">Secs</span>
+										</div>
+									</div>
+								</div>
+								<div class="deal-progress">
+									<div class="d-flex justify-content-between font-size-2 mb-2d75">
+										<span>Already Sold: 14</span> <span>Available: 3</span>
+									</div>
+									<div class="progress">
+										<div class="progress-bar" role="progressbar"
+											style="width: 82%" aria-valuenow="14" aria-valuemin="0"
+											aria-valuemax="17"></div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</section>
+
+	<section class="space-bottom-3">
+		<div class="container">
+			<header
+				class="mb-5 d-md-flex justify-content-between align-items-center">
+				<h2 class="font-size-7 mb-3 mb-md-0">하루북스 추천 책</h2>
+			</header>
+			<!--하루 북스 책추천 책 넣는곳-->
+			<div class="js-slick-carousel u-slick products border"
+				data-pagi-classes="text-center u-slick__pagination mt-md-8 mt-4 position-absolute right-0 left-0"
+				data-slides-show="3"
+				data-responsive='[{
+                   "breakpoint": 992,
+                   "settings": {
+                     "slidesToShow": 2
+                   }
+                }, {
+                   "breakpoint": 768,
+                   "settings": {
+                     "slidesToShow": 1
+                   }
+                }, {
+                   "breakpoint": 554,
+                   "settings": {
+                     "slidesToShow": 1
+                   }
+                }]'>
+				<div class="product product__card border-right">
+					<div class="media p-3 p-md-4d875">
+						<a href="../shop/single-product-v1.html" class="d-block"><img
+							src="https://placehold.it/120x183" alt="image-description"></a>
+						<div class="media-body ml-4d875">
+							<div class="text-uppercase font-size-1 mb-1 text-truncate">
+								<a href="../shop/single-product-v1.html">Hard Cover</a>
+							</div>
+							<h2
+								class="woocommerce-loop-product__title h6 text-lh-md mb-1 text-height-2 crop-text-2 h-dark">
+								<a href="../shop/single-product-v1.html">The Rural Diaries:
+									Love, Livestock, and Big Life Lessons Down on Mischief Farm</a>
+							</h2>
+							<div class="font-size-2 mb-1 text-truncate">
+								<a href="../others/authors-single.html" class="text-gray-700">Hillary
+									Burton</a>
+							</div>
+							<div
+								class="price d-flex align-items-center font-weight-medium font-size-3">
+								<span class="woocommerce-Price-amount amount"><span
+									class="woocommerce-Price-currencySymbol"></span>15000원</span>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<input type="hidden" value="${msg}" id="msg">
+	</section>
+	<script>
+		var msg = document.querySelector('#msg').value;
+		if(msg != ""){
+			alert(msg);
+		}
+	</script>
+	<!-- ====== END MAIN CONTENT ====== -->
+

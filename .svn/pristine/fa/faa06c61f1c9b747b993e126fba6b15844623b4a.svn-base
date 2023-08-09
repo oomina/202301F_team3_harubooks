@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+ <mapper namespace="kr.or.ddit.mapper.bmk.HarustroyMapper">
+ 	
+ 	<!-- 게시판 타입 -->
+  	<sql id="boardType">
+		<if test="searchType != null and searchType == 'order-inq'">
+			order by inq_cnt desc
+		</if>
+		<if test="searchType != null and searchType == 'order-recent'">
+			order by wrt_ymd desc
+		</if>
+	</sql>
+	
+	<!--  게시판 검색 -->
+	<sql id="boardSearch">
+		<if test="searchWord!= null and searchSelect == 'board_title'">
+			and  a.board_title LIKE '%${searchWord}%'
+		</if>
+		<if test="searchWord!= null and searchSelect == 'board_writer'">
+			and  d.mem_nicknm LIKE '%${searchWord}%'
+		</if>
+	</sql>
+	
+ 	<!-- 피드 리스트 -->
+ 	<select id="boardList" resultType="boardVO" parameterType="boardVO">
+		select
+                  d.board_no
+                , d.board_title
+                , d.board_content
+                , d.wrt_ymd
+                , d.last_mdfcn_ymd
+                , d.inq_cnt
+                , d.ccg_b004
+                , d.ua_no
+                , d.ae_id
+                , d.ua_stre_nm
+                , d.ua_etc
+                , d.mem_profile
+                , d.mem_nicknm		 
+		from(
+			select
+                      c.*, row_number() over (<include refid="boardType"/>) rnum
+			from(
+				select
+                      a.board_no
+                    , a.board_title
+                    , a.board_content
+                    , a.wrt_ymd
+                    , a.last_mdfcn_ymd
+                    , a.inq_cnt
+                    , a.ccg_b004
+                    , a.ua_no
+                    , a.ae_id
+                    , b.ua_stre_nm
+                    , b.ua_etc 
+                    , q.mem_profile
+                    , q.mem_nicknm 
+                    from
+                        board a, unity_atchmnfl b, com_member q 
+                    where 
+                        a.ccg_b004 = '자유게시판'
+                    and
+                        a.ua_no = b.ua_no
+                    and 
+                        b.ua_sn = 1
+                    and 
+                        a.ae_id = q.ae_id
+                    <include refid="boardSearch"/>
+			) c
+		) d
+		<![CDATA[
+			where 
+				d.rnum >= (#{currentPage} * #{screenSize}) - (#{screenSize} - 1) and d.rnum <= (#{currentPage} * #{screenSize}) 	
+		]]>
+ 	</select>
+ 	
+ 	<!-- 피드 상세보기 -->
+ 	<select id="boardOne" parameterType="string" resultType="boardVO">
+ 		select 
+               a.board_no
+             , a.board_title
+             , a.board_content
+             , a.wrt_ymd
+             , a.last_mdfcn_ymd
+             , a.inq_cnt
+             , a.ccg_b004
+             , a.ua_no
+             , a.ae_id
+             , q.mem_profile
+             , q.mem_nicknm 
+	 	from 
+	 		board a, com_member q 
+	 	where 
+	 		a.board_no = #{board_no}
+		and
+            a.ae_id = q.ae_id			
+ 	</select>
+ 
+ 	
+ 	<!-- 게시글 작성 -->
+ 	<insert id="storyInsert" parameterType="boardVO">
+ 		<selectKey keyProperty="board_no" resultType="string" order="BEFORE"> 
+	 		select 'BO' || lpad(seq_bo.nextval, 10,'0') from dual
+	 	</selectKey>
+ 			insert into board (
+	 				board_no
+	 	  		  , board_title
+	 	  		  , board_content
+	 	  		  , wrt_ymd
+	 	  		  , last_mdfcn_ymd
+	 	  		  , inq_cnt
+	 	  		  , ccg_b004
+	 	  		  , ua_no
+	 	  		  , ae_id)
+			values (
+	  			  	#{board_no}
+	  			  , #{board_title}
+	  			  , #{board_content}
+			  	  , sysdate
+			  	  , 0
+				  , 0
+			      , #{ccg_b004}
+			  	  , #{ua_no}
+			  	  , #{ae_id})
+ 	</insert>
+ 	
+	<update id="storyUpdate" parameterType="boardVO">
+		update board set
+    		board_title = #{board_title},
+   			board_content = #{board_content}
+   		 where 
+   			board_no = #{board_no}
+	</update> 	
+	
+	
+ </mapper>

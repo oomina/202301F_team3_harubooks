@@ -1,0 +1,460 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@200&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Nanum+Pen+Script&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Jua&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Nanum+Gothic&display=swap');
+
+.chatting{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+	margin: 1rem 1rem;
+}
+
+#chatting-tex h1{
+    font-size: 1.7rem;
+    font-family: 'Nanum Gothic', sans-serif;
+    color: #9f9d9d;
+}
+
+#chatting-search-select{
+	text-align: center;
+    border: 1px solid grey;
+    border-radius: 10px;
+    font-family: 'Nanum Gothic', sans-serif;
+    color: #9f9d9d;
+    padding: 3px;
+    font-weight: bold;
+    outline: none;
+}
+
+#chatting-search-input{
+    width: 350px;
+    text-align: center;
+    border: 1px solid grey;
+    border-radius: 10px;
+    font-family: 'Nanum Gothic', sans-serif;
+    color: #9f9d9d;
+    padding: 3px;
+    font-weight: bold;	
+    outline: none;
+}
+
+#chatting-search-input-btn{
+	width: 65px;
+    font-family: 'Nanum Gothic', sans-serif;
+    color: #9f9d9d;
+    padding: 3px 11px;
+    font-weight: bold;
+    border-radius: 8px;
+    outline: none;
+    border: 0.5px solid #9f9d9d;
+    cursor: pointer;
+}
+
+#chatting-select{
+    width: 115px;;
+    font-family: 'Nanum Gothic', sans-serif;
+    color: #9f9d9d;
+    padding: 4px 11px;
+    font-weight: bold;
+    border-radius: 8px;
+    outline: none;
+    border: 0.5px solid #9f9d9d;
+    cursor: pointer;
+    text-align: center;
+    font-size: 14px;
+}
+
+#chatting-upload-btn {
+    display: flex;
+    align-items: center;
+    padding: 7px;
+    border-radius: 8px;
+    background: #53b12e;
+    cursor: pointer;
+    margin-right: 10px;
+}
+
+#chatting-upload-btn i{
+	color: hsla(0, 0%, 100%, 0.6);
+    margin-right: 10px;
+}
+
+.btn-text{
+	font-family: 'Nanum Gothic', sans-serif;
+    color: white;
+}
+
+#imodal, #dmodal {
+	position: fixed; /* 위치 고정 */
+	left: 0px;
+	top: 0px;
+	width: 100vw; /* 사이즈 고정 */
+	height: 100vh;
+	background-color: rgb(57 56 56 / 50%);;
+	z-index: 100; /* 클 수록 앞으로 나옴 */
+	display: none; /* 처음엔 안 보여야 함 */
+}
+
+
+.imcontainer {
+    padding: 5px;
+    width: 35%;
+    height: 70%;
+    margin: 135px 70px 110px 530px;
+	background-color: white;
+	border-radius: 20px;
+	position: relative;
+	transition: width 0.5s ease;
+	padding: 20px;
+	text-align: center;
+	justify-content: center;
+	align-content: center;
+}
+
+#chatting-insert-div{
+	display: grid;
+    text-align: center;
+}
+
+.chatting-divs{
+	margin-bottom: 20px;
+}
+
+#div-title{
+	display: grid;
+}
+
+.ibtn{	
+	background: no-repeat;
+    border: none;
+    font-size: 30px;
+    float: right;
+    margin: 0px;
+    cursor: pointer;
+}
+
+#div-title h2{
+	font-family: 'Nanum Gothic', sans-serif;
+	color: #53b12e;
+}
+
+#chatting-title{
+	font-family: 'Nanum Gothic', sans-serif;
+	display: grid;
+	text-align: center;
+	justify-content: center;
+}
+
+#chatting-title label{
+	font-weight: bold;
+	margin-bottom: 5px;
+}
+
+#chatting-title input[type="text"]{
+	text-align: center;
+    width: 250px;
+    height: 25px;
+    outline: none;
+    border: none;
+    border-bottom: 0.3px solid grey;
+    font-size: 16px;
+}
+
+#chatting-content{
+	font-family: 'Nanum Gothic', sans-serif;
+	display: grid;
+	text-align: center;
+	justify-content: center;
+}
+
+#chatting-content label{
+	font-weight: bold;
+	margin-bottom: 5px;
+}
+
+#chatting-content textarea{
+	text-align: center;
+    width: 350px;
+    height: 140px;
+    outline: none;
+    border: none;
+    border-bottom: 0.3px solid grey;
+    justify-content: center;
+    font-size: 16px;
+    resize: none;
+}
+
+#iRadio{
+	display: flex;
+	justify-content: center;
+	font-family: 'Nanum Gothic', sans-serif;
+    font-weight: bold;
+    margin-left: 35px;
+    margin-bottom: 10px;
+}
+
+#iRadio input[type='radio']{
+	margin-right: 20px;
+	margin-left: 8px;	
+}
+
+#iPassword{
+	display: none;
+	justify-content: center;
+	font-family: 'Nanum Gothic', sans-serif;
+}
+
+#iPassword span{
+	font-weight: bold;
+    font-size: 14px;
+    margin-right: 11px;
+}
+
+#iPassword input[type="text"]{
+	text-align: center;
+    width: 220px;
+    border-radius: 5px;
+    outline: none;
+    border: 0.5px solid grey;
+}
+
+#iCount{
+	display: flex;
+	justify-content: center;
+	font-family: 'Nanum Gothic', sans-serif;
+	margin-bottom: 35px;
+}
+
+#iCount span{
+	font-weight: bold;
+    font-size: 14px;
+    margin-right: 11px;	
+}
+
+#iCount input[type="number"]{
+    text-align: center;
+    width: 110px;
+    border-radius: 5px;
+    outline: none;
+    border: 0.5px solid grey;
+    height: 20px;
+}
+
+#iBtn{
+	font-family: 'Nanum Gothic', sans-serif;
+}
+
+.iBtns{
+	align-items: center;
+	padding: 7px;
+    border-radius: 8px;
+    background: #53b12e;
+    cursor: pointer;
+    margin-right: 10px;
+    border: none;
+    color: white;
+    font-weight: bold;
+    width: 120px;
+    font-size: 20px;
+}
+
+#chattingList{
+    display: grid;
+    grid-template-columns: repeat(auto-fit,minmax(280px, auto));
+    margin-left: 60px;
+    margin-top: 30px;
+}
+
+.post-box{
+    width: 280px;
+    margin-bottom: 40px;
+    border-radius: 12px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s ease-in-out;
+    height: 340px;
+}
+
+.post-box:hover{
+	transform: translateY(-8px); 
+}
+
+.header-div{
+	padding: 10px;
+	border-bottom: 2px solid #53b12e;
+}
+
+.title-div{
+	display: flex;
+	justify-content: space-between;
+	font-family: 'Nanum Gothic', sans-serif;
+}
+
+.chat-info{
+	font-weight: bold;
+}
+
+#chat-no{
+	color: #53b12e;
+}
+
+#chat-type{
+	font-size: 12px;
+}
+
+.chat-num-div{
+	margin-top: 10px;
+	display: flex;
+	font-family: 'Nanum Gothic', sans-serif;
+	justify-content: space-between;
+	text-align: center;
+}
+
+.chat-data-div{
+	font-size: 10px;
+}
+
+.chat-data-span{	
+	font-weight: bold;
+	margin-bottom: 3px;
+}
+
+.chat-data{
+	font-size: 11px
+}
+
+.chat-count-div{
+	font-size: 10px;	
+}
+
+.chat-data-span{
+	font-weight: bold;
+	margin-bottom: 3px;
+}
+
+.main-div{
+	padding: 10px;
+}
+
+.main-info{
+	height: 180px;
+	overflow: auto;
+	margin-bottom: 20px;
+}
+
+.main-btn{
+	text-align: center;
+}
+
+.main-btn input[type="button"]{
+    padding: 6px 30px;
+    border-radius: 6px;
+    border: 2px solid #53b12e;
+    cursor: pointer;
+    font-family: 'Nanum Gothic', sans-serif;
+    font-weight: bold;
+    background: none;
+    color: #53b12e
+}
+
+.main-btn input[type="button"]:hover{
+	color: white;
+	background: #53b12e;
+}
+
+#chatting-detail-div{
+	display: none;
+}
+
+.dcontainer{
+    padding: 5px;
+    width: 35%;
+    height: 70%;
+    margin: 110px 70px 110px 530px;
+	background-color: white;
+	border-radius: 20px;
+	position: relative;
+	transition: width 0.5s ease;
+	padding: 5px;
+	text-align: center;
+	justify-content: center;
+	align-content: center;	
+}
+
+#chatting-detail-div{
+	display: grid;
+    text-align: center;
+}
+
+.chatting-divs{
+	margin-bottom: 15px;
+}
+
+#div-title{
+	display: grid;
+	
+}
+
+#detail-table{
+	padding: 3px;
+    width: 100%;
+}
+
+#detail-table th{
+	border: 1px solid #53b12e;
+	background-color: #53b12e;
+	color: white;
+}
+
+#detail-table td{
+	border: 1px solid #53b12e;
+}
+
+.dbtn{
+	background: no-repeat;
+    border: none;
+    font-size: 30px;
+    float: right;
+    margin-right: 8px;
+    cursor: pointer;
+}
+
+.dTitel{
+	font-size: 15px;
+	font-weight: bold;
+	width: 50px;
+	color: #53b12e;
+}
+
+#detail-info{
+	height: 210px;
+}
+
+#chat-btn{
+    padding: 8px 55px;
+    border-radius: 6px;
+    border: 2px solid #53b12e;
+    cursor: pointer;
+    font-family: 'Nanum Gothic', sans-serif;
+    font-weight: bold;
+    background: none;
+    color: #53b12e;
+    font-size: 18px;
+    margin-top: 22px;
+}
+
+#chat-btn:hover{
+	color: white;
+	background: #53b12e;	
+}
+
+
+#detail-pw{
+    border: none;
+	width: 250px;
+    text-align: center;	
+    outline: none;
+}
+
+
+

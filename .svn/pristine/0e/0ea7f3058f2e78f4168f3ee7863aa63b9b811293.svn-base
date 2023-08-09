@@ -1,0 +1,40 @@
+package kr.or.ddit.service.jhs;
+
+import java.util.List;
+
+import javax.inject.Inject;
+
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Service;
+
+import kr.or.ddit.ResultStatus;
+import kr.or.ddit.mapper.jhs.MyLibraryMapper;
+import kr.or.ddit.vo.jhs.Ebook_ManagerVO;
+import kr.or.ddit.vo.jhs.Ebook_PageVO;
+
+@Service	
+public class MyLibraryServiceImpl implements IMyLibraryService {
+	
+	@Inject
+	private MyLibraryMapper mapper;
+	
+	@Override
+	public List<Ebook_ManagerVO> getEbookList(Ebook_PageVO<Ebook_ManagerVO> evo) {
+		List<Ebook_ManagerVO> vo = mapper.getEbookList(evo);
+		
+		for(int i = 0; i < vo.size(); i++) {
+			
+			Ebook_ManagerVO tvo = mapper.getEbookDetailList(vo.get(i).getBook_no());
+			vo.get(i).setBook_title(tvo.getBook_title());
+			vo.get(i).setBook_cover(tvo.getBook_cover());
+			
+		}
+		return vo;
+	}
+
+	@Override
+	public int selectEbookListCount(Ebook_PageVO<Ebook_ManagerVO> evo) {
+		return mapper.selectEbookListCount(evo);
+	}
+	
+}

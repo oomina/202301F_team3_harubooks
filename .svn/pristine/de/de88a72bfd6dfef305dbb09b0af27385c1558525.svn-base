@@ -1,0 +1,87 @@
+package kr.or.ddit.controller.omn.mbr;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.inject.Inject;
+
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import kr.or.ddit.service.omn.mbr.IMngMbrService;
+import kr.or.ddit.vo.omn.MngMbrVO;
+import kr.or.ddit.vo.omn.MngPaginationInfoVO;
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
+@Controller
+@RequestMapping("/mng/mbr")
+@PreAuthorize("hasRole('ROLE_ADMIN')")
+public class MngMbrController {
+	
+	@Inject
+	private IMngMbrService service;
+	
+	@ResponseBody
+	@GetMapping(value = "/selectMbrList", produces = "application/json;charset=utf-8")
+	public Map<String, Object> selectMbrList(
+			@RequestParam(name = "page", required = false, defaultValue = "1") int currentPage,
+			@RequestParam(required = false, defaultValue = "id") String searchType,
+			@RequestParam(required = false, defaultValue = "") String searchWord,
+			String ae_id){
+		
+		log.info("selectMbrList()실행");
+		
+		Map<String, Object> map = new HashMap<>();
+		MngPaginationInfoVO<MngMbrVO> pagingVO = new MngPaginationInfoVO<>();
+		
+		if(StringUtils.isNotBlank(searchWord)) {
+			pagingVO.setSearchType(searchType);
+			pagingVO.setSearchWord(searchWord);
+			map.put("searchType", searchType);
+			map.put("searchWord", searchWord);
+		}
+		
+		pagingVO.setCurrentPage(currentPage);
+		pagingVO.setAe_id(ae_id);
+		int totalRecord = service.mbrCount(pagingVO);
+		pagingVO.setTotalRecord(totalRecord);
+		int allRecord = service.mbrAllCount(ae_id);
+		pagingVO.setAllRecord(allRecord);
+		List<MngMbrVO> dataList = service.selectMbrList(pagingVO);
+		pagingVO.setDataList(dataList);
+		map.put("pagingVO", pagingVO);
+		
+		return map;
+	}
+	
+	@ResponseBody
+	@GetMapping(value = "/mbrList", produces = "application/json;charset=utf-8")
+	public List<MngMbrVO> mbrList(){
+		log.info("mbrList()실행");
+		return service.mbrList();
+	}
+	
+	@ResponseBody
+	@GetMapping(value = "/mbrInfo/{id}", produces = "application/json;charset=utf-8")
+	public MngMbrVO mbrInfo(@PathVariable("id") String ae_id) {
+		log.info("mbrInfo()실행");
+		return service.mbrInfo(ae_id);
+	}
+	
+	@ResponseBody
+	@PutMapping(value = "", produces = "application/json;charset=utf-8")
+	public int mbrUpdate(@RequestBody MngMbrVO mngMbrVO) {
+		log.info("mbrUpdate()실행");
+		return service.mbrUpdate(mngMbrVO);
+	}
+}

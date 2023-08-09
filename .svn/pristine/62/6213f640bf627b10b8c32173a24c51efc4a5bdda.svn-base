@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.or.ddit.mapper.omn.mbr.MngMbrMapper">
+	
+	<sql id="mbrSearch">
+		<if test="searchType != null and searchType == 'id'">
+			and (ae_id like '%'||#{searchWord}||'%')
+		</if>
+		<if test="searchType != null and searchType == 'nm'">
+			and (user_nm like '%'||#{searchWord}||'%')
+		</if>
+	</sql>
+	
+	<select id="mbrAllCount" parameterType="string" resultType="int">
+		SELECT count(ae_id)
+		FROM member
+		WHERE 1=1
+	</select>
+	
+	<select id="mbrCount" parameterType="mngPaginationInfoVO" resultType="int">
+		SELECT count(ae_id)
+		FROM member
+		WHERE 1=1
+		<include refid="mbrSearch"/>
+	</select>
+	
+	<select id="selectMbrList" parameterType="mngPaginationInfoVO" resultType="mngMbrVO">
+		SELECT b.ae_id
+			 , b.mbr_mileage
+			 , b.mbr_email
+			 , b.mbr_addr
+			 , b.mbr_daddr
+			 , b.mbr_zip
+			 , b.mbr_telno
+			 , b.mbr_gender
+			 , b.mbr_brdt
+			 , b.rank_name
+			 , b.user_nm
+			 , b.rnum
+		FROM(
+			SELECT
+				a.*, row_number() over (order by a.ae_id) rnum
+			FROM(
+				SELECT c.ae_id
+					 , c.mbr_mileage
+					 , c.mbr_email
+					 , c.mbr_addr
+					 , c.mbr_daddr
+					 , c.mbr_zip
+					 , c.mbr_telno
+					 , c.mbr_gender
+					 , c.mbr_brdt
+					 , c.rank_name
+					 , c.user_nm
+				FROM member c
+				WHERE 1=1
+				<include refid="mbrSearch"/>
+				ORDER BY c.ae_id
+			) a
+		) b
+		<![CDATA[
+			WHERE b.rnum >= #{startRow} and b.rnum <= #{endRow}
+		]]>
+	</select>
+	
+	<select id="mbrList" resultType="map">
+		SELECT ae_id
+			 , mbr_mileage
+			 , mbr_email
+			 , mbr_addr
+			 , mbr_daddr
+			 , mbr_zip
+			 , mbr_telno
+			 , mbr_gender
+			 , mbr_brdt
+			 , rank_name
+			 , user_nm
+		FROM member
+	</select>
+	
+	<select id="mbrInfo" resultType="mngMbrVO">
+		SELECT ae_id
+			 , mbr_mileage
+			 , mbr_email
+			 , mbr_addr
+			 , mbr_daddr
+			 , mbr_zip
+			 , mbr_telno
+			 , mbr_gender
+			 , mbr_brdt
+			 , rank_name
+			 , user_nm
+		FROM member
+		WHERE ae_id = #{ae_id}
+	</select>
+	
+	<update id="mbrUpdate" parameterType="mngMbrVO">
+		UPDATE member
+		SET
+			mbr_mileage = #{mbr_mileage}
+			 , mbr_email = #{mbr_email}
+			 , mbr_addr = #{mbr_addr}
+			 , mbr_daddr = #{mbr_daddr}
+			 , mbr_zip = #{mbr_zip}
+			 , mbr_telno = #{mbr_telno}
+			 , mbr_gender = #{mbr_gender}
+			 , mbr_brdt = #{mbr_brdt}
+			 , rank_name = #{rank_name}
+			 , user_nm = #{user_nm}
+		WHERE ae_id = #{ae_id}
+	</update>
+</mapper>

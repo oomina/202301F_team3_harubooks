@@ -1,0 +1,27 @@
+package kr.or.ddit.service.bmk;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import kr.or.ddit.mapper.bmk.HarustroyMapper;
+import kr.or.ddit.vo.bmk.BoardVO;
+
+@Service
+public class HarustroyServiceImpl implements IHarustoryService {
+
+	@Autowired
+	private HarustroyMapper HarustroyMapper;
+	
+	@Override
+	public List<BoardVO> boardList() {
+		return HarustroyMapper.boardList();
+	}
+
+	@Override
+	public int storyInsert(BoardVO boardVO) {
+		return HarustroyMapper.storyInsert(boardVO);
+	}
+
+}

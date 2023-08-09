@@ -1,0 +1,115 @@
+package kr.or.ddit.aop;
+
+import java.util.Arrays;
+
+import javax.inject.Inject;
+
+import org.aspectj.lang.ProceedingJoinPoint;
+import org.aspectj.lang.annotation.Around;
+import org.aspectj.lang.annotation.Aspect;
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.TransactionStatus;
+import org.springframework.transaction.support.DefaultTransactionDefinition;
+
+import lombok.extern.slf4j.Slf4j;
+
+// @Component 는 스프링 빈으로 등록하기 위한 어노테이션
+// @Aspect 는 어노테이션을 붙여 이 클래스가 Aspect를 나타내는 클래스라는 걸 명시
+// AOPController 클래스 빈 등록 시, aOPController를 할지 aopController로 할지가 명확하기 않을 수 있어서 aopController라는 이름을 명시해줌
+@Component("aopController")
+@Aspect
+@Slf4j
+public class AOPController {
+	
+	/*
+	 * 7. Around 어드바이스
+	 * - 조인 포인트 전 후에 실행된다.
+	 * 
+	 * ProceedingJoinPoin : around 어드바이스에서 사용합니다.
+	 * 
+	 * 스프링 프레임워크가 컨트롤 하고 있는 비즈니스 로직 호출을 가로챈다.
+	 * 책임이 around 어드바이스로 전가되고 그래서 비즈니스 로직에 대한 정보를 arround 어드바이스 메소드가 가지고 있어야하고
+	 * 그 정보를 스프링 컨테이너가 around 어드바이스 메소드로 넘겨주면 ProcedingJoinPoint 객체로 받아서 around 어드바이스가 컨트롤 시 활용함
+	 */
+	@Inject
+	private PlatformTransactionManager transactionManager;
+
+	@Around("execution(* kr.or.ddit.service.*.*(..))"
+			+ "|| execution(* kr.or.ddit.service.jhs..*.*(..))"
+			+ "|| execution(* kr.or.ddit.service.bmk..*.*(..))"
+			+ "|| execution(* kr.or.ddit.service.kmw..*.*(..))"
+			+ "|| execution(* kr.or.ddit.service.ljy..*.*(..))"
+			+ "|| execution(* kr.or.ddit.service.odh..*.*(..))"
+			+ "|| execution(* kr.or.ddit.service.omn..*.*(..))")
+	public Object timeLog(ProceedingJoinPoint pjp) throws Throwable {
+		TransactionStatus status = transactionManager.getTransaction(new DefaultTransactionDefinition());
+		log.info("[@Around] startLog : " + pjp.getSignature());
+		// 메소드 실행 직전 시간 체킹
+		long startTime = System.currentTimeMillis();
+		log.info("[@Around] : " + Arrays.toString(pjp.getArgs()));
+
+		// 메소드 실행
+		Object result;
+        try {
+            // 메소드 실행
+            result = pjp.proceed();
+
+            // 트랜잭션 커밋
+            transactionManager.commit(status);
+        } catch (Exception ex) {
+            // 예외 발생 시 트랜잭션 롤백
+            transactionManager.rollback(status);
+            throw ex;
+        }
+        
+		// 메소드 실행 직후 시간 채킹
+		long endTime = System.currentTimeMillis();
+		log.info("[@Around]pjpEnd : " + Arrays.toString(pjp.getArgs()));
+
+		log.info("[@Around] : " + pjp.getSignature().getName() + "(메소드 실행 시간 :  ) " + (endTime - startTime));
+		
+		return result;
+	}
+	
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

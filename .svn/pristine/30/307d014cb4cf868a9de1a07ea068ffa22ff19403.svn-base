@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+ <mapper namespace="kr.or.ddit.mapper.jhs.ChattingMapper">
+ 
+  	<!-- 채팅방 타입 -->
+  	<sql id="chatType">
+		<if test="searchType != null and searchType == 'order-inq'">
+			order by c.cr_no
+		</if>
+		<if test="searchType != null and searchType == 'order-recent'">
+			order by c.cr_no desc
+		</if>
+	</sql>
+	
+	<!--  채팅방 검색 -->
+	<sql id="chatSearch">
+		<if test="searchWord != null and searchSelect == 'chatting_no'">
+			where  a.cr_no like '%${searchWord}%'
+		</if>
+		<if test="searchWord != null and searchSelect == 'chatting_title'">
+			where  a.cr_nm like '%${searchWord}%'
+		</if>
+	</sql>
+ 
+ 	<!-- 채팅방 리스트 가져오기 -->
+ 	<select id="getChatList" resultType="chatRoomVO" parameterType="chatRoomVO">
+		   select
+	 			  cr_no
+	 			, cr_estbl_ymd
+	 			, cr_last_actvtn_ymd
+	 			, cr_pw
+	 			, cr_nm
+	 			, cr_info
+				, cr_max_nope
+				, cr_nope
+				, cr_cntn_nope
+				, ccg_r003
+				, ae_id
+				, cr_temp_no
+			from (
+			    select
+			        c.*,
+			        row_number() over ( <include refid="chatType"/>) rnum
+			    from (
+			        select
+			 			  cr_no
+			 			, cr_estbl_ymd
+			 			, cr_last_actvtn_ymd
+			 			, cr_pw
+			 			, cr_nm
+			 			, cr_info
+						, cr_max_nope
+						, cr_nope
+						, cr_cntn_nope
+						, ccg_r003
+						, ae_id
+						, cr_temp_no
+			        from chat_room a
+
+			        <include refid="chatSearch"/>
+			    ) c
+			) d
+			<![CDATA[
+			where 
+				d.rnum >= (#{currentPage} * #{screenSize}) - (#{screenSize} - 1) and d.rnum <= (#{currentPage} * #{screenSize}) 	
+			]]>
+ 	</select>
+ 
+ 	<!-- 채팅방 생성 -->
+ 	<insert id="insertChat" parameterType="chatRoomVO">
+ 	 	<selectKey keyProperty="cr_no" resultType="string" order="BEFORE"> 
+	 		select 'CR' || lpad(seq_cr.nextval, 10,'0') from dual
+	 	</selectKey>
+ 		insert into chat_room(
+ 			  cr_no
+ 			, cr_estbl_ymd
+ 			, cr_last_actvtn_ymd
+ 			, cr_pw
+ 			, cr_nm
+ 			, cr_info
+			, cr_max_nope
+			, cr_nope
+			, cr_cntn_nope
+			, ccg_r003
+			, ae_id
+			, cr_temp_no
+ 		)values(
+ 			  #{cr_no}
+ 			, sysdate
+ 			, '0'
+ 			, #{cr_pw}
+ 			, #{cr_nm}
+ 			, #{cr_info}
+ 			, #{cr_max_nope}
+ 			, 0
+ 			, 0
+ 			, #{ccg_r003}
+ 			, #{ae_id}
+ 			, seq_cr.carval
+ 		)
+ 	</insert>
+ 	
+ 	<!-- 채팅 멤버 넣기 -->
+ 	<insert id="insertChatMem" parameterType="chatRoomVO">
+ 		insert into chat_mem(
+ 			  cr_no
+			, ae_id
+			, cn_cntn_yn
+			, cm_master_yn
+			,cm_join_ymd
+		)values(
+			  #{cr_no}
+			, #{ae_id}
+			, 'N'
+			, 'Y'
+			, sysdate 
+		)	
+ 	</insert>
+ 	
+ </mapper>

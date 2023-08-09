@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+ <mapper namespace="kr.or.ddit.mapper.jhs.MyLibraryMapper">
+ 	
+ 	<sql id="ebookType">
+		<if test="searchType != null and searchType == 'order-young'">
+			order by em_date desc
+		</if>
+		<if test="searchType != null and searchType == 'order-old'">
+			order by em_date
+		</if>
+	</sql>
+	
+ 	
+ 	<select id="getEbookList" parameterType="ebookPageVO" resultType="ebookManagerVO">
+			  select
+				  b.ae_id
+                , b.book_no
+                , b.book_page
+                , b.book_read_ymd
+                , b.em_date
+                , b.em_date
+                , b.em_read_page
+                , b.ebook_file
+                , b.ebook_coordinate
+                , b.book_title
+			from(
+				select
+                       a.*, row_number() over (<include refid="ebookType"/>) rnum
+				from(
+					select
+							c.ae_id
+						, c.book_no
+						, c.book_page
+						, c.book_read_ymd
+						, c.em_date
+						, c.em_read_page
+						, c.ebook_file
+						, c.ebook_coordinate
+                        , d.book_title
+					from 
+						ebook_manage c, books d
+					where
+                        c.book_no = d.book_no
+                    and    
+						ae_id = #{ae_id}
+                    and 
+                    	d.book_title LIKE '%${searchWord}%'
+				) a
+			) b
+			<![CDATA[
+				where 
+					b.rnum >= #{startRow} and b.rnum <= #{endRow}	
+			]]>
+ 	</select>
+ 	
+ 	<select id="getEbookDetailList" parameterType="string" resultType="ebookManagerVO">
+	 	select 
+	        book_title
+	    ,   book_cover
+		from
+	    	books
+		where
+	    	book_no = #{book_no}
+ 	</select>
+ 	
+ 	<select id="selectEbookListCount" parameterType="ebookPageVO" resultType="int">
+		select 
+			count(a.book_no)
+		from 
+			ebook_manage a, books b
+		where
+		    a.book_no = b.book_no
+		and
+		    ae_id = #{ae_id}
+		and 
+            book_title LIKE '%${searchWord}%'
+		<include refid="ebookType"/>
+	</select>
+ 	
+ </mapper>

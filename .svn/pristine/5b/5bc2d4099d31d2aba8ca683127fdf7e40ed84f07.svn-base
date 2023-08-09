@@ -1,0 +1,240 @@
+package kr.or.ddit.controller.ljy.excel;
+
+import java.io.BufferedInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.FilenameFilter;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.List;
+import java.util.Map;
+
+import javax.annotation.Resource;
+
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellType;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.xssf.usermodel.XSSFCellStyle;
+import org.apache.poi.xssf.usermodel.XSSFDataFormat;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+
+import kr.or.ddit.vo.ljy.PoMngVO;
+import kr.or.ddit.vo.ljy.PubMngVO;
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
+public class ExcelUtils {
+	
+	// 관리자 발주시 발주 내역서 만들기
+	public static void createPoExcel(String filePath, PubMngVO vo, List<PoMngVO> poList) throws IOException{
+		log.info("createPoExcel 실행");
+		// 발주서 파일 불러오기
+		String fileName = "발주서form.xlsx";
+		FileInputStream file = new FileInputStream(new File(filePath, fileName));
+		BufferedInputStream bis = new BufferedInputStream(file);
+		
+		XSSFWorkbook workbook = new XSSFWorkbook(bis);
+		XSSFSheet sheet = workbook.getSheetAt(0);
+		
+		// 출판사 정보
+		String ae_id = vo.getAe_id();
+		String pub_nm = vo.getPub_nm();
+		String pub_telno = vo.getPub_telno();
+		String pub_eml_addr = vo.getPub_eml_addr();
+		String pub_addr;
+		if(vo.getPub_daddr() != null) {
+			pub_addr = vo.getPub_addr() + " " + vo.getPub_daddr();
+		} else {
+			pub_addr= vo.getPub_addr();
+		}
+		
+		// 수주서에 출판사 정보 입력
+		sheet.getRow(2).getCell(2).setCellValue(pub_nm);
+		sheet.getRow(3).getCell(2).setCellValue(pub_telno);
+		sheet.getRow(4).getCell(2).setCellValue(pub_eml_addr);
+		sheet.getRow(5).getCell(2).setCellValue(pub_addr);
+		
+		// 발주 내역 가져오기
+		int rownum = 12;
+		int cellnum = 1;
+		
+		setList(workbook, rownum, cellnum, poList);
+		
+		// 다른 이름으로 저장
+		// 파일 이름 설정 : 출판사 폴더\발주일자_발주번호_...
+		String excelName = "";
+		String savePath = filePath + "\\" + ae_id;
+		
+		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
+		Calendar cal = Calendar.getInstance();
+		excelName += dateFormat.format(cal.getTime());
+		excelName += "_" + poList.size();
+		for (int i = 0; i < poList.size(); i++) {
+			excelName += "_" + poList.get(i).getBr_no();
+		}
+		File saveFile = new File(savePath);
+		if(!saveFile.exists()) {
+			saveFile.mkdirs();
+		}
+ 		FileOutputStream out = new FileOutputStream(new File(savePath, excelName + ".xlsx"));
+		workbook.write(out);
+		log.info("엑셀 출력 완료");
+		out.close();
+		workbook.close();
+		file.close();
+	}
+
+	// 발주 내역 가져오기
+	public static void setList(XSSFWorkbook workbook, int rownum, int cellnum, List<PoMngVO> poList) throws IOException {
+		XSSFSheet sheet = workbook.getSheetAt(0);
+
+		for (int i = 0; i < poList.size(); i++) {
+			PoMngVO vo = poList.get(i); 
+			Row row = sheet.getRow(rownum);
+			if(row == null) {
+				row = sheet.createRow(rownum);
+			}
+			// 책번호
+			Cell cell1 = row.getCell(cellnum);
+			cell1.setCellValue(vo.getBook_no());
+			// 책이름
+			Cell cell2 = row.getCell(cellnum+1);
+			cell2.setCellValue(vo.getBook_title());
+			// 책 수량
+			Cell cell3 = row.getCell(cellnum+2);
+			cell3.setCellValue(vo.getBook_qty());
+			// 책 단가
+			Cell cell4 = row.getCell(cellnum+3);
+			cell4.setCellValue(vo.getBook_amt() * 0.8);
+			// 책 수량 * 단가
+			Cell cell5 = row.getCell(cellnum+4);
+			cell5.setCellFormula("IF(OR(G"+(rownum+1)+"=\"승인\",G"+(rownum+1)+"=\"\"),D"+(rownum+1)+"*E"+(rownum+1)+",0)");
+			
+			rownum++;
+		}
+		
+		// 발주 정보
+		String brd_accept_ymd = poList.get(0).getBr_ymd();// 발주 요청 수락일자
+		sheet.getRow(7).getCell(2).setCellValue(brd_accept_ymd);
+		
+		String addr = "대전 중구 오류동 인재개발원 406호";
+		sheet.getRow(8).getCell(2).setCellValue(addr);
+		
+		sheet.getRow(9).getCell(2).setCellFormula("SUM(F13:F22)");	// 전체 합계
+		sheet.getRow(22).getCell(3).setCellFormula("SUMIF(G13:G22,\"승인\",D13:D23) + SUMIF(G13:G22,\"\",D13:D23)"); // 수량 합계
+		sheet.getRow(22).getCell(5).setCellFormula("SUM(F13:F22)"); // 전체 합계
+		
+	}
+	
+	// 금액에 , 처리하기
+//	public void setComma(XSSFWorkbook workbook, XSSFSheet sheet, Cell cell) throws Exception, IOException {
+//		// 셀 스타일 만들기
+//		XSSFCellStyle cellStyle = workbook.createCellStyle();
+//		
+//		// 금액 , 스타일 설정
+//		XSSFDataFormat format = workbook.createDataFormat();
+//		cellStyle.setDataFormat(format.getFormat("#,##0"));
+//		
+//		// 글자를 숫자로 변환
+//		double num = Double.parseDouble(cell.toString());
+//		
+//		// 셀에 타입, 숫자 설정
+//		cell.setCellType(CellType.NUMERIC);
+//		cell.setCellValue(num);
+//		cell.setCellStyle(cellStyle);
+//	}
+		
+	// 출판사 발주 승인/거절시 수정
+	public static void modifyPoExcel(String filePath, PoMngVO poMngVO, Map<String,String> statmap) throws IOException {
+		String status = statmap.get("status");	// 승인, 거절 상태
+		String ae_id = poMngVO.getAe_id();
+		String br_no = poMngVO.getBr_no();
+		String book_no = poMngVO.getBook_no();
+		String savePath = filePath + "\\" + ae_id; 
+		File dir = new File(savePath); 
+		File saveFile = new File(savePath);
+		if(!saveFile.exists()) {
+			saveFile.mkdirs();
+		}
+		FilenameFilter filter = new FilenameFilter() {
+			// 필터 조건
+			@Override
+			public boolean accept(File dir, String name) {
+				// 파일이름에 br_no가 붙은 것만 리턴
+				return name.contains(br_no);
+			}
+		};
+		// br_no를 포함하는 파일은 1개 -> 0번째가 구하려는 파일 이름
+		String[] filenames = dir.list(filter);
+		for (String string : filenames) {
+			log.info("file name : " + string);
+		}
+		if(filenames == null || filenames.length == 0) {
+			log.info("filenames 없어용");
+			return;
+		}
+		String saveFileName = filenames[0];
+		FileInputStream file = new FileInputStream(new File(savePath, saveFileName));
+		BufferedInputStream bis = new BufferedInputStream(file);
+		
+		XSSFWorkbook workbook = new XSSFWorkbook(bis);
+		XSSFSheet sheet = workbook.getSheetAt(0);
+		
+		for(int i=12; i<22; i++) {
+			if(book_no.equals(sheet.getRow(i).getCell(1).getStringCellValue())) {
+				sheet.getRow(i).getCell(6).setCellValue(status);
+				break;
+			}
+		}
+		
+		FileOutputStream out = new FileOutputStream(new File(savePath, saveFileName));
+		workbook.write(out);
+		log.info("엑셀 수정 완료");
+		out.close();
+		workbook.close();
+		file.close();
+	}
+//	public void readExcel() {
+//		try {
+//            //FileInputStream file = new FileInputStream(new File(filePath, "새로 저장.xlsx"));
+//
+//            // 엑셀 파일로 Workbook instance를 생성한다.
+//            XSSFWorkbook workbook = new XSSFWorkbook(file);
+//
+//            // workbook의 첫번째 sheet를 가저온다.
+//            XSSFSheet sheet = workbook.getSheetAt(0);
+//
+//            // 모든 행(row)들을 조회한다.
+//            Iterator<Row> rowIterator = sheet.iterator();
+//            while (rowIterator.hasNext()) {
+//                Row row = rowIterator.next();
+//
+//                // 각각의 행에 존재하는 모든 열(cell)을 순회한다.
+//                Iterator<Cell> cellIterator = row.cellIterator();
+//
+//                while (cellIterator.hasNext()) {
+//                    Cell cell = cellIterator.next();
+//
+//                    // cell의 타입을 하고, 값을 가져온다.
+//                    switch (cell.getCellType()) {
+//                        case NUMERIC:
+//                            System.out.print((int) cell.getNumericCellValue() + "\t"); //getNumericCellValue 메서드는 기본으로 double형 반환
+//                            break;
+//                        case STRING:
+//                            System.out.print(cell.getStringCellValue() + "\t");
+//                            break;
+//                    }
+//                }
+//                System.out.println();
+//            }
+//            file.close();
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+//
+//	}
+}

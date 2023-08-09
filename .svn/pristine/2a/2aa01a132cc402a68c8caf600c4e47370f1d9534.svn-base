@@ -1,0 +1,23 @@
+package kr.or.ddit.service.omn.books;
+
+import java.util.List;
+
+import javax.inject.Inject;
+
+import org.springframework.stereotype.Service;
+
+import kr.or.ddit.mapper.omn.books.MngBookRequestMapper;
+import kr.or.ddit.vo.omn.NewBookRequestVO;
+
+@Service
+public class MngBookRequestServiceImpl implements IMngBookRequestService{
+	
+	@Inject
+	private MngBookRequestMapper mapper;
+	
+	@Override
+	public List<NewBookRequestVO> requestList() {
+		return mapper.requestList();
+	}
+
+}

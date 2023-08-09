@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+<mapper namespace="kr.or.ddit.mapper.omn.sales.PubSalesMapper">
+	
+	<sql id="salesSearch">
+		<if test="searchType != null and searchType == 'title'">
+			and (c.book_title like '%'||#{searchWord}||'%')
+		</if>
+		<if test="searchType != null and searchType == 'publisher'">
+			and (c.pub_nm like '%'||#{searchWord}||'%')
+		</if>
+	</sql>
+	
+	<select id="salesAllCount" parameterType="string" resultType="int">
+		SELECT count(b.order_no)
+		FROM purchs_list b
+		   , books c
+		WHERE b.book_no = c.book_no
+	</select>
+	
+	<select id="salesCount" parameterType="mngPaginationInfoVO" resultType="int">
+		SELECT count(b.order_no)
+		FROM purchs_list b
+		   , books c
+		WHERE b.book_no = c.book_no
+		<include refid="salesSearch"/>
+	</select>
+	
+	<select id="selectSalesList" parameterType="mngPaginationInfoVO" resultType="salesVO">
+		SELECT e.*
+		FROM(
+			SELECT
+				d.*, row_number() over (order by d.order_no) rnum
+			FROM(
+				SELECT a.order_no
+					 , a.order_ymd
+					 , c.book_title
+					 , c.pub_nm
+					 , b.pl_prchs_amt * b.pl_cnt * 0.2 AS pl_prchs_amt
+					 , b.pl_cnt
+				FROM orders a
+				INNER JOIN purchs_list b ON a.order_no = b.order_no
+				INNER JOIN books c ON b.book_no = c.book_no
+				WHERE b.pl_dcsn_yn = 'Y'
+				<include refid="salesSearch"/>
+				ORDER BY a.order_no
+			) d
+		) e
+		<![CDATA[
+			WHERE e.rnum >= #{startRow} and e.rnum <= #{endRow}
+		]]>
+	</select>
+	
+	<select id="salesList" resultType="map">
+		SELECT a.order_no
+			 , a.order_ymd
+			 , c.book_title
+			 , c.pub_nm
+			 , b.pl_prchs_amt
+			 , b.pl_cnt
+		FROM orders a
+			 , purchs_list b
+			 , books c
+		WHERE a.order_no = b.order_no
+		AND b.book_no = c.book_no
+	</select>
+	
+	<select id="bestPublisher" resultType="salesVO">
+		SELECT pub_nm
+			 , total_sales
+		FROM(
+			SELECT c.pub_nm
+				 , SUM(b.pl_prchs_amt * b.pl_cnt * 0.2) AS total_sales
+				 , ROW_NUMBER() OVER (ORDER BY SUM(b.pl_prchs_amt * b.pl_cnt * 0.2) DESC) AS rank
+			FROM purchs_list b
+			INNER JOIN books c ON b.book_no = c.book_no
+			WHERE b.pl_dcsn_yn = 'Y'
+			GROUP BY c.pub_nm
+		)
+		<![CDATA[
+			WHERE rank <= 5
+		]]>
+	</select>
+	
+	<select id="bestBooks" resultType="salesVO">
+		SELECT book_title
+			 , total_cnt
+		FROM(
+			SELECT c.book_title
+				 , SUM(b.pl_cnt) AS total_cnt
+				 , ROW_NUMBER() OVER (ORDER BY SUM(b.pl_cnt) DESC) AS rank
+			FROM purchs_list b
+			INNER JOIN books c ON b.book_no = c.book_no
+			WHERE b.pl_dcsn_yn = 'Y'
+			GROUP BY c.book_title
+		)
+		<![CDATA[
+			WHERE rank <= 5
+		]]>
+	</select>
+	
+	<select id="monthlySales" resultType="salesVO">
+		SELECT SUBSTR(a.order_ymd, 4, 2) AS month
+			 , SUM(b.pl_prchs_amt * b.pl_cnt * 0.2) AS total_sales
+		FROM orders a
+		INNER JOIN purchs_list b ON a.order_no = b.order_no
+		WHERE b.pl_dcsn_yn = 'Y'
+		GROUP BY SUBSTR(a.order_ymd, 4, 2)
+		ORDER BY SUBSTR(a.order_ymd, 4, 2)
+	</select>
+	
+	<select id="monthlyCnt" resultType="salesVO">
+		SELECT SUBSTR(a.order_ymd, 4, 2) AS month 
+			 , SUM(b.pl_cnt) AS total_cnt
+		FROM orders a
+		INNER JOIN purchs_list b ON a.order_no = b.order_no
+		WHERE b.pl_dcsn_yn = 'Y'
+		GROUP BY SUBSTR(a.order_ymd, 4, 2)
+		ORDER BY SUBSTR(a.order_ymd, 4, 2)
+	</select>
+	
+</mapper>

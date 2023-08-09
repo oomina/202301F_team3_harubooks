@@ -1,0 +1,67 @@
+package kr.or.ddit.controller.kmw.harubooks;
+
+import java.util.List;
+
+import javax.inject.Inject;
+
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import kr.or.ddit.service.LoginService;
+import kr.or.ddit.service.kmw.BookService;
+import kr.or.ddit.service.kmw.OrderService;
+import kr.or.ddit.vo.UserInfoVO;
+import kr.or.ddit.vo.kmw.OrderVO;
+
+@Controller
+@RequestMapping("/harubooks/myPage")
+public class MyPageMainController {
+	@Inject
+	private OrderService orderService;
+	
+	@Inject
+	private BookService bookService;
+	
+	@Inject
+	private LoginService userSevice;
+	
+	@GetMapping("/orderList")
+	public String myPageMain(Model model) {
+		String ae_id = SecurityContextHolder.getContext().getAuthentication().getName();
+		// 장바구니 개수
+		int cartCnt = bookService.cartCnt(ae_id);
+		// 유저 정보
+		UserInfoVO userInfo = userSevice.selectUser(ae_id);
+		// 찜목록 개수
+		int wishCnt = bookService.wishCnt(ae_id);
+		// 배송준비 개수
+		int preparedDelivery = orderService.preparedDelivery(ae_id);
+		// 배송 중 개수
+		int DeliveringCnt = orderService.DeliveringCnt(ae_id);
+		// 배송완료 개수
+		int finishDelivery = orderService.finishDelivery(ae_id);
+		// 환불 여부 개수
+		int refundCnt = orderService.refundCnt(ae_id);
+		model.addAttribute("cartCnt", cartCnt);
+		model.addAttribute("userInfo", userInfo);
+		model.addAttribute("wishCnt", wishCnt);
+		model.addAttribute("preparedDelivery",preparedDelivery);
+		model.addAttribute("DeliveringCnt",DeliveringCnt);
+		model.addAttribute("finishDelivery",finishDelivery);
+		model.addAttribute("refundCnt",refundCnt);
+		return "bookstore/mypage/myOrderList";
+	}
+	
+	// 배송 되기전에 시킨 상품들 리스트 
+	@ResponseBody
+	@GetMapping(value = "/currentPurchase", produces = "application/json;charset=utf-8")
+	public List<OrderVO> currentPurchase(){
+		String ae_id = SecurityContextHolder.getContext().getAuthentication().getName();
+		List<OrderVO> list = orderService.preparedProd(ae_id);
+		return list;
+	}
+}

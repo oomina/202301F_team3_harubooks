@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+ <mapper namespace="kr.or.ddit.mapper.kmw.ReviewMapper">
+	<!-- alias (reviewVO) -->
+	<insert id="insertReview" parameterType="reviewVO">
+		insert into review (
+								book_no
+								,ae_id
+								,review_scr
+								,review_title
+								,review_content
+								,review_wrt_ymd
+								,review_mdfcn_ymd
+								,ua_no
+							)
+							values(
+									#{book_no}
+									,#{ae_id}
+									,#{review_scr}
+									,#{review_title}
+									,#{review_content}
+									,sysdate
+									,'-'
+									,#{ua_no}
+							)
+							
+	</insert>
+	
+	<!-- 리뷰 정보리스트 가져오기 -->
+	<select id="reviewList" parameterType="String" resultType="reviewVO">
+		select 
+		    book_no
+		    ,ae_id
+		    ,review_scr
+		    ,review_title
+		    ,review_content
+		    ,review_wrt_ymd
+		    ,review_mdfcn_ymd
+		    ,ua_no
+		from review
+		where book_no = #{book_no}
+	</select>
+	
+	<!-- 리뷰총개수 -->
+	<select id="reviewCnt" parameterType="String" resultType="int">
+		select count(*)
+		from review
+		where book_no = #{book_no}
+	</select>
+	
+	<!-- 리뷰 별점 총합 -->
+	<select id="reviewTotalScore" parameterType="String" resultType="int">
+		select sum(review_scr)
+		from review
+		where book_no = #{book_no}
+	</select>
+ </mapper>

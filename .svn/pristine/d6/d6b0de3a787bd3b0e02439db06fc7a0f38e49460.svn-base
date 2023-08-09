@@ -1,0 +1,8 @@
+package kr.or.ddit.service.jhs;
+
+import kr.or.ddit.ResultStatus;
+
+public interface IMyLibraryService {
+	
+	public ResultStatus idCheck();
+}

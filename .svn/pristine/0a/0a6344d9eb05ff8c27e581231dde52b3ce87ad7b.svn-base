@@ -1,0 +1,66 @@
+package kr.or.ddit.controller.jhs.haruter;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.inject.Inject;
+
+import org.springframework.web.socket.CloseStatus;
+import org.springframework.web.socket.TextMessage;
+import org.springframework.web.socket.WebSocketMessage;
+import org.springframework.web.socket.WebSocketSession;
+import org.springframework.web.socket.handler.TextWebSocketHandler;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import kr.or.ddit.service.bmk.IHarustoryService;
+import kr.or.ddit.vo.bmk.BoardVO;
+import kr.or.ddit.vo.bmk.ReplyVO;
+
+public class HaruterEcho extends TextWebSocketHandler{
+	
+	@Inject
+	private IHarustoryService service;
+	
+	private List<WebSocketSession> custom = new ArrayList<>();
+	
+	@Override
+	public void afterConnectionEstablished(WebSocketSession wsession) throws Exception {
+		custom.add(wsession);
+		System.out.println("name : Hi");
+	}
+
+	@Override
+	protected void handleTextMessage(WebSocketSession wsession, TextMessage message) throws Exception {
+		String userId = message.getPayload();
+		
+		List<BoardVO> bvo = service.getMyStoryListBell(userId);
+		
+		List<ReplyVO> rvo = new ArrayList<ReplyVO>();
+		
+		for(BoardVO vo : bvo) {
+			List<ReplyVO> tempVO = service.boardBellCount(vo.getBoard_no());
+			for(ReplyVO tempReplyVO : tempVO) {
+				rvo.add(tempReplyVO);
+			}
+		}
+
+		
+		for(WebSocketSession session : custom) {
+			if(wsession.getId().equals(session.getId()) && rvo.size() > 0) {
+				for(ReplyVO tempVO : rvo) {					
+				session.sendMessage(new TextMessage(
+						  "<div id='echo-reply' data-board="+tempVO.getBoard_no()+">"
+						+ "		<span>"+tempVO.getMem_nicknm()+"님이 댓글을 달았습니다.</span>"
+						+ "</div>"));
+				}
+			}
+		}
+		
+	}
+
+	@Override
+	public void afterConnectionClosed(WebSocketSession wsession, CloseStatus status) throws Exception {
+		
+	}
+}

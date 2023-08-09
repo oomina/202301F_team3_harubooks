@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+<mapper namespace="kr.or.ddit.mapper.ljy.PubMngMapper">
+	<resultMap type="pubMngVO" id="pubMngMap">
+		<result property="ae_id" column="ae_id"/>
+		<result property="ae_pw" column="ae_pw"/>
+		<result property="pub_nm" column="pub_nm"/>
+		<result property="pub_zip" column="pub_zip"/>
+		<result property="pub_addr" column="pub_addr"/>
+		<result property="pub_daddr" column="pub_daddr"/>
+		<result property="pub_telno" column="pub_telno"/>
+		<result property="pub_eml_addr" column="pub_eml_addr"/>
+		<result property="enabled" column="enabled"/>
+		<collection property="authList" resultMap="authMap"/>
+	</resultMap>
+
+	<resultMap type="authVO" id="authMap">
+ 	 	<result property="ae_id" column="ae_id"/>
+ 	 	<result property="auth" column="auth"/>
+ 	 </resultMap>
+
+	<select id="pubList" parameterType="pubMngVO" resultMap="pubMngMap">
+		<include refid="commonMapper.pagingHeader"/>
+			SELECT
+			    ae_id
+			    , pub_nm
+			    , pub_addr
+			    , pub_telno
+			    , pub_eml_addr
+			FROM
+			    publisher
+			WHERE
+				1 = 1
+				<if test="searchWord != null">
+					and (pub_nm like '%'||#{searchWord}||'%')
+				</if>
+			ORDER BY ae_id
+		<include refid="commonMapper.pagingFooter"/>
+	</select>
+	
+	<insert id="insertAllEmplyr" parameterType="pubMngVO">
+		INSERT INTO all_emplyr(
+		    ae_id
+		    , ae_pw
+		    , enabled
+		) VALUES (
+		    #{ae_id}
+		    , #{ae_pw}
+		    , '1'
+		)
+	</insert>
+	
+	<insert id="insertAuthor" parameterType="pubMngVO">
+		INSERT INTO author(
+		    ae_id
+		    , auth
+		) VALUES (
+		    #{ae_id}
+		    , 'ROLE_PUBLISHER'
+		)
+	</insert>
+	
+	<insert id="insertPub" parameterType="pubMngVO">
+		INSERT INTO publisher(
+		    ae_id
+		    , pub_addr
+		    , pub_nm
+		    , pub_telno
+		    , pub_eml_addr
+		    , pub_zip
+		    , pub_daddr
+		) VALUES (
+		    #{ae_id}
+		    , #{pub_addr}
+		    , #{pub_nm}
+		    , #{pub_telno}
+		    , #{pub_eml_addr}
+		    , #{pub_zip}
+		    , #{pub_daddr}
+		)
+	</insert>
+	
+	<insert id="insertUsers" parameterType="pubMngVO">
+		INSERT INTO users(
+		    ae_id
+		    , user_type
+		    , user_nm
+		) VALUES (
+		    #{ae_id}
+		    , '회원'
+		    , #{pub_nm}
+		)
+	</insert>
+	
+	<insert id="insertMember" parameterType="pubMngVO">
+		INSERT INTO member(
+		    ae_id
+		    , mbr_email
+		    , mbr_addr
+		    , mbr_daddr
+		    , mbr_zip
+		    , mbr_telno
+		    , rank_name
+		    , user_nm
+		) values (
+		    #{ae_id}
+		    , #{pub_eml_addr}
+		    , #{pub_addr}
+		    , #{pub_daddr}
+		    , #{pub_zip}
+		    , #{pub_telno}
+		    , '브론즈'
+		    , #{pub_nm}
+		)
+	</insert>
+	
+	<select id="pubListCnt" resultType="int">
+		SELECT
+			count(*)
+		FROM 
+			publisher
+	</select>
+	
+	<select id="getPub" parameterType="String" resultType="pubMngVO">
+		SELECT
+		    ae_id
+		    , pub_nm
+		    , pub_addr
+            , pub_daddr
+		    , pub_telno
+		    , pub_eml_addr
+		FROM
+		    publisher
+		WHERE 
+            pub_nm = #{pub_nm}
+	</select>
+</mapper>

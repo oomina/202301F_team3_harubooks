@@ -1,0 +1,31 @@
+package kr.or.ddit.mapper.kmw;
+
+import java.util.List;
+
+import kr.or.ddit.vo.kmw.OrderVO;
+
+public interface OrderMapper {
+
+	int insertOrder(OrderVO orderVO);
+
+	int insertPurchs(OrderVO orderVO);
+
+	int insertDelivery(OrderVO orderVO);
+
+	void spendMileage(OrderVO orderVO);
+
+	void deleteCart(String ae_id);
+
+	List<OrderVO> orderCompleteList(String ae_id);
+
+	List<OrderVO> preparedProd(String ae_id);
+
+	int preparedDelivery(String ae_id);
+
+	int DeliveringCnt(String ae_id);
+
+	int finishDelivery(String ae_id);
+
+	int refundCnt(String ae_id);
+
+}

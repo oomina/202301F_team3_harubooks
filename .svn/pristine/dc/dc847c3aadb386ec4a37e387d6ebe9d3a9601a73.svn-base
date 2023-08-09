@@ -1,0 +1,17 @@
+package kr.or.ddit.mapper;
+
+import java.util.List;
+
+import kr.or.ddit.vo.FileVO;
+
+public interface FileMapper {
+
+	public int fileInsert(FileVO fileVO);
+
+	public List<FileVO> fileList(String ua_no);
+
+	public int filesFilterInsert(FileVO vo);
+
+	public String getUaNo();
+
+}

@@ -1,0 +1,41 @@
+package kr.or.ddit.service.kmw;
+
+import javax.inject.Inject;
+
+import org.springframework.stereotype.Service;
+
+import kr.or.ddit.mapper.kmw.OrderMapper;
+import kr.or.ddit.vo.kmw.OrderVO;
+
+@Service
+public class OrderServiceImpl implements OrderService{
+	@Inject
+	private OrderMapper mapper;
+
+	@Override
+	public int insertOrder(OrderVO orderVO) {	
+		return mapper.insertOrder(orderVO);
+	}
+
+	@Override
+	public int insertPurchs(OrderVO orderVO) {
+		return mapper.insertPurchs(orderVO);
+	}
+
+	@Override
+	public int insertDelivery(OrderVO orderVO) {
+		return mapper.insertDelivery(orderVO);
+	}
+
+	@Override
+	public void spendMileage(OrderVO orderVO) {
+		mapper.spendMileage(orderVO);
+		
+	}
+
+	@Override
+	public void deleteCart(String ae_id) {
+		mapper.deleteCart(ae_id);
+		
+	}
+}

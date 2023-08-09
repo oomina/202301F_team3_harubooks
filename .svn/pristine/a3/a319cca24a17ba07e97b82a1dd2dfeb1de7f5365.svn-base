@@ -1,0 +1,615 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ taglib uri="http://www.springframework.org/security/tags" prefix="sec"%>
+<%@ taglib uri="http://www.springframework.org/tags/form" prefix="form" %>
+<!--게시물 나오는곳-->
+<link rel="stylesheet" href="/resources/asset/css/haruFeed.css">
+
+
+<div class="stories-title">
+	<h1>하루 스토리</h1>
+	<a href="#" class="btn"> <i class="ri-play-circle-line"></i>
+		<div class="text">모두 보기</div>
+	</a>
+</div>
+<!--스토리 내용-->
+<div class="stories">
+	<div id="story-info">
+		<span id="si1">하루하루 설레는 독서인의 쉼터 </span><span id="si2">하루터</span>
+	</div>
+	<img id="si-img" src="/resources/asset/image/남녀.png">
+</div>
+<!--메인 피드 -->
+<div class="feed">
+	<div id="feed-tex">
+		<h1>하루피드</h1>
+	</div>
+	<div id="feed-search">
+		<select id="feed-search-select">
+			<option>제목</option>
+			<option>작성자</option>
+		</select>
+		<input id="feed-search-input" type="text" placeholder="찾을 게시물을 입력하세요">	
+	</div>
+	
+	<div id="feed-upload-btn" onclick="fModalOpen()">
+          <i class="ri-add-circle-fill"></i>
+          <div class="btn-text">피드 작성하기</div>
+    </div>
+</div>
+<!-- 게시글 작성 모달 -->
+<div id="modal">
+	<button class="mbtn" onclick="modalClose()">x</button>
+	<div class="mcontainer">
+		<form action="">
+			<input type="hidden" id="id" value="<sec:authentication property="name"/>"/>
+			<!-- 모달 header  -->
+			<div id="mheader">
+				<div id="mheader-before" class="mheader-btns">←</div>
+				<div id="mheader-text">사진 추가</div>
+				<div id="mheader-next" class="mheader-btns">다음</div>
+			</div>			
+			<hr>
+
+			<!-- 모달 첫번째 DIV -->
+			<div id="mimages-div">
+				<input type="file" id="mimages-file" accept="image/jpeg, image/png, image/jpeg" multiple="multiple" >
+				<img alt="" src="../resources/asset/image/fileUpload.png" width="130px" height="130px">
+				<h2>공유할 사진을 선택하세요! (최대 5개)</h2>
+				<button id="mimages-select">파일 선택</button>
+			</div>
+			
+			<!-- 모달 두번째 DIV -->
+			<div id="img-filter-div">
+				<div id="img-select-div">
+					<div id="img-select-before-div">
+						<div id="img-select-before">&lt;</div>
+					</div>
+					<div id="img-select-div2">
+						<img id="img-select" src="" >
+					</div>
+					<div id="img-select-next-div">
+						<div id="img-select-next">&gt;</div>
+					</div>
+				</div>
+				<!-- 두번째에만 나올 필터 모달창 -->
+				<div id="img-filter"> 
+				    <div class="img-filters-row">
+					    <div class="img-filters-div">
+					      <img class='img-filters grayscale' alt="grayscale" src="../resources/asset/image/exImage2.png" >
+						  <h4 class="img-filters-h3">grayscale</h4>
+					    </div>
+					    <div class="img-filters-div">
+					      <img class='img-filters sepia' alt="sepia" src="../resources/asset/image/exImage2.png">
+					      <h4 class="img-filters-h3">sepia</h4>
+					    </div>
+					    <div class="img-filters-div">
+					      <img class='img-filters saturate' alt="saturate" src="../resources/asset/image/exImage2.png">
+					      <h4 class="img-filters-h3">saturate</h4>
+					    </div>
+				    </div>
+				    <div class="img-filters-row">
+				        <div class="img-filters-div">
+				          <img class='img-filters contrast' alt="contrast" src="../resources/asset/image/exImage2.png">
+				          <h4 class="img-filters-h3">contrast</h4>
+				        </div>
+				        <div class="img-filters-div">
+				          <img class='img-filters brightness' alt="brightness" src="../resources/asset/image/exImage2.png">
+				          <h4 class="img-filters-h3">brightness</h4>
+				        </div>
+				        <div class="img-filters-div">
+				          <img class='img-filters hue-rotate' alt="hue-rotate" src="../resources/asset/image/exImage2.png">
+				          <h4 class="img-filters-h3">hue-rotate</h4>
+				        </div>
+				    </div>
+				    <div class="img-filters-row">
+				        <div class="img-filters-div">
+				          <img class='img-filters ruby' alt="ruby" src="../resources/asset/image/exImage2.png">
+				          <h4 class="img-filters-h3">ruby</h4>
+				        </div>
+				        <div class="img-filters-div">
+				          <img class='img-filters aquamarine' alt="aquamarine" src="../resources/asset/image/exImage2.png">
+				          <h4 class="img-filters-h3">aquamarine</h4>
+				        </div>
+				        <div class="img-filters-div">
+				          <img class='img-filters emerald' alt="emerald" src="../resources/asset/image/exImage2.png">
+				          <h4 class="img-filters-h3">emerald</h4>
+				        </div>
+				    </div>
+				</div>
+				<!-- 제목과 내용을 입력할 세번째 모달 -->
+				<div id="text-div">
+					<div id="text-div-title">
+						<input id="text-tile" type="text" placeholder="제목을 입력하세요" maxlength="50">
+					</div>
+					<div id="text-div-content">
+						<textarea id="text-content" rows="300" cols="600" placeholder="내용을 입력하세요" maxlength="2000"></textarea>
+					</div>
+				</div>
+			</div>
+			
+			<!-- 모달 세번째 DIV -->		
+			<div id="mtitle">
+				<input type="text" name="board_title" placeholder="제목입력..." value="" maxlength="30">
+			</div>
+			<div id="mcontent">
+				<textarea rows="10" cols="30" name="board_content"
+				 	maxlength="1000" placeholder="내용입력..."></textarea>
+			</div>
+			<input id="mbtn" type="button" onclick="insertFeed()" value="작성">
+		</form>
+	</div>
+</div>
+<div id="mModal"></div>
+<div id="dModal"></div>
+<div id="list" class='main-posts'></div>
+
+<script type="text/javascript">
+var ae_id = document.querySelector("#id").value;
+
+const mHeader = document.querySelector("#mheader"); 
+
+const mimagesDiv = document.querySelector("#mimages-div");				// 게시글 생성 첫 모달 화면
+const mimagesSelect = document.querySelector("#mimages-select");		// 사진 선택 버튼
+const mheaderText = document.querySelector("#mheader-text");			// 타이틀(변경을 위해)
+const mimagesFile = document.querySelector("#mimages-file");			// 실제 사진이 들어가는 input:file
+
+const mheaderBefore = document.querySelector("#mheader-before")			// 모달 top 이전 버튼
+const mheaderNext = document.querySelector("#mheader-next")				// 모달 top 다음 버튼
+
+const imgFilterDiv = document.querySelector("#img-filter-div");			// 사진들이 나올 두번째 모달 화면
+const imgFilter = document.querySelector("#img-filter");				// 사진들의 필터들이 나올 두번째 모달 화면
+const imgSelect = document.querySelector("#img-select"); 				// 확인할 이미지
+const imgSelectBeforeDiv = document.querySelector("#img-select-before-div");    // 사진 이전 버튼
+const imgSelectNextDiv = document.querySelector("#img-select-next-div"); 	    // 사진 다음 버튼
+const filteredImage = document.querySelector("#filtered-image");				// 필터 적용
+const imgFilters = document.querySelectorAll(".img-filters");					// 적용할 필터 부분
+
+const textDiv = document.querySelector("#text-div");					// 제목과 내용을 입력할 세번째 모달 화면
+const textTile = document.querySelector("#text-tile");					// 제목의 내용
+const textContent = document.querySelector("#text-content");			// 제목의 내용
+
+
+
+const myList = document.querySelector("#list");
+const Modal = document.querySelector("#modal");
+const mModal = document.querySelector("#mModal");
+const dModal = document.querySelector("#dModal");
+const myForm = document.forms[0];
+const mForm = document.querySelector("#mForm");
+const mContainer = document.querySelector(".mcontainer");
+
+maxFile = 5;															// 최대 담을 수 있는 파일 갯수
+inputFileNum = 0; 														// 선택한 파일
+tempEvent='';															// 파일 event 저장														
+page=0;																	// 현재 페이지
+filterInfo = [];														// 각 사진들의 필터 정보를 담는다.
+
+for(let i = 0; i < maxFile; i++){
+	filterInfo.push("0");
+}
+
+window.onload = function() {
+	storyList()					// 리스트
+};
+
+
+// 모달 열기
+function fModalOpen() {
+	Modal.style.display = "block"; // 보이게
+	document.body.style.overflowY = "hidden";
+	page = 0;
+}
+
+// 모달 닫기
+function modalClose(){
+	page = 10;													// 닫을 때는 상태 10으로
+	goBefore();
+}
+
+// 	insert 모달 창 닫기 전 초기화
+function fmodalReset() {
+	if(page == 10){
+		Modal.style.display = "none"; // 안보이게		
+	}
+// 	dModal.style.display = "none"; // 안보이게
+// 	mModal.style.display = "none"; // 안보이게
+	
+	page = 0;
+	// 첫번째 화면 제외하고 모두 초기화
+	mimagesDiv.style.display = "block";							// 첫번째 화면으로 보이기
+	mheaderText.textContent = "사진 추가";						// 타이틀 사진 추가로 초기화	
+	mheaderNext.style.display = "none";							// 다음가기 버튼 안보이기
+	mheaderBefore.style.display = "none";						// 이전가기 버튼 안보이기
+	mContainer.style.width = "40%";								// 크기 40으로 초기화
+	classReset();												// img에 적용된 필터 모두 제거
+	imgFilterDiv.style.display = "none";						// 두번째 화면 안보이기
+	imgFilter.style.display = "block";
+	textDiv.style.display = "none";								// 세번째 화면 안보이기
+	mheaderNext.textContent = "다음";							// 두번째의 페이지에 바로 다음 보이게 하기
+	document.body.style.overflowY = "unset";					// 드래그 안보이게
+	mimagesFile.value = "";										// 선택한 파일들 초기화
+	inputFileNum = 0;											// 선택 파일 초기화
+	tempEvent = '';												// 임시 저장 파일들 초기화(event 초기화);
+}	
+
+// 뒤로가기 누르기
+mheaderBefore.addEventListener("click", function(){
+	goBefore();
+	page = page - 1;
+})
+
+// 다음으로 버튼 누르기
+mheaderNext.addEventListener("click", function(){
+	goNext();
+	page = page + 1;
+})
+
+// 뒤로가기 눌렀을 때 다양한 상황들 처리
+function goBefore(){
+	var tempTitle = "";
+	if(page==1){
+		tempTitle = '게시글 작성을 멈추겠습니까?'			
+	}else if(page == 2){
+		textDiv.style.display = "none";
+		imgFilter.style.display = "block";
+		mheaderText.textContent = "필터 적용";
+		mheaderNext.textContent = "다음";
+	}else if(page==10){
+		tempTitle = '작성 기록이 사라집니다. 그래도 나가겠습니까?';
+	}
+	if(page == 1 || page == 10){
+		Swal.fire({
+			  title: tempTitle,
+			  showDenyButton: true,
+			  confirmButtonText: '네',
+			  denyButtonText: '아니요',
+			}).then((result) => {
+			  /* Read more about isConfirmed, isDenied below */
+			  if (result.isConfirmed) {
+				  fmodalReset()
+			  } else{
+				  page = page + 1;
+				  return false;
+			  }
+		})	
+	}
+}
+
+//다음버튼 눌렀을 때 다양한 상황들 처리
+function goNext(){
+	if(page==1){
+		textDiv.style.display = "block";
+		imgFilter.style.display = "none";
+		mheaderText.textContent = "제목/내용 입력";
+		mheaderNext.textContent = "공유하기";
+	}else if(page==2){
+		insertFeed();
+	}
+}
+
+// 피드 추가하기
+function insertFeed(){
+	var form = new FormData();
+
+	form.append("board_title",textTile.value);
+	form.append("board_content",textContent.value);
+	form.append("ccg_b004", "자유게시판");
+	for (var i = 0; i < mimagesFile.files.length; i++) {
+	   form.append("imgFile", mimagesFile.files[i]);
+	 }
+	form.append("ae_id", ae_id);
+	form.append("filters", filterInfo);
+	
+	$.ajax({
+		type : "post",
+		url : "/haruter/insertFeed",
+		data: form,
+	    processData: false,
+	    contentType: false,
+		beforeSend : function(xhr){
+			xhr.setRequestHeader("${_csrf.headerName}", "${_csrf.token}");
+		},
+		success: function(res){
+			if(res=='good'){
+				alert("good~");
+			}
+     	},
+     	error: function(ex){
+     		console.log("error", ex);
+     	}
+	});	
+	page = page - 1;
+}
+
+// 파일 선택 버튼 클릭
+mimagesSelect.addEventListener("click", function(event){
+	event.preventDefault();
+	mimagesFile.click();
+	page = page + 1;
+})	
+
+// 파일이 바뀌었을 때
+mimagesFile.addEventListener("change", function(){
+	tempEvent = event;
+	
+	imageLoad();
+})
+
+
+// 선택한 이미지 하나 보여주기
+function imageLoad(){
+	if(mimagesFile.files.length > maxFile){
+		Swal.fire({
+			  icon: 'error',
+			  title: '사진은 최대 '+maxFile+'개까지만 가능합니다!',
+			})
+	}
+	var fileTempNm = tempEvent.target.files[inputFileNum];	// 보여줄 이미지만 보여준다.
+	
+	if(mimagesFile.files.length > 1 && (inputFileNum+1) < mimagesFile.files.length){
+		imgSelectNextDiv.style.display = "block";
+	}else{
+		imgSelectNextDiv.style.display = "none";		
+	}
+	
+	if(mimagesFile.files.length > 1 && inputFileNum > 0){
+		imgSelectBeforeDiv.style.display = "block";
+	}else{
+		imgSelectBeforeDiv.style.display = "none";		
+	}
+	
+	if (mimagesFile.files.length > 0 && mimagesFile.files.length < 6) { // 파일이 선택되었는지 확인
+	
+		// 선택한 파일을 썸네일로 onload될 때 효과
+	    if (isImageFile(fileTempNm)) {
+	      var reader = new FileReader();
+	      reader.onload = function (e) {
+	    	mContainer.style.width = "60%";				
+	    	mHeader.style.justifyContent = "space-between"
+	        mimagesDiv.style.display = "none";
+	    	imgFilterDiv.style.display = "flex";
+	
+	        mheaderBefore.style.display = "block";
+	        mheaderNext.style.display = "block";
+	        imgSelect.src = e.target.result;
+	    	mheaderText.textContent = "필터 적용";
+	      };
+	      reader.readAsDataURL(fileTempNm);
+	    } else {
+	    	Swal.fire("이미지 파일을 선택해주세요!")
+	    }
+	 }
+}
+
+// 다음 이미지를 보여준다
+imgSelectNextDiv.addEventListener("click", function(){
+	classReset();
+	inputFileNum = inputFileNum + 1; 
+	imgSelect.classList.add(filterInfo[inputFileNum]);
+	imageLoad();
+})
+
+// 이전 이미지를 보여준다.
+imgSelectBeforeDiv.addEventListener("click", function(){
+	classReset();
+	inputFileNum = inputFileNum - 1; 
+	imgSelect.classList.add(filterInfo[inputFileNum]);
+	imageLoad();
+})
+
+// 필터를 클릭했을 때
+imgFilters.forEach(img => {
+  img.addEventListener("click", function() {
+    const altText = img.getAttribute("alt");
+    classReset();
+    filterInfo[inputFileNum] = altText
+    imgSelect.classList.add(filterInfo[inputFileNum]);
+  });
+});
+
+
+// 처음에 적용된 모든 필터 제거
+function classReset(){
+	imgSelect.classList.value = "";
+}
+
+//이미지 파일인지 체크(확장자를 이용해서)
+function isImageFile(file){
+	var ext = file.name.split(".").pop().toLowerCase();	// 파일명에서 확장자를 가져온다.
+	return ($.inArray(ext, ["jpg","jpeg","png"]) === -1 ) ? false : true;
+}
+
+// imgSelect.addEventListener("mousedown", startDragging);
+// imgSelect.addEventListener("mousemove", duringDragging);
+// imgSelect.addEventListener("mouseup", stopDragging);
+
+// // 이미지를 움직일 때 사용하는 변수들
+// let startX = 0;
+// let startY = 0;
+// let translateX = 0;
+// let translateY = 0;
+// isDragging = false;
+
+// function startDragging(event) {
+//   event.preventDefault(); // 드래그시 발생하는 브라우저 기본 동작 방지
+
+//   startX = event.clientX - translateX;
+//   startY = event.clientY - translateY;
+//   isDragging = true;
+// }
+
+// function duringDragging(event) {
+//   if (isDragging) {
+//     const offsetX = event.clientX - startX;
+//     const offsetY = event.clientY - startY;
+//     translateX = offsetX;
+//     translateY = offsetY;
+//     imgSelect.style.transform = "translate("+offsetX+"px, "+offsetY+"px)";
+    
+//   }
+// }
+
+// function stopDragging() {
+//   isDragging = false;
+// }
+	
+
+
+// 	// 수정폼
+// 	function updateForm(element) {
+// 		const board_no = element.getAttribute('board_no');
+// 		dModal.style.display = "none"; // 안보이게
+// 		mModal.style.display = "block"; // 보이게
+		
+// 		let xhr = new XMLHttpRequest();
+// 		xhr.open('get', "/haruter/harustorys?board_no="+board_no, true);
+// 		xhr.setRequestHeader("${_csrf.headerName}", "${_csrf.token}");
+// 		xhr.onreadystatechange = function() {
+// 			let tblStr = "";
+// 			if (xhr.readyState == 4 && xhr.status == 200){
+// 				let data = JSON.parse(xhr.responseText);
+// 				tblStr += "<button class='mbtn' onclick='fmodalClose()'>x</button>";  
+// 				tblStr += "	<div class='modcontainer'>";  
+// 				tblStr += "		<form action='' id='mForm'>";  
+// 				tblStr += "			<input type='hidden'"+data.ae_id+" value='<sec:authentication property='name'/>'/>";  
+// 				tblStr += "			<input type='hidden' value='"+data.board_no+"' id='boardNo'/>";  
+// 				tblStr += "			<div id='mheader'>내용 수정</div>";  
+// 				tblStr += "			<hr>";  
+// 				tblStr += "			<div id='mtitle'>";  
+// 				tblStr += "				<input type='text' name='board_title' id='boardTitle' placeholder='제목입력...' value='"+data.board_title+"' maxlength='30'>";  
+// 				tblStr += "			</div>";  
+// 				tblStr += "			<div id='mcontent'>";  
+// 				tblStr += "				<textarea id='boardContent' rows='10' cols='30' name='board_content'";  
+// 				tblStr += "				 	maxlength='1000' placeholder='내용입력...'>"+data.board_content+"</textarea>";  
+// 				tblStr += "			</div>";  
+// 				tblStr += "			<input type='button' onclick='updateFeed()' value='수정'>";  
+// 				tblStr += "		</form>";  
+// 				tblStr += "	</div>";  
+// 			}
+// 			mModal.innerHTML = tblStr;
+// 		}
+// 		xhr.send();
+// 	}
+	
+	// 피드수정
+// 	function updateFeed() {
+// 		var boardTitle = document.querySelector("#boardTitle");
+// 		var boardContent = document.querySelector("#boardContent");
+// 		var boardNo = document.querySelector("#boardNo");
+		
+// 		let data = {
+// 			board_no : boardNo.value,
+// 			board_title : boardTitle.value,
+// 			board_content : boardContent.value,
+// 			id : ae_id
+// 		}
+// 		console.log("data",data)
+// 		let xhr = new XMLHttpRequest(); 
+// 		xhr.open('put', '/haruter/harustory', true);
+// 		xhr.setRequestHeader('content-type', 'application/json;charset=utf-8');
+// 		xhr.setRequestHeader("${_csrf.headerName}", "${_csrf.token}");
+// 		xhr.onreadystatechange = function(){
+// 			if(xhr.readyState == 4 && xhr.status == 200){
+// 				if (xhr.responseText !=0){
+// 					confirm("정말 수정하시겠습니까?");
+					
+// 					if (dModal && dModal.style.display == "block") {
+// 				          // 수정 후 상세보기 모달을 업데이트
+// 				          detailFeed();
+// 				        }
+// 					mModal.style.display = "none";
+// 					dModal.style.display = "block";
+// 				}
+// 			}
+// 		}
+// 		xhr.send(JSON.stringify(data));
+		
+// 	}
+	// 피드 작성
+// 	function insertFeed() {
+
+// 		let data = {
+// 			storyTitle : myForm.board_title.value,
+// 			storyContent : myForm.board_content.value,
+// 			id : ae_id
+// 		}
+
+// 		let xhr = new XMLHttpRequest();
+// 		xhr.open('post', '/haruter/harustory', true);
+// 		xhr.setRequestHeader('content-type', 'application/json;charset=utf-8');
+// 		xhr.setRequestHeader("${_csrf.headerName}", "${_csrf.token}");
+// 		xhr.onreadystatechange = function() {
+// 			if (xhr.readyState == 4 && xhr.status == 200) {
+// 				if (xhr.responseText != 0) {
+// 					alert("입력 완료");
+					
+// 					fmodalClose(); // 모달 닫기
+// 				}
+// 			}
+// 		}
+// 		xhr.send(JSON.stringify(data));
+// 	}
+		
+	// 피드 상세보기
+// 	function detailFeed(element) {
+// 		const board_no = element.getAttribute('board_no');
+// 		dModal.style.display = "block"; // 보이게
+// 		document.body.style.overflowY = "hidden";
+
+// 		let xhr = new XMLHttpRequest();
+// 		xhr.open('get', "/haruter/harustorys?board_no="+ board_no, true);
+// 		xhr.setRequestHeader("${_csrf.headerName}", "${_csrf.token}");			
+// 		xhr.onreadystatechange = function(){
+// 			let tblStr = "";
+// 			if(xhr.readyState == 4 && xhr.status == 200){
+// 				let data = JSON.parse(xhr.responseText);
+// 				console.log(data)
+// 				tblStr += "		<button class='mbtn' onclick='fmodalClose()'>x</button>";
+// 				tblStr += "		<div class='mcontainer'>";
+// 				tblStr += "			<div id='mheader'>"+data.board_title+"</div>";
+// 				tblStr += "				<img class='dimg'src='/resources/asset/image/post3.jpg'/>";
+// 				tblStr += "				<div id='dprofile'>";
+// 				tblStr += "					<img class='dproimg' src='/resources/asset/image/profile.jpg'>";
+// 				tblStr += "				<h4>"+data.ae_id+"</h4>";
+// 				tblStr += "				</div>";
+// 				tblStr += "				<div class='dcontent'>"+data.board_content+"</div>";
+// 				tblStr += "			<div class='dlikes'><i class='ri-heart-line'></i>";
+// 				tblStr += "			<span>991</span><i class='ri-chat-3-line'></i><span>123</span><div>";
+// 				tblStr += "		<input board_no="+data.board_no+" type='button' onclick='updateForm(this)' value='수정'>"
+// 				tblStr += "		<input type='button' onclick='' value='삭제'>"
+// 				tblStr += "		</div>";
+// 			}
+// 			dModal.innerHTML = tblStr;
+// 		}
+// 		xhr.send();		
+// 	}
+	
+	// 피드 목록 출력
+	function storyList() {
+		let xhr = new XMLHttpRequest();
+		xhr.open('get', '/haruter/harustory', true);
+		xhr.onreadystatechange = function() {
+			if (xhr.readyState == 4 && xhr.status == 200) {
+				event.preventDefault();
+				let dataList = JSON.parse(xhr.responseText);
+				let tblStr = "";
+				for (let i = 0; i < dataList.length; i++) {
+					tblStr += "<div class='post-box'>";
+					tblStr += "<img src='/resources/asset/image/post3.jpg' board_no="+dataList[i].board_no+" onclick='detailFeed(this)'/>";
+					tblStr += `<div class='post-info'>`;
+					tblStr += `<div class='post-profile'>`;
+					tblStr += `<div class='post-img'>`;
+					tblStr += `<img src='/resources/asset/image/profile.jpg'></div>`;
+					tblStr += "<h3>"+dataList[i].ae_id+"</h3>";
+					tblStr += `</div><div class='likes'><i class='ri-heart-line'></i>`;
+					tblStr += `<span>991</span><i class='ri-chat-3-line'></i><span>123</span></div></div></div>`;
+				}
+				myList.innerHTML = tblStr;
+			}
+		}
+		xhr.send();
+	}
+ 	//window.addEventListener("DOMContentLoaded", storyList);
+
+	
+</script>

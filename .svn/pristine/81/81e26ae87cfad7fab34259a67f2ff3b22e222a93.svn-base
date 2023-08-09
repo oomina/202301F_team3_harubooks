@@ -1,0 +1,8 @@
+package kr.or.ddit.service.bmk;
+
+import org.springframework.stereotype.Service;
+
+@Service
+public class MyDiaryServiceImpl {
+
+}

@@ -1,0 +1,271 @@
+package kr.or.ddit.controller.jhs.haruter;
+
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.inject.Inject;
+
+import org.springframework.web.socket.CloseStatus;
+import org.springframework.web.socket.TextMessage;
+import org.springframework.web.socket.WebSocketSession;
+import org.springframework.web.socket.handler.TextWebSocketHandler;
+
+import kr.or.ddit.service.jhs.IChattingService;
+import kr.or.ddit.vo.jhs.Chat_MemVO;
+import kr.or.ddit.vo.jhs.ChattingVO;
+import kr.or.ddit.vo.jhs.MessageVO;
+
+public class HaruterChatting extends TextWebSocketHandler {
+	
+	@Inject
+	private IChattingService service;
+	
+	private Map<String, List<WebSocketSession>> chatRoom = new HashMap<>();
+	
+	@Override
+	public void afterConnectionEstablished(WebSocketSession wsession) throws Exception {
+		Map<String, Object> info = wsession.getAttributes();
+		Chat_MemVO member = (Chat_MemVO) info.get("member");		
+
+		if (!chatRoom.containsKey(member.getCr_no())) {
+			chatRoom.put(member.getCr_no(), new ArrayList<>());
+		}
+		service.updateChatState(member); 
+		
+
+		List<WebSocketSession> users = chatRoom.get(member.getCr_no());
+		users.add(wsession);
+		chatRoom.put(member.getCr_no(), users);
+		
+		List<ChattingVO> allChat = service.getChatting(member.getCr_no());
+		
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yy/MM/dd HH:mm:ss");
+
+        // 문자열을 LocalDateTime 객체로 변환
+        if(allChat.size() != 0 ) {      
+		// 처음 들어오면 기존 메세지들을 꺼내준다.
+			for (WebSocketSession webSocketSession : chatRoom.get(member.getCr_no())){
+				if (wsession.getId().equals(webSocketSession.getId())) {
+					for(int i=allChat.size()-1; i >= 0; i--) {
+						LocalDateTime dateTime1 = LocalDateTime.parse(member.getCm_join_ymd(), formatter);
+				        LocalDateTime dateTime2 = LocalDateTime.parse(allChat.get(i).getChat_wrt_ymd(), formatter);
+				        // 사용자가 채팅방 가입한 날보다 전에 있던 채팅만 보여준다.	        	        
+				        if (dateTime2.isAfter(dateTime1)) { 
+							if ("all".equals(allChat.get(i).getChat_type()) && !(allChat.get(i).getAe_id().equals(member.getAe_id()))) {
+								webSocketSession.sendMessage(new TextMessage(
+										"state0:<div class='your-all-chatting'>"
+										+ 	"<div class='profile-div'>"
+										+ 		"<img src='/upload/images/"+allChat.get(i).getMem_profile()+"'/>"
+										+ 		"<div class='your-chatting-span'>"
+										+ 			"<span class='your-chatting-nicknm'>"
+										+ 				allChat.get(i).getMem_nicknm()
+										+ 			"</span>"
+										+ 		"</div>"
+										+ 	"</div>"
+										+ 	"<div class='your-chatting-div'>"
+										+ 		allChat.get(i).getChat_message()
+										+ 		"<div class='your-chatting-date'>"
+										+ 			allChat.get(i).getChat_current_time() 
+										+		"</div>"
+										+ 	"</div>"
+										+"</div>"
+										+"<div>&nbsp;</div>"));
+							// 만약 내가 보낸 메세지일 때
+							}else if ("all".equals(allChat.get(i).getChat_type()) && (allChat.get(i).getAe_id().equals(member.getAe_id()))) {
+								webSocketSession.sendMessage(new TextMessage(
+										"state0:<div class='my-all-chatting'>"
+										+ 	"<div class='my-chatting'>"
+										+ 		allChat.get(i).getChat_message()
+										+ 		"<div class='my-chatting-date'>"
+										+ 			allChat.get(i).getChat_current_time()  
+										+		"</div>"
+										+ 	"</div>"
+										+"</div>"
+										+"<div style='clear:both;>&nbsp;</div>"));
+							// 내가 받은 귓속말일 때
+							}else if ("one".equals(allChat.get(i).getChat_type()) && allChat.get(i).getChat_to().equals(member.getAe_id())) {
+								webSocketSession.sendMessage(new TextMessage(
+										"state0:<div class='your-all-chatting'>"
+												+ 	"<div class='profile-div'>"
+												+ 		"<img src='/upload/images/"+allChat.get(i).getMem_profile()+"'/>"
+												+ 		"<div class='your-chatting-span'>"
+												+ 			"<span class='your-chatting-nicknm'>"
+												+ 				allChat.get(i).getMem_nicknm()
+												+ 			"</span>"
+												+ 		"</div>"
+												+ 	"</div>"
+												+ 	"<div class='your-chatting-div' style='color: red;'>"
+												+ 		allChat.get(i).getChat_message()
+												+ 		"<div class='your-chatting-date'>"
+												+ 			allChat.get(i).getChat_current_time() 
+												+		"</div>"
+												+ 	"</div>"
+												+"</div>"
+												+"<div>&nbsp;</div>"));
+							// 내가 보낸 귓속말일 때
+							}else if ("one".equals(allChat.get(i).getChat_type()) && allChat.get(i).getAe_id().equals(member.getAe_id())) {
+								webSocketSession.sendMessage(new TextMessage(
+										"state0:<div class='my-all-chatting'>"
+										+ 	"<div class='my-chatting' style='color: red;'>"
+										+ 		allChat.get(i).getChat_message()
+										+ 		"<div class='my-chatting-date'>"
+										+ 			allChat.get(i).getChat_current_time()  
+										+		"</div>"
+										+ 	"</div>"
+										+"</div>"
+										+"<div style='clear:both;>&nbsp;</div>"));
+							}
+				        }
+					}
+				}
+			}
+        }
+	}
+
+	@Override
+	protected void handleTextMessage(WebSocketSession wsession, TextMessage message) throws Exception {
+	
+		Map<String, Object> map = wsession.getAttributes();
+		Chat_MemVO member = (Chat_MemVO) map.get("member");
+
+		MessageVO messagevo = MessageVO.converMessage(message.getPayload());
+
+		Date now = new Date();
+		String currentTime = String.format("%tp %tl:%tM", now, now, now);
+		
+		// 나와 같은 채팅방 사람들에게 전부 메세지를 보낸다
+		for (WebSocketSession webSocketSession : chatRoom.get(member.getCr_no())){
+			// 자신을 제외한 모든 사용자들에게 채팅을 보낸다.
+			if ("all".equals(messagevo.getType())) {
+				if (!wsession.getId().equals(webSocketSession.getId())) {
+					webSocketSession.sendMessage(new TextMessage(
+							"state0:<div class='your-all-chatting'>"
+							+ 	"<div class='profile-div'>"
+							+ 		"<img src='/upload/images/"+member.getMem_profile()+"'/>"
+							+ 		"<div class='your-chatting-span'>"
+							+ 			"<span class='your-chatting-nicknm'>"
+							+ 				member.getMem_nicknm()
+							+ 			"</span>"
+							+ 		"</div>"
+							+ 	"</div>"
+							+ 	"<div class='your-chatting-div'>"
+							+ 		messagevo.getMessage()
+							+ 		"<div class='your-chatting-date'>"
+							+ 			currentTime  
+							+		"</div>"
+							+ 	"</div>"
+							+"</div>"
+							+"<div>&nbsp;</div>"));
+				
+				}
+				
+			// 누가 채팅방에 나가거나 들어오거나  사용된다.
+			}else if("notice".equals(messagevo.getType())) {
+					webSocketSession.sendMessage(new TextMessage(
+							"state1:<div class='notice-all-chatting'>"
+							+ 	"<div class='notice-chatting-div'>"
+							+ 		messagevo.getMessage()
+							+ 	"</div>"
+							+"</div>"
+							+"<div>&nbsp;</div>"));
+					
+			// 누군가 채팅방에 강퇴당할 때 사용된다.	
+			}else if("out".equals(messagevo.getType())) {
+				Map<String, Object> map1 = webSocketSession.getAttributes();
+				Chat_MemVO user = (Chat_MemVO) map1.get("member");
+				String to = user.getAe_id();
+				if (!(to.equals(messagevo.getTo()))) {				
+					webSocketSession.sendMessage(new TextMessage(
+							"state1:<div class='notice-all-chatting'>"
+							+ 	"<div class='notice-chatting-div'>"
+							+ 		messagevo.getMessage()
+							+ 	"</div>"
+							+"</div>"
+							+"<div>&nbsp;</div>"));
+				}else{
+					webSocketSession.sendMessage(new TextMessage(
+							"state2:<div class='notice-all-chatting'>"
+							+ 	"<div class='notice-chatting-div'>"
+							+ 		messagevo.getMessage()
+							+ 	"</div>"
+							+"</div>"
+							+"<div>&nbsp;</div>"));					
+				}
+
+			}else {
+					Map<String, Object> map1 = webSocketSession.getAttributes();
+					Chat_MemVO user = (Chat_MemVO) map1.get("member");
+					String to = user.getAe_id();
+
+					if (messagevo.getTo().equals(to)) {
+						webSocketSession.sendMessage(new TextMessage(
+							"state0:<div class='your-all-chatting'>"
+									+ 	"<div class='profile-div'>"
+									+ 		"<img src='/upload/images/"+member.getMem_profile()+"'/>"
+									+ 		"<div class='your-chatting-span'>"
+									+ 			"<span class='your-chatting-nicknm'>"
+									+ 				member.getMem_nicknm()
+									+ 			"</span>"
+									+ 		"</div>"
+									+ 	"</div>"
+									+ 	"<div class='your-chatting-div' style='color: red;'>"
+									+ 		messagevo.getMessage()
+									+ 		"<div class='your-chatting-date'>"
+									+ 			currentTime  
+									+		"</div>"
+									+ 	"</div>"
+									+"</div>"
+									+"<div>&nbsp;</div>"));
+						break; 
+					}
+				}
+
+		}
+		if(!("notice".equals(messagevo.getType()))){
+			member.setChat_current_time(currentTime);
+			member.setChat_message(messagevo.getMessage());
+			member.setChat_to(messagevo.getTo());
+			member.setChat_type(messagevo.getType());
+			
+			service.insertChatInfo(member);
+		}
+		
+	}
+
+	@Override
+	public void afterConnectionClosed(WebSocketSession wsession, CloseStatus status) throws Exception {
+		
+		Map<String, Object> map = wsession.getAttributes();
+		Chat_MemVO loginuser = (Chat_MemVO) map.get("member");
+
+		
+		List<WebSocketSession> sessions = chatRoom.get(loginuser.getCr_no());
+		sessions.remove(wsession);
+		
+		chatRoom.put(loginuser.getCr_no(), sessions);
+
+		service.updateChatStateDown(loginuser); 
+		
+		if (loginuser.getCr_no().equals(loginuser.getCr_no())) {
+			for (WebSocketSession webSocketSession : chatRoom.get(loginuser.getCr_no())) {
+
+				if (!wsession.getId().equals(webSocketSession.getId())) {
+					webSocketSession.sendMessage(new TextMessage(							
+									"state1:<div class='notice-all-chatting'>"
+									+ 	"<div class='notice-chatting-div'>"
+									+ 		loginuser.getMem_nicknm()+"님이 채팅방을 떠나셨습니다."
+									+ 	"</div>"
+									+"</div>"
+									+"<div>&nbsp;</div>"));
+				}
+
+			}
+
+		}
+	}
+}

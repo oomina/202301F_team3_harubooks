@@ -1,0 +1,13 @@
+package kr.or.ddit.service.jhs;
+
+import java.util.List;
+
+import kr.or.ddit.vo.jhs.Chat_RoomVO;
+
+public interface IChattingService {
+
+	public String insertChat(Chat_RoomVO vo);
+
+	public List<Chat_RoomVO> getChatList(Chat_RoomVO vo);
+
+}

@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+ <mapper namespace="kr.or.ddit.mapper.odh.InquiryMapper1">
+ <insert id="insertInquiry" parameterType="myInqueryVO">
+ 		<selectKey keyProperty="inquiry_no" resultType="string" order="BEFORE">
+ 			select 'IN' || LPAD(seq_in.nextval, 10, '0') from dual
+ 		</selectKey>
+ 			insert into inquiry(
+				inquiry_no
+			   ,ae_id
+			   ,inquiry_title
+			   ,inquiry_ymd
+			   ,inquiry_content
+			   ,ua_no
+			   ,ccg_i001
+			   ,ccg_i002
+ 			)
+ 			values (
+ 				#{inquiry_no}
+ 			   ,#{ae_id}
+ 			   ,#{inquiry_title}
+ 			   ,TO_CHAR(sysdate, 'YYYY/MM/DD')
+ 			   ,#{inquiry_content}
+ 			   ,#{ua_no}
+ 			   ,'문의대기'
+ 			   ,#{ccg_i002}
+ 			)
+ 	</insert>
+ 	
+ 	 <update id="updateInquiry" parameterType="myInqueryVO">
+ 		update inquiry
+ 		set ccg_i002 = #{ccg_i002},
+ 			inquiry_title = #{inquiry_title},
+ 			inquiry_content = #{inquiry_content},
+ 			inquiry_ymd = TO_CHAR(sysdate, 'YYYY/MM/DD'),
+ 			ua_no = #{ua_no}
+ 		where
+ 			inquiry_no = #{inquiry_no}
+	 </update>
+ 	
+	 <delete id="delInquiry" parameterType="String">
+	 		delete from inquiry where inquiry_no =  #{inquiry_no}
+	 </delete>
+ 	
+	 <select id="selectInquiryList" parameterType="String" resultType="int">
+	 		  	select count (inquiry_no)
+	 		  	from inquiry
+				where ae_id = #{ae_id}
+	 </select>
+	 
+	 <select id="selectInquiryList2" parameterType="pageVO" resultType="myInqueryVO">
+			select
+			b.*
+			from(
+			select
+				a.*, row_number() over(order by a.inquiry_no desc) rnum
+				from(
+				select
+					ae_id, inquiry_no, inquiry_title, inquiry_content, ccg_i001, ccg_i002,
+					inquiry_ymd
+				from inquiry
+				where 1=1
+				and ae_id = #{ae_id}
+				order by inquiry_no desc
+				)a 
+			)b
+			 where b.rnum between #{startRow} and #{endRow}
+	 </select>
+	 
+	 <select id="selectInquiryCount" parameterType="pageVO" resultType="int">
+	 		select count(inquiry_no)
+	 		from inquiry
+	 		where ae_id = #{ae_id}
+	 </select>
+	 
+	 <select id="inquOne" parameterType="String" resultType="myInqueryVO">
+	 		select inquiry_no, ccg_i002, inquiry_title, inquiry_content, inquiry_ymd, ccg_i001, ua_no, inquiry_reply
+		  	from inquiry
+			where inquiry_no = #{inquiry_no}
+	 </select>
+	
+	 <select id="inquOne2" parameterType="String" resultType="myInqueryVO">
+	 		select ua_no
+		  	from inquiry
+			where inquiry_no = #{inquiry_no}
+	 </select>
+ 	
+ 	<select id="list" parameterType="String" resultType="myInqueryVO">
+ 			select
+ 			inquiry_no, ae_id, inquiry_reply
+ 	</select>
+
+ </mapper>

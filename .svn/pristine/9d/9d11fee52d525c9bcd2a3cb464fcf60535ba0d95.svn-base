@@ -1,0 +1,37 @@
+package kr.or.ddit.controller.omn.books;
+
+import java.util.List;
+
+import javax.inject.Inject;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import kr.or.ddit.service.omn.books.IMngCategoryService;
+import kr.or.ddit.vo.omn.MngCategoryVO;
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
+@Controller
+@RequestMapping("/mng/category")
+public class MngCategoryController {
+	
+	@Inject
+	private IMngCategoryService service;
+	
+	@ResponseBody
+	@GetMapping(value = "/categoryMainList", produces = "application/json;charset=utf-8")
+	public List<MngCategoryVO> categoryMainList(){
+		log.info("categoryMainList()실행");
+		return service.categoryMainList();
+	}
+	
+	@ResponseBody
+	@GetMapping(value = "/categoryMidList", produces = "application/json;charset=utf-8")
+	public List<MngCategoryVO> categoryMidList(){
+		log.info("categoryMidList()실행");
+		return service.categoryMidList();
+	}
+}

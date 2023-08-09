@@ -1,0 +1,114 @@
+package kr.or.ddit.controller.jhs.haruter;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.inject.Inject;
+
+import org.springframework.web.socket.CloseStatus;
+import org.springframework.web.socket.TextMessage;
+import org.springframework.web.socket.WebSocketSession;
+import org.springframework.web.socket.handler.TextWebSocketHandler;
+
+import kr.or.ddit.service.jhs.IChattingService;
+import kr.or.ddit.vo.jhs.Chat_MemVO;
+import kr.or.ddit.vo.jhs.MessageVO;
+
+public class HaruterChatting extends TextWebSocketHandler {
+	
+	@Inject
+	private IChattingService service;
+	
+	private Map<String, List<WebSocketSession>> chatRoom = new HashMap<>();
+	
+	@Override
+	public void afterConnectionEstablished(WebSocketSession wsession) throws Exception {
+		Map<String, Object> info = wsession.getAttributes();
+		Chat_MemVO member = (Chat_MemVO) info.get("member");		
+
+		service.updateChatState(member); 
+		if (!chatRoom.containsKey(member.getCr_no())) {
+			chatRoom.put(member.getCr_no(), new ArrayList<>());
+		}
+
+		List<WebSocketSession> users = chatRoom.get(member.getCr_no());
+		users.add(wsession);
+		chatRoom.put(member.getCr_no(), users);
+	
+	}
+
+	@Override
+	protected void handleTextMessage(WebSocketSession wsession, TextMessage message) throws Exception {
+	
+		Map<String, Object> map = wsession.getAttributes();
+		Chat_MemVO member = (Chat_MemVO) map.get("member");
+
+		MessageVO messagevo = MessageVO.converMessage(message.getPayload());
+
+		Date now = new Date();
+		String currentTime = String.format("%tp %tl:%tM", now, now, now);
+		System.out.println("chatRoom:    "+ messagevo.getType());
+		
+		for (WebSocketSession webSocketSession : chatRoom.get(member.getCr_no())){
+			if ("all".equals(messagevo.getType())) {
+				if (!wsession.getId().equals(webSocketSession.getId())) {
+					webSocketSession.sendMessage(new TextMessage("<span style= 'color:white;'>" + member.getAe_id()
+							+ "</span>&nbsp;<span style='font-weight:bold; color:white; cursor:pointer;' class='loginuserName'>["
+							+ member.getMem_nicknm()
+							+ "]</span><br><div style='background-color: #642EFE; display: inline-block; max-width: 60%; padding: 7px; border-radius: 15%; word-break: break-all; color:white'>"
+							+ messagevo.getMessage()
+							+ "</div> <div style='display: inline-block; padding: 20px 0 0 5px; font-size: 7pt;'>"
+							+ currentTime + "</div> <div>&nbsp;</div>"));
+				
+				}
+			} else {
+					Map<String, Object> map1 = webSocketSession.getAttributes();
+					Chat_MemVO user = (Chat_MemVO) map1.get("member");
+					String to = user.getAe_id();
+
+					if (messagevo.getTo().equals(to)) {
+						webSocketSession.sendMessage(new TextMessage("<span style= 'color:white;'> 귓속말" + member.getAe_id()
+							+ "</span>&nbsp;<span style='font-weight:bold; color:white; cursor:pointer;' class='loginuserName'>["
+							+ member.getMem_nicknm()
+							+ "]</span><br><div style='background-color: #642EFE; display: inline-block; max-width: 60%; padding: 7px; border-radius: 15%; word-break: break-all; color: red;'>"
+							+ messagevo.getMessage()
+							+ "</div> <div style='display: inline-block; padding: 20px 0 0 5px; font-size: 7pt;'>"
+							+ currentTime + "</div> <div>&nbsp;</div>"));
+						break; 
+					}
+				}
+
+		}
+	}
+
+	@Override
+	public void afterConnectionClosed(WebSocketSession wsession, CloseStatus status) throws Exception {
+		
+		Map<String, Object> map = wsession.getAttributes();
+		Chat_MemVO loginuser = (Chat_MemVO) map.get("member");
+
+		
+		List<WebSocketSession> sessions = chatRoom.get(loginuser.getCr_no());
+		sessions.remove(wsession);
+		
+		chatRoom.put(loginuser.getCr_no(), sessions);
+
+		service.updateChatStateDown(loginuser); 
+		
+		if (loginuser.getCr_no().equals(loginuser.getCr_no())) {
+			for (WebSocketSession webSocketSession : chatRoom.get(loginuser.getCr_no())) {
+
+				if (!wsession.getId().equals(webSocketSession.getId())) {
+					webSocketSession
+							.sendMessage(new TextMessage("<span style='font-weight:bold; color: red;'>["+wsession.getRemoteAddress().getAddress().getHostAddress()									+ loginuser.getMem_nicknm()
+									+ "님이 퇴장했습니다.]</span>"));
+				}
+
+			}
+
+		}
+	}
+}

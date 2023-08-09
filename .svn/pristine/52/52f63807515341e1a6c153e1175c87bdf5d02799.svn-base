@@ -1,0 +1,73 @@
+package kr.or.ddit.schedule;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Component;
+
+import kr.or.ddit.mapper.ljy.PoMngMapper;
+import kr.or.ddit.mapper.ljy.RemainMngMapper;
+import kr.or.ddit.service.ljy.RemainMngServiceImpl;
+import kr.or.ddit.vo.ljy.PoMngVO;
+import kr.or.ddit.vo.ljy.RemainMngVO;
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
+@Component
+public class MySchedule {
+
+	@Autowired
+	private RemainMngMapper remainMapper;
+	@Autowired
+	private PoMngMapper poMapper;
+	
+	
+	public void autoPoSchedule() {
+		log.debug("지영 메롱");
+		// 여기서 서비스 불러서 실행하기
+		//remainService.autoPoReq();
+	}
+	
+	//@Scheduled(fixedRate = 120000)// 2분
+	public void autoPoReq() {
+		log.info("자동발주 시작");
+		List<RemainMngVO> remainDangerList = remainMapper.remainDangerList();// 6개
+		List<PoMngVO> poWaitingList = poMapper.poWaitingList();// 0개
+		if(poWaitingList == null || poWaitingList.size() == 0) { // 발주 신청 목록이 없을 때 => 바로 자동발주
+			// 자동발주 신청
+			for (RemainMngVO remainMngVO : remainDangerList) {
+				PoMngVO newPoMngVO = new PoMngVO();
+				newPoMngVO.setBook_no(remainMngVO.getBook_no());
+				newPoMngVO.setPub_nm(remainMngVO.getPub_nm());
+				int book_qty = remainMngVO.getBm_bsc_cnt() - remainMngVO.getBm_cnt();
+				newPoMngVO.setBook_qty(book_qty);
+				log.info("newPoMngVO 자동발주 insert" + newPoMngVO);
+				poMapper.poAuto(newPoMngVO);
+			}
+		} else {
+			// 발주 신청 목록과 비교하기
+			for (RemainMngVO remainMngVO : remainDangerList) {
+				boolean chk = false;
+				for (PoMngVO poMngVO : poWaitingList) {
+					log.info("remainMngVO" + "");
+					if(poMngVO.getBook_no().equals(remainMngVO.getBook_no())) {
+						log.info(remainMngVO + "이미 대기목록 존재");
+						chk = true;
+						break;
+					} 
+				}
+				if(!chk) {
+					PoMngVO newPoMngVO = new PoMngVO();
+					newPoMngVO.setBook_no(remainMngVO.getBook_no());
+					newPoMngVO.setPub_nm(remainMngVO.getPub_nm());
+					int book_qty = remainMngVO.getBm_bsc_cnt() - remainMngVO.getBm_cnt();
+					newPoMngVO.setBook_qty(book_qty);
+					log.info("newPoMngVO 자동발주 insert" + newPoMngVO);
+					poMapper.poAuto(newPoMngVO);
+				}
+			}
+		}
+		log.info("자동발주 끝");
+	}	
+}

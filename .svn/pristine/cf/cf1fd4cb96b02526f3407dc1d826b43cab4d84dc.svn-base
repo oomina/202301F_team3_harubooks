@@ -1,0 +1,144 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@200&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Nanum+Pen+Script&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Jua&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Nanum+Gothic&display=swap');
+*{
+    margin: 0;
+    padding: 0;
+    
+    font-family: 'Poppins', 'ans-serif's;
+    box-sizing: border-box;
+    list-style: none;
+    text-decoration: none;
+}
+.chatting-board{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+	margin: 1rem 1rem;
+}
+
+#chatting-board-tex h1{
+    font-size: 1.7rem;
+    font-family: 'Nanum Gothic', sans-serif;
+    color: #9f9d9d;
+}
+
+#chatboard-search-select{
+	text-align: center;
+    border: 1px solid grey;
+    border-radius: 10px;
+    font-family: 'Nanum Gothic', sans-serif;
+    color: #9f9d9d;
+    padding: 3px;
+    font-weight: bold;
+    outline: none;
+}
+
+#chatboard-search-input{
+    width: 350px;
+    text-align: center;
+    border: 1px solid grey;
+    border-radius: 10px;
+    font-family: 'Nanum Gothic', sans-serif;
+    color: #9f9d9d;
+    padding: 3px;
+    font-weight: bold;	
+    outline: none;
+}
+
+#chatboard-search-input-btn{
+	width: 65px;
+    font-family: 'Nanum Gothic', sans-serif;
+    color: #9f9d9d;
+    padding: 3px 11px;
+    font-weight: bold;
+    border-radius: 8px;
+    outline: none;
+    border: 0.5px solid #9f9d9d;
+    cursor: pointer;
+}
+
+#chatboard-select{
+    width: 115px;;
+    font-family: 'Nanum Gothic', sans-serif;
+    color: #9f9d9d;
+    padding: 4px 11px;
+    font-weight: bold;
+    border-radius: 8px;
+    outline: none;
+    border: 0.5px solid #9f9d9d;
+    cursor: pointer;
+    text-align: center;
+    font-size: 14px;
+}
+
+#chatboard-upload-btn {
+    display: flex;
+    align-items: center;
+    padding: 7px;
+    border-radius: 8px;
+    background: #53b12e;
+    cursor: pointer;
+    margin-right: 10px;
+}
+
+#chatboard-upload-btn i{
+	color: hsla(0, 0%, 100%, 0.6);
+    margin-right: 10px;
+}
+
+.chatboard-btn-text{
+	font-family: 'Nanum Gothic', sans-serif;
+    color: white;
+}
+
+#diModal {
+	position: fixed; /* 위치 고정 */
+	left: 0px;
+	top: 0px;
+	width: 100vw; /* 사이즈 고정 */
+	height: 100vh;
+	background-color: rgb(57 56 56 / 50%);;
+	z-index: 100; /* 클 수록 앞으로 나옴 */
+	display: none; /* 처음엔 안 보여야 함 */
+}
+
+
+.diContainer {
+    padding: 5px;
+    width: 35%;
+    height: 70%;
+    margin: 135px 70px 110px 530px;
+	background-color: white;
+	border-radius: 20px;
+	position: relative;
+	transition: width 0.5s ease;
+	padding: 20px;
+	text-align: center;
+	justify-content: center;
+	align-content: center;
+}
+
+#chatboard-insert-div{
+	display: grid;
+    text-align: center;
+}
+
+.chatboard-divs{
+	margin-bottom: 20px;
+}
+
+#div-title{
+	display: grid;
+}
+
+.ibtn{	
+	background: no-repeat;
+    border: none;
+    font-size: 30px;
+    float: right;
+    margin: 0px;
+    cursor: pointer;
+}
+

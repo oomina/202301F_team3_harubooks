@@ -1,0 +1,25 @@
+package kr.or.ddit.service.jhs;
+
+import java.util.List;
+
+import kr.or.ddit.ResultStatus;
+import kr.or.ddit.vo.jhs.Com_MemberVO;
+import kr.or.ddit.vo.jhs.Ebook_ManagerVO;
+import kr.or.ddit.vo.jhs.Ebook_PageVO;;
+
+public interface IMyLibraryService {
+
+	public List<Ebook_ManagerVO> getEbookList(Ebook_PageVO<Ebook_ManagerVO> evo);
+
+	public int selectEbookListCount(Ebook_PageVO<Ebook_ManagerVO> evo);
+
+	public int selectAllRecord(String id);
+
+	public Com_MemberVO callComMember(String id);
+
+	public int updateReadPage(Ebook_ManagerVO vo);
+
+	public int insertBookRecode(Ebook_ManagerVO vo);
+
+	public Ebook_ManagerVO getEbookManager(Ebook_ManagerVO vo);
+}

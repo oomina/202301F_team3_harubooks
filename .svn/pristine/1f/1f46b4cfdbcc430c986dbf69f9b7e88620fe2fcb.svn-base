@@ -1,0 +1,14 @@
+package kr.or.ddit.service.jhs;
+
+import java.util.List;
+
+import kr.or.ddit.ResultStatus;
+import kr.or.ddit.vo.jhs.Ebook_ManagerVO;
+import kr.or.ddit.vo.jhs.Ebook_PageVO;;
+
+public interface IMyLibraryService {
+
+	public List<Ebook_ManagerVO> getEbookList(Ebook_PageVO<Ebook_ManagerVO> evo);
+
+	public int selectEbookListCount(Ebook_PageVO<Ebook_ManagerVO> evo);
+}

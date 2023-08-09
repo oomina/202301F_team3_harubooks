@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE configuration
+  PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-config.dtd">
+  
+  <configuration>
+  <!-- 
+  		[마이바티스] 스프링에서 "_"를 사용한 컬럼명 사용 시 (BOOK 테이블의 BOOK_ID와 같은 컬럼)
+  		카멜케이스로 읽어주는 역할 (bookId와 같이)
+  		ex) 테이블 컬러명이 member_id인 경우 jsp화면단에서 이 값을 사용시 memberId로 사용할 수 있다.
+   -->
+  	<settings>
+  		<setting name="mapUnderscoreToCamelCase" value="false"/>
+  	</settings>
+  	
+  	<!-- 자주 사용하는 타입의 별칭을 셋팅 -->
+  	<typeAliases>
+  							<!-- 작성예 -->
+   	<typeAlias type="kr.or.ddit.vo.UserInfoVO" alias="userVO"/> 
+   	<typeAlias type="kr.or.ddit.vo.UserAuthVO" alias="authVO"/> 
+   	<typeAlias type="kr.or.ddit.vo.bmk.BoardVO" alias="boardVO"/> 
+   	<typeAlias type="kr.or.ddit.vo.jhs.Ebook_ManagerVO" alias="ebookManagerVO"/> 
+   	<typeAlias type="kr.or.ddit.vo.ljy.NoticeVO" alias="noticeVO"/> 
+   	<typeAlias type="kr.or.ddit.vo.kmw.BookInfoVO" alias="bookVO"/>    	    	   	
+   	<typeAlias type="kr.or.ddit.vo.jhs.Ebook_PageVO" alias="ebookPageVO"/> 
+   	<typeAlias type="kr.or.ddit.vo.ljy.InquiryVO" alias="inquiryVO"/> 
+   	<typeAlias type="kr.or.ddit.vo.kmw.PaginationVO" alias="pagingVO"/> 
+   	<typeAlias type="kr.or.ddit.vo.jhs.Com_MemberVO" alias="comMemberVO"/> 
+   	<typeAlias type="kr.or.ddit.vo.jhs.Ebook_RecodeVO" alias="ebookRecodeVO"/> 
+   	<typeAlias type="kr.or.ddit.vo.kmw.CartVO" alias="cartVO"/> 
+   	<typeAlias type="kr.or.ddit.vo.jhs.Ebook_MemoVO" alias="ebookMemoVO"/> 
+   	<typeAlias type="kr.or.ddit.vo.bmk.CalendarVO" alias="calendarVO"/>
+   	<typeAlias type="kr.or.ddit.vo.FileVO" alias="fileVO"/>
+   	<typeAlias type="kr.or.ddit.vo.kmw.OrderVO" alias="orderVO"/>
+   	<typeAlias type="kr.or.ddit.vo.ljy.OrderMngVO" alias="orderMngVO"/>
+   	<typeAlias type="kr.or.ddit.vo.ljy.PurchsMngVO" alias="purchsMngVO"/>
+   	<typeAlias type="kr.or.ddit.vo.ljy.DeliveryMngVO" alias="deliveryMngVO"/>
+   	<typeAlias type="kr.or.ddit.vo.ljy.RemainMngVO" alias="remainMngVO"/>
+   	<typeAlias type="kr.or.ddit.vo.omn.SalesVO" alias="salesVO"/> 
+   	<typeAlias type="kr.or.ddit.vo.omn.MngMbrVO" alias="mngMbrVO"/> 
+   	<typeAlias type="kr.or.ddit.vo.omn.MngBooksVO" alias="mngBooksVO"/> 
+   	<typeAlias type="kr.or.ddit.vo.omn.MngCategoryVO" alias="mngCategoryVO"/> 
+   	<typeAlias type="kr.or.ddit.vo.omn.NewBookRequestVO" alias="newBookRequestVO"/> 
+   	<typeAlias type="kr.or.ddit.vo.omn.MngPaginationInfoVO" alias="mngPaginationInfoVO"/> 
+   	<typeAlias type="kr.or.ddit.vo.bmk.DiaryVO" alias="diaryVO"/> 
+   	<typeAlias type="kr.or.ddit.vo.kmw.RefundVO" alias="refundVO"/> 
+   	<typeAlias type="kr.or.ddit.vo.bmk.Diary_PageVO" alias="diaryPageVO"/>
+   	<typeAlias type="kr.or.ddit.vo.ljy.RefundMngVO" alias="refundMngVO"/> 
+   	<typeAlias type="kr.or.ddit.vo.ljy.PoMngVO" alias="poMngVO"/> 
+   	<typeAlias type="kr.or.ddit.vo.kmw.ReviewVO" alias="reviewVO"/> 
+   	
+ 	</typeAliases>
+  </configuration>

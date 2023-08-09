@@ -1,0 +1,132 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib uri="http://www.springframework.org/security/tags" prefix="sec" %>
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>MyPage</title>
+<style>
+#memId{
+	border: none;
+}
+#div1{
+	/* border : 1px solid blue; */
+	width : 80%;
+	height : 100%;
+	margin : auto;
+}
+</style>
+</head>
+<body>
+<h1 align="center">회원정보 수정</h1>
+<div id="div1">
+<form id="memberForm" action="/mypage/modify?${_csrf.parameterName }=${_csrf.token}" method="post">
+아이디 : <input type="text" id="ae_id" name="ae_id" value="${userId}" readonly="readonly"> <br/>
+이름 : <input type="text" id="name" name="user_nm" value="${member.user_nm }" /><br/><br/>
+비밀번호 : <input type="password" id="password" name="ae_pw" /> <br/><br/>
+비밀번호 확인 : <input type="password" id="password2" placeholder="다시 비밀번호를 입력해주세요."> <br/><br/>
+성별 : <input type="radio" name="mbr_gender" value="남자">남자
+	   <input type="radio" name="mbr_gender" value="여자">여자<br/><br/>
+전화번호 : <input type="text" id="mbr_telno" name="mbr_telNo" value=" ${member.mbr_telNo }"/> <br/><br/>
+주소<br/>
+	   <input type="text" id="postcode" name="mbr_zip" value="${member.mbr_zip }" /><button id="postcodeBtn" onclick="daumPostcode()" type="button">우편번호찾기</button> <br/><br/>
+	   <input type="text" id="address" name="mbr_addr" value="${member.mbr_addr }"/> <br/><br/>
+	   <input type="text" id="detailAddress" name="mbr_dAddr" value="${member.mbr_dAddr }"/> <br/><br/>
+생년월일 : <input type="date" name="mbr_brdt" id="birth"> <br/><br/>
+메일 : <input type="text" id="email" name="mbr_email" value="${member.mbr_email }"/> <br/><br/>
+<input type="submit" id="modifyBtn" value="수정"/>
+<input type="button" id="deleteBtn" value="탈퇴"/>
+<sec:csrfInput/>
+</form>
+<script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+<script>
+
+var memberForm = document.querySelector("#memberForm");
+var modifyBtn = document.querySelector("#modifyBtn");
+var deleteBtn = document.querySelector("#deleteBtn");
+
+modifyBtn.addEventListener('click', function(){
+	event.preventDefault();
+	let name = document.querySelector("#name").value;
+	let password = document.querySelector("#password").value;
+	let password2 = document.querySelector("#password2").value;
+	let tel = document.querySelector("#mbr_telno").value;
+	let postcode = document.querySelector("#postcode").value;
+	let address = document.querySelector("#address").value;
+	let detailAddress = document.querySelector("#detailAddress").value;
+	let birth = document.querySelector("#birth").value;
+	let email = document.querySelector("#email").value;
+
+	if(name == "" || name == null){
+		alert('이름을 입력해주세요!');
+		return false;
+	}
+	if(password != password2){
+		alert('비밀번호가 일치하지 않습니다! 다시 입력해주세요');
+		return false;
+	}
+	if((password =="" || password == null) || (password2 =="" || password2 == null)){
+		alert("비밀번호를 입력해주세요!");
+		return false;
+	}
+	if(tel == "" || tel == null){
+		alert("연락처를 입력해주세요");
+		return false;
+	}
+	if((postcode ==  "" || postcode == null) || (address ==  "" || address == null) || (detailAddress ==  "" || detailAddress == null)){
+		alert('주소를 입력해주세요');
+		return false;
+	}
+	if(birth == "" || birth == null){
+		alert('생년월일을 입력해주세요');
+		return false;
+	}
+	if(email == "" || email == null){
+		alert("이메일을 입력해주세요");
+		return false;
+	}
+	memberForm.submit();
+});
+
+deleteBtn.addEventListener("click", function(){
+	memberForm.setAttribute("method", "post");
+	memberForm.setAttribute("action", "/mypage/delete");
+	
+	memberForm.submit();
+});
+
+// 다음 주소 API
+var postcode = document.querySelector("#postcode");
+var postcodeBtn = document.querySelector('#postcodeBtn');
+var address = document.querySelector('#address');
+var detailAddress = document.querySelector('#detailAddress');
+function daumPostcode() {
+    new daum.Postcode({
+        oncomplete: function (data) {
+                // 팝업에서 검색결과 항목을 클릭했을때 실행할 코드를 작성하는 부분.
+
+                // 각 주소의 노출 규칙에 따라 주소를 조합한다.
+                // 내려오는 변수가 값이 없는 경우엔 공백('')값을 가지므로, 이를 참고하여 분기 한다.
+            var addr = ''; // 주소 변수
+               
+                //사용자가 선택한 주소 타입에 따라 해당 주소 값을 가져온다.
+            if (data.userSelectedType === 'R') { // 사용자가 도로명 주소를 선택했을 경우
+                addr = data.roadAddress;
+            } else { // 사용자가 지번 주소를 선택했을 경우(J)
+                addr = data.jibunAddress;
+            }
+                // 우편번호와 주소 정보를 해당 필드에 넣는다.
+            postcode.value = data.zonecode;
+            address.value = addr;
+                // 커서를 상세주소 필드로 이동한다.
+            detailAddress.focus();
+        }
+   }).open();
+}
+
+</script>
+</div>
+</body>
+</html>

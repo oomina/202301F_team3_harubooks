@@ -1,0 +1,166 @@
+package kr.or.ddit.service.ljy;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Service;
+
+import kr.or.ddit.mapper.ljy.PoMngMapper;
+import kr.or.ddit.mapper.ljy.RemainMngMapper;
+import kr.or.ddit.vo.ljy.PoMngVO;
+import kr.or.ddit.vo.ljy.RemainMngVO;
+import kr.or.ddit.vo.omn.MngPaginationInfoVO;
+import lombok.extern.slf4j.Slf4j;
+
+@Service
+@Slf4j
+public class RemainMngServiceImpl implements RemainMngService {
+	
+	@Autowired
+	private RemainMngMapper remainMapper;
+	@Autowired
+	private PoMngMapper poMapper;
+	
+	@Override
+	public List<RemainMngVO> remainList(MngPaginationInfoVO<RemainMngVO> mngPaginationInfoVO) {
+		return remainMapper.remainList(mngPaginationInfoVO);
+	}
+
+	@Override
+	public int remainListCnt(MngPaginationInfoVO<RemainMngVO> mngPaginationInfoVO) {
+		return remainMapper.remainListCnt(mngPaginationInfoVO);
+	}
+
+	@Override
+	public int poOne(PoMngVO poMngVO) {
+		return poMapper.poOne(poMngVO);
+	}
+
+	@Override
+	public RemainMngVO remainOne(String book_no) {
+		return remainMapper.remainOne(book_no);
+	}
+
+	@Override
+	public int poListCnt(MngPaginationInfoVO<PoMngVO> mngPaginationInfoVO) {
+		return poMapper.poListCnt(mngPaginationInfoVO);
+	}
+
+	@Override
+	public List<PoMngVO> poList(MngPaginationInfoVO<PoMngVO> mngPaginationInfoVO) {
+		return poMapper.poList(mngPaginationInfoVO);
+	}
+
+	@Override
+	public String poReqList(List<PoMngVO> poList) {
+		int cnt = 0;
+		String rslt = "";
+		for (int i = 0; i < poList.size(); i++) {
+			PoMngVO poMngVO = poList.get(i);
+			int res = poMapper.poOne(poMngVO);
+			if(res > 0 ) {
+				cnt++;
+			} else {
+				rslt += poList.get(i).getBook_no()+ "_" + poList.get(i).getBook_qty() + "_" + poList.get(i).getAe_id() + "/";
+			}
+		}
+		if(cnt == poList.size()) {
+			rslt = "success";
+		} else {
+			rslt += "fail";
+		}
+		return rslt;
+	}
+
+	@Override
+	public List<RemainMngVO> remainPubList(RemainMngVO remainMngVO) {
+		return remainMapper.remainPubList(remainMngVO);
+	}
+
+	@Override
+	public List<PoMngVO> poPubList(PoMngVO poMngVO) {
+		return poMapper.poPubList(poMngVO);
+	}
+
+	@Override
+	public String poReqPub(List<PoMngVO> poreqPubList) {
+		Map<String,String> map = new HashMap<String, String>();
+		int cnt = 0;
+		String rslt = "";
+		for (int i = 0; i < poreqPubList.size(); i++) {
+			PoMngVO poMngVO = poreqPubList.get(i);
+			int res = poMapper.updatePoReqPub(poMngVO);
+			map.put("book_no", poMngVO.getBook_no());
+			map.put("book_qty", poMngVO.getBook_qty()+"");
+			remainMapper.updateBmCnt(map);
+			if(res > 0 ) {
+				cnt++;
+			} else {
+				rslt += poreqPubList.get(i).getBook_no()+ "_" + poreqPubList.get(i).getBook_qty() + "_" + poreqPubList.get(i).getAe_id() + "/";
+			}
+		}
+		if(cnt == poreqPubList.size()) {
+			rslt = "success";
+		} else {
+			rslt += "fail";
+		}
+		return rslt;
+	}
+
+	@Override
+	public String poRejPub(List<PoMngVO> porejPubList) {
+		int cnt = 0;
+		String rslt = "";
+		for (int i = 0; i < porejPubList.size(); i++) {
+			PoMngVO poMngVO = porejPubList.get(i);
+			int res = poMapper.updatePoRejPub(poMngVO);
+			if(res > 0 ) {
+				cnt++;
+			} else {
+				rslt += porejPubList.get(i).getBook_no()+ "_" + porejPubList.get(i).getBook_qty() + "_" + porejPubList.get(i).getAe_id() + "/";
+			}
+		}
+		if(cnt == porejPubList.size()) {
+			rslt = "success";
+		} else {
+			rslt += "fail";
+		}
+		return rslt;
+	}
+
+	@Override
+	public int remainPubListCnt(RemainMngVO remainMngVO) {
+		return remainMapper.remainPubListCnt(remainMngVO);
+	}
+	
+//	@Override
+//	public List<RemainMngVO> remainPubList(String ae_id) {
+//		return remainMapper.remainPubList(ae_id);
+//	}
+	
+	// 자동발주
+//	public void autoPoReq() {
+//		log.info("자동발주 시작");
+//		List<RemainMngVO> remainDangerList = remainMapper.remainDangerList();// 6개
+//		List<PoMngVO> poWaitingList = poMapper.poWaitingList();// 34개
+//		for (RemainMngVO remainMngVO : remainDangerList) {
+//			for (PoMngVO poMngVO : poWaitingList) {
+//			//log.info("remainMngVO" + "");
+//				if(poMngVO.getBook_no().equals(remainMngVO.getBook_no())) {
+//					log.info(remainMngVO + "이미 대기목록 존재");
+//					break;
+//				} 
+//				PoMngVO newPoMngVO = new PoMngVO();
+//				newPoMngVO.setBook_no(remainMngVO.getBook_no());
+//				newPoMngVO.setPub_nm(remainMngVO.getPub_nm());
+//				int book_qty = remainMngVO.getBm_bsc_cnt() - remainMngVO.getBm_cnt();
+//				newPoMngVO.setBook_qty(book_qty);
+//				log.info("newPoMngVO 자동발주 insert" + newPoMngVO);
+//				//poMapper.poAuto(poMngVO);
+//			}
+//		}
+//	}	
+}

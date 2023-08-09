@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+<mapper namespace="kr.or.ddit.mapper.ljy.OrderMngMapper">
+	<!-- 주문내역 -->
+	<resultMap type="orderMngVO" id="orderMngMap">
+		<id property="order_no" column="order_no"/>
+		<result property="ae_id" column="ae_id"/>
+		<result property="order_ymd" column="order_ymd"/>
+		<result property="order_dmnd_nocs" column="order_dmnd_nocs"/>
+		<result property="ccg_o001" column="ccg_o001"/>
+		<result property="order_mileage" column="order_mileage"/>
+		<collection property="purchsMngList" resultMap="purchsMngList"/>
+		<collection property="deliveryMngVO" resultMap="deliveryMngVO"/>
+	</resultMap>
+	
+	<!-- 주문 내역중 구매 항목 -->
+	<resultMap type="purchsMngVO" id="purchsMngList">
+		<result property="order_no" column="order_no"/>
+		<result property="book_no" column="book_no"/>
+		<result property="ae_id" column= "ae_id"/>
+		<result property="pl_cnt" column="pl_cnt"/>
+		<result property="book_ntsl_amt" column="book_ntsl_amt"/>
+		<result property="pl_refund_yn" column="pl_refund_yn"/>
+		<result property="pl_dcsn_yn" column= "pl_dcsn_yn"/>
+		<result property="expected_mileage" column="expected_mileage"/>
+		<result property="book_title" column= "book_title"/>
+		<result property="pub_nm" column="pub_nm"/>
+	</resultMap>
+ 	
+ 	<resultMap type="deliveryMngVO" id="deliveryMngVO">
+ 		<result property="order_no" column="order_no"/>
+ 		<result property="ae_id" column="ae_id"/>
+ 		<result property="user_addr" column="user_addr"/>
+ 		<result property="user_daddr" column="user_daddr"/>
+ 		<result property="user_zip" column="user_zip"/>
+ 		<result property="user_telno" column="user_telno"/>
+ 		<result property="user_nm" column="user_nm"/>
+ 		<result property="deliver_ymd" column="deliver_ymd"/>
+ 		<result property="ccg_d001" column="ccg_d001"/>
+ 	</resultMap>
+	<select id="orderList" resultMap="orderMngMap">
+		SELECT 
+		    o.order_no
+		    , o.ae_id
+		    , o.order_ymd
+		    , o.order_dmnd_nocs
+		    , o.ccg_o001
+		    , o.order_mileage
+		    , p.book_no
+		    , p.pl_cnt
+		    , p.book_ntsl_amt
+		    , p.pl_refund_yn
+		    , p.pl_dcsn_yn
+		    , p.expected_mileage
+		    , b.book_title
+		    , b.pub_nm
+		FROM 
+		    orders o
+		    INNER JOIN purchs_list p ON o.order_no = p.order_no
+		    INNER JOIN books b on b.book_no = p.book_no 
+	</select>
+	
+	<select id="orderOne" resultMap="orderMngMap" parameterType="String">
+		SELECT 
+		    o.order_no
+		    , o.ae_id
+		    , o.order_ymd
+		    , o.order_dmnd_nocs
+		    , o.ccg_o001
+		    , o.order_mileage
+		    , p.book_no
+		    , p.pl_cnt
+		    , p.book_ntsl_amt
+		    , p.pl_refund_yn
+		    , p.pl_dcsn_yn
+		    , p.expected_mileage
+		    , b.book_title
+		    , b.pub_nm
+		FROM 
+		    orders o
+		    INNER JOIN purchs_list p ON o.order_no = p.order_no
+		    INNER JOIN books b on b.book_no = p.book_no
+		WHERE 
+		    o.order_no = #{order_no}
+	</select>
+	<!-- <select id="purchsMngList" resultType="purchsMngVO" parameterType="String">
+		SELECT 
+		    p.order_no
+		    ,p.ae_id
+		    , p.book_no
+		    , b.book_title
+		    , b.pub_nm
+		    , p.pl_prchs_amt
+		    , p.book_ntsl_amt
+		    , p.pl_cnt
+		    , p.pl_refund_yn
+		    , p.pl_dcsn_yn
+		    , p.expected_mileage
+		FROM 
+		    purchs_list p
+		    INNER JOIN books b ON p.book_no = b.book_no
+		WHERE 
+    		p.order_no = #{order_no} 
+	</select>  -->
+</mapper>

@@ -1,0 +1,65 @@
+package kr.or.ddit.controller.bmk.haruter;
+
+import java.util.List;
+import java.util.Map;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import kr.or.ddit.service.bmk.IHarustoryService;
+import kr.or.ddit.vo.bmk.BoardVO;
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
+@Controller
+@RequestMapping("/haruter")
+public class HarustoryController {
+	
+	@Autowired
+	private IHarustoryService harustoryService;
+	
+	// 리스트 조회
+	@ResponseBody
+	@GetMapping(value = "/harustory", produces = "application/json;charset=utf-8")
+	public List<BoardVO> boardList(){
+		return harustoryService.boardList();
+	}
+	
+	// 상세 조회
+	@ResponseBody
+	@GetMapping(value = "/harustorys", produces = "application/json;charset=utf-8")
+	public BoardVO boardOne(@RequestParam("board_no") String board_no){
+		System.out.println(board_no);
+		return harustoryService.boardOne(board_no);
+	}
+	
+	// 인서트
+	@ResponseBody
+	@PostMapping(value="/harustory", produces = "application/json;charset=utf-8")
+	public int storyInsert(@RequestBody Map<String, String> resMap) {
+		String title = resMap.get("storyTitle");
+		String content = resMap.get("storyContent");
+		String ae_id = resMap.get("id");
+		BoardVO vo = new BoardVO();
+		vo.setBoard_title(title);
+		vo.setBoard_content(content);
+		vo.setAe_id(ae_id);
+		return harustoryService.storyInsert(vo);
+	}
+	
+	// 수정
+	@PutMapping(value = "/harustory", produces = "application/json;charset=utf-8")
+	public int storyUpdate(@RequestBody BoardVO boardVO) {
+		return harustoryService.storyUpdate(boardVO);
+	}
+	
+	
+	
+}

@@ -1,0 +1,180 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        #container {
+            width: 400px;
+            height: 100%;
+            margin: 5% auto;
+            display: flex;
+            flex-direction: column;
+            align-content: center;
+        }
+
+        #logo {
+            width: 150px;
+            height: 110px;
+            align-items: center;
+        }
+
+        #main-logo {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .form-item {
+            margin-top: 60px;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            border: 1px solid #d5d5d5;
+            border-radius: 10px;
+        }
+
+        .input-items {
+            width: 80%;
+            text-decoration: none;
+            margin: 0 auto;
+        }
+
+        .input-info {
+            border: 1px solid #d5d5d5;
+            width: 100%;
+            height: 50px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+        #findResult{
+            width: 100%;
+            height: 90px;
+            border: 1px solid #d5d5d5;
+            border-radius: 10px;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        #selectOpt{
+            display: flex;
+            flex-direction: row;
+            margin-bottom: 30px;
+        }
+        .findOption{
+            width: 130px;
+            border: 1px solid #d5d5d5;
+            height: 50px;
+            display: flex;
+            justify-items: center;
+            align-items: center;
+        }
+        .find-form{
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+    </style>
+</head>
+<body>
+    <div id="container">
+        <div id="main-logo"><img src="/resources/asset/image/logo1.png" alt="" id="logo"></div>
+        
+        <div class="form-item">
+            <div id="selectOpt" style="margin-top: 20px;">
+                <div class="findOption" id="findId" style="border:2px solid #1b9c3b;">
+                    <p style="margin: 0 auto; font-weight: bold;">아이디찾기</p>
+                </div>
+                <div class="findOption" id="findPw">
+                    <p style="margin: 0 auto; font-weight: bold;">비밀번호찾기</p>
+                </div>
+            </div>
+            <!--아이디 찾기-->
+            <form action="/login/findId.do" class="find-form" id="id-form">
+                <div class="input-items">
+                    <input type="text" name="name" class="input-info" placeholder="이름을 입력해주세요" id="name">
+                </div>
+                <div class="input-items">
+                    <input type="email" name="eMail" class="input-info" placeholder="이메일을 입력해주세요" id="eMail">
+                </div>
+                <!--AJAX로 처리해야한다.-->
+                <div class="input-items" style="margin-top: 30px;margin-bottom: 30px;">
+                    <button class="input-info" type="submit"
+                        style="background-color: #767676; border: 1px solid #767676; color: white; font-weight: bold; font-size: 1.2em;" id="findIdBtn">아이디 찾기</button>
+                    <br>     
+                </div>
+                
+                <div class="input-items" id="resultForm" style="display: none;">
+                    <div id="findResult">
+                        <h3>현재 고객님의 아이디는</h3>
+                        <p><span style="color: rgb(29, 139, 29); font-weight: bold;">a101</span> 입니다</p>
+                    </div>
+                </div>
+                <div class="input-items">
+                    <div style="text-align: center; margin-bottom: 20px;" >
+                        <a href="/login/signinForm" style="color: #767676;">로그인</a> 
+                        <a href="/login/signupForm" style="color: #767676;">회원가입</a>
+                    </div>
+                </div>
+            </form>
+            <!--비밀번호 찾기-->
+            <form action="/login//findPw.do" class="find-form" id="pw-form" style="display: none;" >
+                <div class="input-items">
+                    <input type="text" name="name" class="input-info" placeholder="이름을 입력해주세요" id="name">
+                </div>
+                <div class="input-items">
+                    <input type="text" name="id" class="input-info" placeholder="아이디를 입력해주세요" id="id">
+                </div>
+                <div class="input-items">
+                    <input type="email" name="eMail" class="input-info" placeholder="이메일을 입력해주세요" id="eMail">
+                </div>
+                
+                <div class="input-items" style="margin-top: 30px;margin-bottom: 30px;">
+                    <button class="input-info" type="submit"
+                        style="background-color: #767676; border: 1px solid #767676; color: white; font-weight: bold; font-size: 1.2em;" id="findPwBtn">비밀번호 찾기</button>
+                    <br>    
+                </div>
+                <div class="input-items">
+                    <div style="text-align: center; margin-bottom: 20px;" >
+                        <a href="/login/signinForm" style="color: #767676;">로그인</a> 
+                        <a href="/login/signupForm" style="color: #767676;">회원가입</a>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+    </div>   
+    <script>
+        let findId = document.querySelector('#findId');
+        let findPw = document.querySelector('#findPw');
+        let idForm = document.querySelector('#id-form');
+        let pwForm = document.querySelector('#pw-form');
+
+        findId.addEventListener('click',function(){
+            findPw.style.border = "1px solid #d5d5d5";
+            findId.style.border = "2px solid #1b9c3b";
+            idForm.style.display = "block";
+            pwForm.style.display = "none";
+        })
+        findPw.addEventListener('click',function(){
+            findId.style.border = "1px solid #d5d5d5";
+            findPw.style.border = "2px solid #1b9c3b";
+            idForm.style.display = "none";
+            pwForm.style.display = "block";
+        })
+
+        let findIdBtn = document.querySelector('#findIdBtn');
+        let findResult = document.querySelector('#resultForm');
+        findIdBtn.addEventListener('click',function(){
+            
+            findResult.style.display = "block";
+        })
+    </script> 
+</body>
+</html>

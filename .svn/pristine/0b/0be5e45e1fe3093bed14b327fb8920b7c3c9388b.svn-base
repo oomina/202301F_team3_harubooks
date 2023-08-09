@@ -1,0 +1,21 @@
+package kr.or.ddit.vo.bmk;
+
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
+
+@Getter
+@Setter
+@ToString
+public class BoardVO {
+	
+	private String boardNo;
+	private String boardTitle;
+	private String boardContent;
+	private String wrtYmd;
+	private String lastMdfcnYmd;
+	private int inqCnt;
+	private String ccgB004;
+	private String uaNo;
+	private String aeId;
+}

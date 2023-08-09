@@ -1,0 +1,735 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@ taglib uri="http://www.springframework.org/security/tags" prefix="sec" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
+<link rel="stylesheet" href="/resources/assets/css/myPage.css">
+<link rel="stylesheet" href="/resources/assets/css/prod-order.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Orbit&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
+
+<meta charset="UTF-8">
+<meta name="_csrf_header" id="_csrf_header" content="${_csrf.headerName}">
+<meta name="_csrf" id="_csrf" content="${_csrf.token }"/>
+<style>
+#myModal{
+	display: none; /* Hidden by default */
+    position: fixed; /* Stay in place */
+    z-index: 5; /* Sit on top */
+    left: 0;
+    top: 0;
+    width: 100%; /* Full width */
+    height: 3000px; /* Full height */
+    background-color: rgb(0,0,0); /* Fallback color */
+    background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+}
+
+#con{
+	 background-color: #fefefe;
+     margin: 0.5% auto; /* 15% from the top and centered */
+     padding: 15px;
+     border: 1px solid #888;
+     width: 1000px; /* Could be more or less, depending on screen size */
+     height : 690px;
+     border-radius: 10px;
+     padding : 30px;
+}
+
+#menu {
+	text-align: right;
+}
+#img1{
+	width:19px;
+	height:19px;
+	filter: invert(100%) sepia(100%) saturate(0%) hue-rotate(108deg) 
+	brightness(104%) contrast(104%);
+	vertical-align: text-bottom;
+}
+#close{
+	border : none;
+	background-color: #fefefe;
+	font-size: 20px;
+}
+#inquery {
+    font-size: 14px;
+    font: sans-serif;
+    color: white;
+    background: #6A5ACD;
+    border: none;
+    width: 123px;
+    height: 39px;
+    border-radius: 7px;
+    float: right;
+    transition: background-color 0.3s ease; /* 트랜지션을 추가합니다. */
+}
+
+#inquery:hover {
+    background: #483D8B;
+}
+
+#star1{
+	font-weight:bold;
+	margin-right: 100px;
+	color : green;
+}
+#star2{
+	font-weight:bold;
+	margin-right: 128px;
+	color : green;
+}
+
+#word{
+	margin-left : 10px;
+	font-size : 14px;
+	font-weight : bold;
+	font: sans-serif;
+}
+
+#select1{
+	width : 80%;
+	height : 45px;
+	border-radius: 5px;
+	border:none;
+	outline : 1px solid #D8D8D8;
+	font-size: 14px;
+}
+#inContent{
+	width : 80%;
+	padding : 13px;
+	height : 45px;
+	border-radius: 5px;
+	border:none;
+	outline : 1px solid #D8D8D8;
+	margin-bottom: 15px;
+	font-size: 14px;
+}
+
+#tarea{
+	margin-left : 185px;
+	width : 80%;
+	height : 180px;
+	padding : 13px;
+	border-radius: 5px;
+	border:none;
+	outline : 1px solid #D8D8D8;
+	margin-bottom: 10px;
+	font-size: 14px;
+	z-index: -1;
+	resize: none;
+}
+#tarea-container {
+    position: relative;
+  }
+  
+#test_cnt {
+  position: absolute;
+  right: 10px;
+  bottom: 25px;
+  font-size: 14px;
+}
+
+#error-message{
+	margin-left: 190px;
+	font-size : 13px;
+	font-weight: bold;
+	white-space: nowrap;
+	margin-top: 10px;
+}
+#imageCounter{
+	margin-right : 88px;
+	font-size : 14px;
+}
+
+#inqu1{
+	height:50px;
+	width : 200px;
+	border : none;
+	color : white;
+	background-color: gray;
+	border-radius: 7px;
+	font-weight: bold;
+	font-size: 16px;
+	font-family: 'Noto Sans KR', sans-serif;
+}
+
+#inqu2{
+	height:50px;
+	width : 200px;
+	border : none;
+	color : white;
+	background-color: #6A5ACD;
+	border-radius: 7px;
+	font-weight: bold;
+	font-size: 16px;
+	font-family: 'Noto Sans KR', sans-serif;
+}
+
+th{
+	text-align: left;
+	border-top:1px solid #d5d5d5;
+	border-bottom:1px solid #d5d5d5;
+	padding: 10px;
+	font-family: 'Noto Sans KR', sans-serif;
+	background: #33b052;
+	color : white;
+}
+
+#emptyIn{
+	text-align: center;
+	font-size : 18px;
+	font-family: 'Orbit', sans-serif;
+}
+#inImg{
+	filter: invert(87%) sepia(0%) saturate(83%) hue-rotate(148deg) brightness(90%) contrast(85%);
+	width: 35px; height:35px;
+}
+#td1{
+	font-size:14px;
+}
+#td2{
+	font-size:14px;
+}
+#td3{
+	font-size:14px;
+}
+#td4{
+	font-size:14px;
+}
+#td5{
+	border-radius: 10px;
+	font-size:14px;
+	background: #5055b1;
+	color : white;
+	width : 80px;
+	line-height : 25px;
+	text-align: center;
+}
+#ctd5{
+	border-radius: 10px;
+	font-size:14px;
+	background: orange;
+	color : white;
+	width : 80px;
+	line-height : 25px;
+	text-align: center;
+}
+#pagingArea{
+	padding-right: 45px;
+}
+
+.faq_q{
+position: relative;
+	width: 24px;
+	height: 24px;
+	color: #fff;
+	background-color: #5055b1;
+	border-radius: 50%;
+	font-family: "Roboto", sans-serif;
+	text-align: center;
+	line-height: 24px;
+}
+.faq_q2{
+position: relative;
+	width: 24px;
+	height: 24px;
+	color: #fff;
+	background-color: orange;
+	border-radius: 50%;
+	font-family: "Roboto", sans-serif;
+	text-align: center;
+	line-height: 24px;
+}
+.faq_circle{
+position: relative;
+	width: 24px;
+	height: 24px;
+	color: #fff;
+	background-color: #5055b1;
+	border-radius: 50%;
+	font-family: "Roboto", sans-serif;
+	font-weight : bold;
+	text-align: center;
+	line-height: 24px;
+}
+.faq_circle2{
+position: relative;
+	width: 24px;
+	height: 24px;
+	color: #fff;
+	background-color: orange;
+	border-radius: 50%;
+	font-family: "Roboto", sans-serif;
+	font-weight : bold;
+	text-align: center;
+	line-height: 24px;
+}
+
+</style>
+<body>
+
+<!-- 유저 아이디 -->
+<input type="hidden" value="<sec:authentication property="name"/>" id="ae_id" name="ae_id">
+	<div id="container">
+		<div id="sidebar">
+			<div>
+				<p style="font-weight: bold;font-size: 24px;">마이페이지</p>
+			</div>
+			<div id="myInfo">
+				<div class="info" style="display: flex;flex-direction: column;">
+					<div style="display: flex;margin: 0 auto; flex-direction: column;">
+						<p style="font-size: 18px;color: white;margin: 5px;font-weight: bold;">${userInfo.user_nm }님</p>
+						<div style="background-color: #3cb454;height: 24px;border-radius: 15px;"><p style="margin-bottom: 0px;color: white;text-align: center;font-weight: bold;">${userInfo.rank_name }</p></div>
+					</div>
+					<div id="info-1" style="display: flex;flex-direction: column;width: 90%;margin: 0 auto;margin-top: 20px;">
+						<div style="display: flex;justify-content: space-between;align-items: center;">
+							<p style="font-size: 13px;color: white;">보유 마일리지</p><p style="font-size: 15px;color: white;font-weight: bold;">${userInfo.mbr_mileage }P</p>
+						</div>
+						<div style="display: flex;justify-content: space-between;align-items: center;">
+							<p style="font-size: 13px;color: white;">찜 목록</p><p style="font-size: 15px;color: white;font-weight: bold;">${wishCnt }개</p>
+						</div>
+						<div style="display: flex;justify-content: space-between;align-items: center;">
+							<p style="font-size: 13px;color: white;">장바구니</p><p style="font-size: 15px;color: white;font-weight: bold;">${cartCnt }개</p>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div id="category">
+				<div class="categoryInfo">
+					<p>쇼핑내역</p>
+					<a href="/harubooks/myPage/orderList?status=order">주문/배송목록</a>
+					<a href="/harubooks/myPage/orderList?status=complete" >구매확정목록</a>
+					<a href="/harubooks/myPage/orderList?status=refund">환불내역</a>
+					<a href="/wish/list" >찜 목록</a>
+					<a href="/harubooks/myCart">장바구니 목록</a>
+				</div>
+				<div class="categoryInfo">
+					<p>문의 내역</p>
+					<a href="/inquiry/list" >1:1문의</a>
+				</div>
+				<div class="categoryInfo">
+					<p>나의 정보</p>
+					<a href="/mypage/agree" >내 정보 수정</a>
+				</div>
+			</div>
+		</div>
+		<form id="pageForm" name="pageForm">
+			<input type="hidden" name="page" id="page"/>
+			<sec:csrfInput/>
+		</form>
+		<div id="content">
+			<div>
+				<p style="font-size: 18px;font-weight: bold;">1:1문의</p>
+			</div>
+			<div id="prodInfo">
+				<div>
+					<p style="font-size: 18px; font-weight: bold;">나의 문의</p>
+				</div>
+				<div id="inquiryList">
+					<div style="display: flex; flex-direction: column;">
+						<p style="font-size: 16px; font-weight: bold; margin-right: 30px; font-family: 'Noto Sans KR', sans-serif;"class="semi-title">문의 목록
+						<!-- 1:1문의하기 버튼을 누르면 모달창으로 넘어가서 등록 폼이 나온다. -->
+						<button type="button" id="inquery" onclick="fmodalOpen()">
+  						<img src="/resources/assets/img/pngegg (1).png" id="img1">&nbsp;1:1문의하기
+						</button>
+						</p>
+						
+					</div>
+					<table>
+							<tr>
+								<th style="width:130px; font-size: 15px;">문의 유형</th>
+								<th style="width:180px; font-size: 15px;">문의 제목</th>
+								<th style="width:330px; font-size: 15px;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;문의 내용</th>
+								<th style="width:210px; font-size: 15px;">등록 날짜</th>
+								<th style="width:110px; font-size: 15px;">문의 상태</th>
+							</tr>
+						<c:set value="${pagingVO.dataList}" var="inquiryList"/>
+						<c:choose>
+							<c:when test="${empty inquiryList}">
+							<tr style="text-align: center;">
+							    <td style="padding-top: 200px; padding-right: 20px;" colspan="5">
+							        <img id="inImg" src="/resources/assets/img/경고.png">
+							    </td>
+							</tr>
+							<tr id="emptyIn">
+								<td style="padding-top: 10px;" colspan="5">문의 내역이 존재하지 않습니다.</td>
+							</tr>
+							</c:when>
+							<c:otherwise>
+								<c:forEach items="${inquiryList}" var="inquiry">
+									<tr style="text-align: left; border-bottom : 1px solid darkgray;" onclick="location.href='/inquiry/detail?inquiry_no=${inquiry.inquiry_no}'">
+										<td id="td1" style="padding-top: 10px; padding-bottom: 10px; padding-left:10px;">${inquiry.ccg_i002}</td>
+										<td id="td2"> 
+										<c:choose>
+											<c:when test="${inquiry.ccg_i001 eq '문의완료'}">
+												<div style="display:inline-block;" class="faq_q2"><span class="faq_circle2" aria-hidden="true">A</span></div>
+											</c:when>
+											<c:otherwise>
+												<div style="display:inline-block;" class="faq_q"><span class="faq_circle" aria-hidden="true">Q</span></div>
+											</c:otherwise>
+										</c:choose>
+											
+											<c:choose>
+											  <c:when test="${fn:length(inquiry.inquiry_title) > 5}">
+											    <c:out value="${fn:substring(inquiry.inquiry_title, 0, 5)}"/>...
+											  </c:when>
+											  <c:otherwise>
+											    <c:out value="${inquiry.inquiry_title}"/>
+											  </c:otherwise>
+											</c:choose>
+										</td>
+										<td id="td3">
+										<c:choose>
+											<c:when test="${fn:length(inquiry.inquiry_content) > 14}">
+												<c:out value="${fn:substring(inquiry.inquiry_content, 0, 14)}"/>...
+											</c:when>
+											<c:otherwise>
+												<c:out value="${inquiry.inquiry_content}"/>
+											</c:otherwise>
+										</c:choose>
+										</td>
+										<td id="td4">${inquiry.inquiry_ymd}</td>
+										<c:choose>
+										  <c:when test="${inquiry.ccg_i001 eq '문의완료'}">
+										    <td> <!-- "문의완료"인 경우 셀의 배경색을 초록색으로 설정 -->
+										      <div id="ctd5">
+										      ${inquiry.ccg_i001} <!-- inquiry.ccg_i001 값을 출력 -->
+										      </div>
+										    </td>
+										  </c:when>
+										  <c:otherwise>
+										    <td> <!-- "문의완료"가 아닌 경우에는 배경색을 따로 지정하지 않음 -->
+										      <div id="td5">
+										      ${inquiry.ccg_i001} <!-- inquiry.ccg_i001 값을 출력 -->
+										      </div>
+										    </td>
+										  </c:otherwise>
+										</c:choose>
+									</tr>
+								</c:forEach>
+							</c:otherwise>
+						</c:choose>
+					</table>
+				</div>
+			</div>
+			<div style="padding-top: 35px;" id="pagingArea">
+				${pagingVO.pagingHTML}
+			</div>
+		</div>
+	</div>
+			<!--모달창 만들기-->
+			<div id="myModal">
+				<!--  모달창 내용  -->
+				<div id="con">
+					<!-- x를 누르면 모달창 닫힘  -->
+					<div id="menu"><button id="close" onclick="fmodalClose()">x</button></div>
+					<!-- 등록 모달창 제목  -->
+					<div style="border-bottom: 1px solid black; margin-bottom: 25px;"><h4 style="font-weight: bold; margin-bottom: 30px;">1:1문의 접수</h4></div>
+					<!--  폼으로 등록하기 /select, text, file -->
+					<form id="form-name">			
+					
+					<!--  문의 유형 선택  -->
+					<span id="word">문의유형</span> <span id="star1">*</span>
+						<select id="select1" name="select1">
+							<!-- 제일 첫번째 셀렉트 옵션에 selected value="" 설정을 해줌으로써 선택하지 않으면 경고창이 뜸 -->
+						    <option selected value="">&nbsp;&nbsp;문의 유형을 선택해주세요.</option>
+						    <option value="일반문의">&nbsp;&nbsp;일반 문의</option>
+						    <option value="상품문의">&nbsp;&nbsp;상품 문의</option>
+						</select>
+					<!-- 내용 입력 창들 -->
+					<div style="margin-top : 10px;">
+					<span id="word">내용</span> <span id="star2">*</span>
+					<!--  제목 입력  -->
+						<input type="text" id="inContent" name="inContent" placeholder="제목을 입력해주세요."/>
+						<!--  내용 입력  -->
+						<div id="tarea-container">
+						  <textarea style="font-size: 14px;" id="tarea" name="tarea" style="resize: none" maxlength="500" placeholder="빠른 답변을 위해 10자 이상의 문의 내용을 입력해 주세요."></textarea>
+						  <div id="test_cnt">0 / 500</div>
+						</div>
+					</div>
+					<!--  사진 썸네일 추가  -->
+					<span id="word">사진첨부</span> <span id="imageCounter">0/3</span>
+					<span style="font-size: 13px">빠른 답변을 위해 이미지를 첨부해주세요.</span>
+					<div style="margin-top : 10px; margin-left: 180px;">
+						<!--  사진 추가버튼을 이미지로 대체  -->
+						<label for="imageInput" id="imageAddButton">
+							<img src="/resources/assets/img/이미지추가.png" style="width:100px; height:100px; cursor: pointer;">
+						</label>
+						<!--  파일 업로드 기능만 하고 실제로는 이미지로 대체 원래 파일폼 숨김  -->
+						<input type="file" id="imageInput" name="imageInput" onchange="previewImage(this, 'View_area')" style="display: none;" accept="image/jpeg, image/jpg, image/png, image/gif" multiple="multiple"/>
+						<label>
+						<!--  이미지가 보여지는 칸  -->
+						<span id="View_area" style="position:releative; color: black; border: 0px solid black;">
+						</span>
+						</label>
+						<!--  파일 업로드는 3장만 할 수 있게 막아놨음 파일은 업로드 안됨  -->
+						<div style="font-size: 13px; margin-bottom : 10px;">* JPG, PNG, GIF 파일만 최대 3장 업로드 가능합니다.</div>
+					</div>
+					</form>
+					<!--  취소 버튼을 누르면 1:1 문의창으로 넘어가고 문의 접수를 누르면 문의 접수가 되고 1:1 문의창으로 넘어감  -->
+					<div style="text-align: center;"><button id="inqu1" name="inqu1" type="button" onclick="location.href='/inquiry/list'">취소</button> &nbsp;&nbsp;<button type="button" id="inqu2" name="inqu2">문의 접수</button></div>
+					<sec:csrfInput/>
+				</div>
+			</div>
+
+<script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.0/jquery.min.js" charset="utf-8"></script>
+
+<!--결제 API -->
+<script type="text/javascript" src="https://cdn.iamport.kr/js/iamport.payment-1.1.5.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@9"></script>
+<script>
+	// 폼
+	var ae_id = document.querySelector("#ae_id").value;
+	
+	var inqu1 = document.querySelector("#inqu1");
+	var inqu2 = document.querySelector("#inqu2");
+	var addForm = document.querySelector("#addForm");
+	const mModal = document.querySelector("#myModal");
+	const select1 = document.querySelector("#select1");
+	const inContent = document.querySelector("#inContent");
+	const tarea = document.querySelector("#tarea");
+	const imageInput = document.querySelector("#imageInput");
+	
+
+	// 1:1 문의접수를 누르면 모달 오픈
+	function fmodalOpen(){
+		mModal.style.display = "block";
+	}
+	// 모달 오픈됬을 때 x를 누르면 모달창이 닫힌다
+	function fmodalClose(){
+		mModal.style.display = "none";
+		document.forms['form-name'].reset();
+		resetTextareaCounter();
+		
+		fileInfoArr = []; // 이미지 첨부 관련 데이터 초기화
+	    $("#View_area").empty(); // 썸네일 이미지들을 모두 제거
+	    
+	    updateImageCounter();
+	}
+	
+	// 문의 내용 작성 할 때 글자수 카운트
+	$(document).ready(function() {
+        var maxLength = 500;
+
+        $('#tarea').on('input', function() {
+            var currentLength = $(this).val().length;
+            $('#test_cnt').html(currentLength + " / " + maxLength);
+
+            if (currentLength > maxLength) {
+                $(this).val($(this).val().substring(0, maxLength));
+                $('#test_cnt').html(maxLength + " / " + maxLength);
+                alert("글자수가 최대로 입력되었습니다");
+            }
+        });
+    });
+	
+	// 모달 닫힐 때 내용 초기화 함수
+	function resetTextareaCounter() {
+	    $('#tarea').val(''); // 텍스트 영역의 내용을 지웁니다.
+	    $('#test_cnt').html('0 / 500'); // 카운터를 0으로 초기화합니다.
+	}
+	
+	// 사진 첨부할 때 썸네일 출력
+	var fileArr;
+    var fileInfoArr = [];
+    var maxImageLimit = 3;
+
+    // 사진 첨부시 카운트 표시
+    function updateImageCounter() {
+    if (fileInfoArr.length === 0) {
+        $("#imageCounter").text("0/" + maxImageLimit);
+    } else {
+        var counterText = fileInfoArr.length + "/" + maxImageLimit;
+        $("#imageCounter").text(counterText);
+    }
+}
+    
+    // 사진 첨부 최대가 3개이고 3개가 되면 사진 추가버튼이 사라짐
+    function updateAddButtonVisibility() {
+        if (fileInfoArr.length >= maxImageLimit) {
+            $("#imageAddButton").hide();
+        } else {
+            $("#imageAddButton").show();
+        }
+    }
+
+    // 사진을 선택하면 지워짐
+    function fileRemove(index) {
+        console.log("index: " + index);
+        fileInfoArr.splice(index, 1);
+
+        var imgId = "#img_id_" + index;
+        $(imgId).remove();
+        console.log(fileInfoArr);
+
+        updateImageCounter();
+        updateAddButtonVisibility();
+    }
+	
+    // 썸네일 사진 표시
+    function previewImage(targetObj, View_area) {
+    var files = targetObj.files;
+    fileArr = Array.prototype.slice.call(files);
+
+    var preview = document.getElementById(View_area); //div id
+
+    // 자를 이미지 개수 계산
+    var imagesToRemove = fileInfoArr.length + fileArr.length - maxImageLimit;
+    
+    if (imagesToRemove > 0) {
+        // 이미지를 자른다.
+        for (var i = 0; i < imagesToRemove; i++) {
+            fileInfoArr.shift();
+        }
+        // 화면에서도 이미지를 제거한다.
+        var images = document.getElementsByClassName("addImg");
+        for (var i = 0; i < imagesToRemove; i++) {
+            preview.removeChild(images[i].parentNode);
+        }
+    }
+
+    for (var i = 0; i < files.length; i++) {
+        var file = files[i];
+        fileInfoArr.push(file);
+
+        var imageType = /image.*/; //이미지 파일일 경우만 뿌려줍니다.
+        if (!file.type.match(imageType)) continue;
+
+        var span = document.createElement('span');
+        span.id = "img_id_" + i;
+        span.style.width = '100px';
+        span.style.height = '100px';
+        preview.appendChild(span);
+
+        var img = document.createElement("img");
+        img.className = "addImg";
+        img.classList.add("obj");
+        img.file = file;
+        img.style.width = '100px';
+        img.style.height = '100px';
+        img.style.cursor = 'pointer';
+        const idx = i;
+        img.onclick = () => fileRemove(idx); //이미지를 클릭했을 때.
+        span.appendChild(img);
+
+        if (window.FileReader) {
+            var reader = new FileReader();
+            reader.onloadend = (function (aImg) {
+                return function (e) {
+                    aImg.src = e.target.result;
+                };
+            })(img);
+            reader.readAsDataURL(file);
+        } else {
+            alert('FileReader를 지원하지 않는 브라우저입니다.');
+        }
+    }
+
+    updateImageCounter();
+    updateAddButtonVisibility();
+}
+
+// 문의 작성하기
+$('#inqu2').on("click", function() {
+	if(select1.value.trim() ==""){
+		Swal.fire({
+			title : '문의 유형을 선택해주세요',
+			icon : 'error'
+		})
+		return false;
+	}	
+	
+	if(inContent.value.trim() == ""){
+		Swal.fire({
+			title : '문의 제목을 입력해주세요',
+			icon : 'error'
+		})
+		return false;
+	}
+	if(tarea.value.trim() == ""){
+		Swal.fire({
+			title : '문의 내용을 입력해주세요',
+			icon : 'error'
+		})
+		return false;
+	}
+	if(imageInput.value.trim() == ""){
+		Swal.fire({
+			title : '사진은 최소 1장 이상 넣어주세요',
+			icon : 'error'
+		})
+		return false;
+	}
+	
+	Swal.fire({
+		title: "문의를 등록하시겠습니까?",
+		icon:'question',
+		showDenyButton: true,
+		confirmButtonText: '네',
+		denyButtonText: '아니요',
+	}).then((result) => {
+		if (result.isConfirmed) {
+			var form = new FormData();
+
+			form.append("ccg_i002", select1.value);
+			form.append("inquiry_title", inContent.value);
+			form.append("inquiry_content", tarea.value);
+			for (var i = 0; i < imageInput.files.length; i++) {
+				form.append("imgFile", imageInput.files[i]);
+			}
+			form.append("ae_id", ae_id);
+
+			$.ajax({
+				type: "post",
+				url: "/inquiry/insert",
+				data: form,
+				processData: false,
+				contentType: false,
+				beforeSend: function(xhr) {
+					xhr.setRequestHeader("${_csrf.headerName}", "${_csrf.token}");
+				},
+				success: function(res) {
+					if (res == 'OK') {
+						Swal.fire({
+							icon: 'success',
+							title: '문의가 등록되었습니다!',
+						}).then(()=> {
+							window.location.href = "/inquiry/list"; // 문의 완료 후 이동
+						});
+						inputModal = true;
+						fmodalReset();
+						StoryReset();
+					} else {
+						Swal.fire({
+							icon: 'error',
+							title: '서버 에러! 다시 작성해주세요',
+						});
+						return false;
+					}
+				}
+			});
+		}
+	});
+});
+
+$(function(){
+	var pageForm = $("#pageForm");
+	var pagingArea = $("#pagingArea");
+	
+	pagingArea.on("click", "a", function(event){
+		event.preventDefault();
+		var pageNo = $(this).data("page");
+		pageForm.find("#page").val(pageNo);
+		pageForm.submit();
+	});
+})
+</script>
+</body>

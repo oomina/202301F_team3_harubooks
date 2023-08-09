@@ -1,0 +1,19 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+    <%@ taglib uri="http://www.springframework.org/security/tags" prefix="sec" %>
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>탈퇴 페이지</title>
+</head>
+<body>
+<h1>탈퇴 페이지</h1>
+ 정말로 삭제하시겠습니까?
+<form action="/mypage/delete?${_csrf.parameterName }=${_csrf.token}" method="post">
+<input type="hidden" id="ae_id" name="ae_id" value="${userId}"/>
+<input type="submit" id="deleteBtn" value="회원탈퇴"/>
+<sec:csrfInput/>
+</form>
+</body>
+</html>

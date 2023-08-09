@@ -1,0 +1,17 @@
+package kr.or.ddit.mapper.kmw;
+
+import kr.or.ddit.vo.kmw.OrderVO;
+
+public interface OrderMapper {
+
+	int insertOrder(OrderVO orderVO);
+
+	int insertPurchs(OrderVO orderVO);
+
+	int insertDelivery(OrderVO orderVO);
+
+	void spendMileage(OrderVO orderVO);
+
+	void deleteCart(String ae_id);
+
+}

@@ -1,0 +1,12 @@
+package kr.or.ddit.service;
+
+import kr.or.ddit.ResultStatus;
+import kr.or.ddit.vo.UserInfoVO;
+
+public interface LoginService {
+
+	public ResultStatus idCheck(String idVal);
+
+	public ResultStatus insertMember(UserInfoVO user);
+	
+}

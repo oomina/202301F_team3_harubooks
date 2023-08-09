@@ -1,0 +1,233 @@
+package kr.or.ddit.controller.kmw.harubooks;
+
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.FileVisitOption;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.annotation.Resource;
+import javax.inject.Inject;
+
+import org.apache.commons.collections.map.HashedMap;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.multipart.MultipartFile;
+
+import kr.or.ddit.controller.file.UploadFileUtils;
+import kr.or.ddit.service.FileService;
+import kr.or.ddit.service.LoginService;
+import kr.or.ddit.service.kmw.BookService;
+import kr.or.ddit.service.kmw.OrderService;
+import kr.or.ddit.service.kmw.RefundService;
+import kr.or.ddit.vo.FileVO;
+import kr.or.ddit.vo.UserInfoVO;
+import kr.or.ddit.vo.kmw.OrderVO;
+import kr.or.ddit.vo.kmw.PagingVO;
+import kr.or.ddit.vo.kmw.RefundVO;
+import lombok.extern.slf4j.Slf4j;
+@Slf4j
+@Controller
+@PreAuthorize("hasAnyRole('ROLE_MEMBER','ROLE_ADMIN','ROLE_TEMP','ROLE_PUBLISHER')")
+@RequestMapping("/harubooks/myPage")
+public class MyPageMainController {
+	@Inject
+	private OrderService orderService;
+	
+	@Inject
+	private BookService bookService;
+	
+	@Inject
+	private LoginService userSevice;
+	
+	@Inject
+	private FileService fileService;
+	
+	@Inject
+	private RefundService refundService;
+	
+	// 첨부파일 저장경로 - root-context.xml에서 설정함
+	@Resource(name = "uploadImg")
+	private String uploadPath;
+	
+	@GetMapping("/orderList")
+	public String myPageMain(Model model, @RequestParam(name = "status", required = false) String status) {
+		String ae_id = SecurityContextHolder.getContext().getAuthentication().getName();
+		// 장바구니 개수
+		int cartCnt = bookService.cartCnt(ae_id);
+		// 유저 정보
+		UserInfoVO userInfo = userSevice.selectUser(ae_id);
+		// 찜목록 개수
+		int wishCnt = bookService.wishCnt(ae_id);
+		// 배송준비 개수
+		int preparedDelivery = orderService.preparedDelivery(ae_id);
+		// 배송 중 개수
+		int DeliveringCnt = orderService.DeliveringCnt(ae_id);
+		// 배송완료 개수
+		int finishDelivery = orderService.finishDelivery(ae_id);
+		// 환불 여부 개수
+		int refundCnt = orderService.refundCnt(ae_id);
+		model.addAttribute("cartCnt", cartCnt);
+		model.addAttribute("userInfo", userInfo);
+		model.addAttribute("wishCnt", wishCnt);
+		model.addAttribute("preparedDelivery",preparedDelivery);
+		model.addAttribute("DeliveringCnt",DeliveringCnt);
+		model.addAttribute("finishDelivery",finishDelivery);
+		model.addAttribute("refundCnt",refundCnt);
+		if(status.equals("order")) {
+			return "bookstore/mypage/myOrderList";			
+		}else if(status.equals("refund")) {
+			return "bookstore/mypage/refundCheck";
+		}else if(status.equals("inquiry")) {
+			return "bookstore/mypage/myInquiry";
+		}else if(status.equals("complete")) {
+			return "bookstore/mypage/completePurchase";
+		}
+		return "bookstore/mypage/myOrderList";
+	}
+	// 배송 되기전에 시킨 상품들 리스트
+	@ResponseBody
+	@GetMapping(value = "/currentPurchase", produces = "application/json;charset=utf-8")
+	public List<OrderVO> currentPurchase(){
+		String ae_id = SecurityContextHolder.getContext().getAuthentication().getName();
+		List<OrderVO> list = orderService.preparedProd(ae_id);
+		return list;
+	}
+	
+	// 배송완료된 후 구매 확정 전인 목록
+	@ResponseBody
+	@GetMapping(value = "/completeDelivery", produces = "application/json;charset=utf-8")
+	public List<OrderVO> completeDelivery(){
+		String ae_id = SecurityContextHolder.getContext().getAuthentication().getName();
+		List<OrderVO> list = orderService.completeDeliveryList(ae_id);
+		return list;
+	}
+	// 구매확정 버튼을 눌렀을시 로직
+	@ResponseBody
+	@PostMapping("/purchaseConfirm")
+	public String purchaseConfirm(@RequestBody Map<String, String>resMap) {
+		String ae_id = SecurityContextHolder.getContext().getAuthentication().getName();
+		String book_no = resMap.get("bookNo");
+		String order_no = resMap.get("orderNO");
+		String expected_mileage = resMap.get("expectedMileage");
+		String pl_cnt = resMap.get("plCnt");
+		String result;
+		OrderVO vo = new OrderVO();
+		vo.setAe_id(ae_id);
+		vo.setBook_no(book_no);
+		vo.setOrder_no(order_no);
+		vo.setExpected_mileage(expected_mileage);
+		vo.setPl_cnt(pl_cnt);
+		int res = orderService.decisionPurchase(vo);
+		if(res > 0) {
+			result = "OK";
+		}else {
+			result = "FAIL";
+		}
+		return result;
+	}
+	
+	// 환불 요청 로직
+	@PostMapping("/refundRegister")
+	public String refundRegister(RefundVO refundVO) throws IOException {
+		String ae_id = SecurityContextHolder.getContext().getAuthentication().getName();
+		String uploadRslt = "";
+		// 동기 일땐 폼태그안에 input type 파일 태그가 존재하면 파일을 넣지 않고 전송했을때 크기가 0 이므로 조건
+		if(refundVO.getRefund_file()!=null && refundVO.getRefund_file().getSize() > 0) {
+			MultipartFile nFile = refundVO.getRefund_file();
+			
+			log.info("fileName : "+nFile.getOriginalFilename()); // 파일이름
+			// 경로까지 포함한 풀네임 
+			String uploadedFileName = UploadFileUtils.uploadFile(uploadPath, nFile.getOriginalFilename(), nFile.getBytes());
+			String savedName = uploadedFileName.substring(uploadedFileName.lastIndexOf("/")+1); // 경로를 포함하지 않은 파일이름
+			log.info("savedName : "+savedName); // 저장이름 : uuid_파일이름
+			log.info("uploadedFileName : "+uploadedFileName); // 저장 경로 + 저장 이름 : /unityUpload/files/10f82e57-018c-4eb2-a884-1349792f2d4e_연습.jpg
+			log.info("uploadPath : "+uploadPath);
+			String fileType = nFile.getOriginalFilename().substring(nFile.getOriginalFilename().lastIndexOf(".")+1); // 확장자
+			nFile.transferTo(new File(uploadedFileName)); // 파일 복사
+			
+			// 파일 업로드
+			FileVO fileVO = new FileVO();
+			fileVO.setUa_sn("1"); // 하나밖에 없어서 1로 하드코딩한거 만약 여러개 파일이 존재한다면 반복문돌려서 숫자 삽입
+			fileVO.setUa_type("REFUND_REQUEST"); // 테이블 이름가지고 상황에따라 파일 정리 위한 컬럼
+			fileVO.setUa_path(uploadedFileName); // 파일 경로 풀네임으로 써줘야함
+			fileVO.setUa_nm(nFile.getOriginalFilename()); 	// 원본 파일명 uuid 적용 전 
+			fileVO.setUa_stre_nm(savedName);	// 파일 저장이름 : uuid_파일이름
+			fileVO.setUa_file_type(fileType); // 확장자명 ex) .jpg .png ...
+			fileVO.setUa_size(nFile.getSize()); // 파일 크기
+			fileVO.setUa_regist_id(ae_id);
+			int cnt = fileService.fileInsert(fileVO);
+			
+			if(cnt > 0) {
+				refundVO.setUa_no(fileVO.getUa_no());
+			}else {
+				refundVO.setUa_no("0");
+			}
+			
+			// 환불 테이블 삽입
+			int insertRefund = refundService.insertRefund(refundVO);
+			// 환불 신청
+		}
+		return "redirect:/harubooks/myPage/orderList?status=refund";
+	}
+	
+	// 환불 리스트 로직
+	@ResponseBody
+	@GetMapping(value ="/refundList",produces = "application/json;charset=utf-8")
+	public Map<String, Object> refundList(@RequestParam(name = "page", required = false, defaultValue = "1")int currentPage) {
+		String ae_id = SecurityContextHolder.getContext().getAuthentication().getName();
+		PagingVO<OrderVO> pagingVO = new PagingVO<OrderVO>(4,5) {};
+		pagingVO.setAe_id(ae_id);
+		int refundCnt = orderService.refundListCnt(ae_id);
+		pagingVO.setTotalPostCnt(refundCnt);
+		pagingVO.setCurrentPage(currentPage);
+		List<OrderVO> resultList = orderService.pagingRefundList(pagingVO);
+		pagingVO.setDataList(resultList);
+		
+		Map<String, Object> resMap = new HashMap<String, Object>();
+		resMap.put("pagingVO", pagingVO);
+		resMap.put("resultList", resultList);
+		return resMap;
+	}
+	// 환불 내역 조회(1개)
+	@ResponseBody
+	@PostMapping("/refundOne")
+	public RefundVO refundOne(@RequestBody Map<String, String>resMap) {
+		RefundVO vo = new RefundVO();
+		vo.setBook_no(resMap.get("refundBookNo"));
+		vo.setOrder_no(resMap.get("refundOrderNo"));
+		RefundVO res = refundService.refundOne(vo);
+		String ua_no = res.getUa_no();
+		FileVO file = refundService.refundImg(ua_no);
+		res.setFileName(file.getUa_stre_nm());
+		return res;
+	}
+	
+	// 구매확정 리스트 로직
+	@ResponseBody
+	@GetMapping(value = "/completePurchase", produces = "application/json;charset=utf-8")
+	public Map<String, Object> completeList(@RequestParam(name = "page",required = false,defaultValue = "1")int currentPage){
+		String ae_id = SecurityContextHolder.getContext().getAuthentication().getName();
+		PagingVO<OrderVO> pagingVO = new PagingVO<OrderVO>(4,5) {};
+		pagingVO.setAe_id(ae_id);
+		int purCnt = orderService.completePurCnt(ae_id);
+		pagingVO.setTotalPostCnt(purCnt);
+		pagingVO.setCurrentPage(currentPage);
+		List<OrderVO> resultList = orderService.pagingComplete(pagingVO);
+		pagingVO.setDataList(resultList);
+		
+		Map<String, Object> resMap = new HashMap<String, Object>();
+		resMap.put("pagingVO", pagingVO);
+		resMap.put("resultList", resultList);
+		return resMap;
+	}
+}

@@ -1,0 +1,87 @@
+package kr.or.ddit.vo.kmw;
+
+
+public abstract class PagingVO {
+	private int currentPage; //현재 페이지
+	private int pageSize ; // 한 페이지당 목록 개수
+	private int totalCount; //전체 목록 수
+	
+	private int startRow; //현재 페이지 글 목록의 시작 번호
+	private int endRow; // 현재 페이지 글 목록의 마지막 번호
+	private int startPage; // 페이지 이동 버튼의 시작 번호
+	private int endPage; //페이지 이동 버튼의 마지막 번호
+	private int totalPage; //페이지 개수
+	
+	public PagingVO(int pageSize, int totalCount, int currentPage) {
+		this.pageSize = pageSize;
+		this.totalCount = totalCount;
+		this.currentPage = currentPage;
+	}
+
+	public int getCurrentPage() {
+		return currentPage;
+	}
+
+	public void setCurrentPage(int currentPage) {
+		this.currentPage = currentPage;
+	}
+
+	public int getPageSize() {
+		return pageSize;
+	}
+
+	public void setPageSize(int pageSize) {
+		this.pageSize = pageSize;
+	}
+
+	public int getTotalCount() {
+		return totalCount;
+	}
+
+	public void setTotalCount(int totalCount) {
+		this.totalCount = totalCount;
+	}
+
+	public int getStartRow() {
+		return startRow;
+	}
+
+	public void setStartRow(int startRow) {
+		this.startRow = startRow;
+	}
+
+	public int getEndRow() {
+		return endRow;
+	}
+
+	public void setEndRow(int endRow) {
+		this.endRow = endRow;
+	}
+
+	public int getStartPage() {
+		return startPage;
+	}
+
+	public void setStartPage(int startPage) {
+		this.startPage = startPage;
+	}
+
+	public int getEndPage() {
+		return endPage;
+	}
+
+	public void setEndPage(int endPage) {
+		this.endPage = endPage;
+	}
+
+	public int getTotalPage() {
+		return totalPage;
+	}
+
+	public void setTotalPage(int totalPage) {
+		this.totalPage = totalPage;
+	}
+
+	
+	
+}

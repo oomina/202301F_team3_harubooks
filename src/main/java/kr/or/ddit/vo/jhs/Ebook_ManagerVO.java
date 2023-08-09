@@ -1,0 +1,24 @@
+package kr.or.ddit.vo.jhs;
+
+import java.util.List;
+
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
+
+@Getter
+@Setter
+@ToString
+public class Ebook_ManagerVO {
+	private String ae_id;
+	private String book_no;
+	private int book_page;
+	private String book_read_ymd;
+	private String em_date;
+	private int em_read_page;
+	private String book_title;
+	private String book_cover;
+	private List<Integer> er_page;
+	private List<Integer> em_page;
+	private List<String> em_content;
+}

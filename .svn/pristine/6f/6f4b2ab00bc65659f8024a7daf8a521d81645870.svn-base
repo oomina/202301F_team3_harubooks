@@ -1,0 +1,28 @@
+package kr.or.ddit.vo.omn;
+
+import org.springframework.web.multipart.MultipartFile;
+
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
+
+@Getter
+@Setter
+@ToString
+public class MngMbrVO {
+	private String ae_id;					// 아이디
+	private int mbr_mileage;				// 마일리지
+	private String mbr_email;				// 이메일
+	private String mbr_addr;				// 주소
+	private String mbr_daddr;				// 상세주소
+	private String mbr_zip;					// 우편번호
+	private String mbr_telno;				// 핸드폰번호
+	private String mbr_gender;				// 성별
+	private String mbr_brdt;				// 생년월일
+	private String rank_name;				// 등급이름
+	private String user_nm;					// 이름
+	private String mem_profile;				// 프로필 사진
+	private String mem_nicknm;				// 닉네임
+	private String rnum;					// 순서번호
+	private MultipartFile mem_profile_file;	// 프로필 사진 파일
+}

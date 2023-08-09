@@ -1,0 +1,24 @@
+package kr.or.ddit.vo.kmw;
+
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
+
+@Getter
+@Setter
+@ToString
+public class BookInfoVO {
+	private String book_no;
+    private String book_title;
+    private String book_content;
+    private String book_cover;
+    private String book_spmt_ymd;
+    private String book_author;
+    private String pub_nm;
+    private String book_talt;
+    private float book_margin;
+    private float book_mileage;
+    private String ccg_b001;
+    private String ccg_b002;
+    private String ccg_b003;
+}

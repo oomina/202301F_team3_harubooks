@@ -1,0 +1,762 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@200&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Nanum+Pen+Script&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Jua&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Nanum+Gothic&display=swap');
+*{
+    margin: 0;
+    padding: 0;
+    
+    font-family: 'Poppins', 'ans-serif's;
+    box-sizing: border-box;
+    list-style: none;
+    text-decoration: none;
+}
+.chatting-board{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+	margin: 1rem 1rem;
+}
+
+#chatting-board-tex h1{
+    font-size: 1.7rem;
+    font-family: 'Nanum Gothic', sans-serif;
+    color: #9f9d9d;
+}
+
+#chatboard-search-select{
+	text-align: center;
+    border: 1px solid grey;
+    border-radius: 10px;
+    font-family: 'Nanum Gothic', sans-serif;
+    color: #9f9d9d;
+    padding: 3px;
+    font-weight: bold;
+    outline: none;
+}
+
+#chatboard-search-input{
+    width: 350px;
+    text-align: center;
+    border: 1px solid grey;
+    border-radius: 10px;
+    font-family: 'Nanum Gothic', sans-serif;
+    color: #9f9d9d;
+    padding: 3px;
+    font-weight: bold;	
+    outline: none;
+}
+
+#chatboard-search-input-btn{
+	width: 65px;
+    font-family: 'Nanum Gothic', sans-serif;
+    color: #9f9d9d;
+    padding: 3px 11px;
+    font-weight: bold;
+    border-radius: 8px;
+    outline: none;
+    border: 0.5px solid #9f9d9d;
+    cursor: pointer;
+}
+
+#chatboard-select{	
+    width: 97px;
+    font-family: 'Nanum Gothic', sans-serif;
+    color: #9f9d9d;
+    padding: 4px 11px;
+    font-weight: bold;
+    border-radius: 8px;
+    outline: none;
+    border: 0.5px solid #9f9d9d;
+    cursor: pointer;
+    text-align: center;
+    font-size: 14px;
+}
+
+#chatboard-upload-btn {
+    display: flex;
+    align-items: center;
+    padding: 7px;
+    border-radius: 8px;
+    background: #53b12e;
+    cursor: pointer;
+    margin-right: 10px;
+}
+
+#chatboard-upload-btn i{
+	color: hsla(0, 0%, 100%, 0.6);
+    margin-right: 10px;
+}
+
+.chatboard-btn-text{
+	font-family: 'Nanum Gothic', sans-serif;
+    color: white;
+}
+
+#diModal, #ddModal {
+	position: fixed; /* 위치 고정 */
+	left: 0px;
+	top: 0px;
+	width: 100vw; /* 사이즈 고정 */
+	height: 100vh;
+	background-color: rgb(57 56 56 / 50%);;
+	z-index: 100; /* 클 수록 앞으로 나옴 */
+	display: none; /* 처음엔 안 보여야 함 */
+}
+
+
+.diContainer {
+	width: 35%;
+    height: 65%;
+    margin: 155px 70px 110px 530px;
+    background-color: white;
+    border-radius: 20px;
+    position: relative;
+    transition: width 0.5s ease;
+    text-align: center;
+}
+
+#chatboard-insert-div{
+	display: grid;
+    text-align: center;
+    justify-content: center;
+}
+
+#diClose-div{
+	display: flex;
+    height: 40px;
+    width: 100%;
+    justify-content: right;
+}
+
+.dibtn{
+	font-size: 38px;
+    margin-right: 10px;
+    margin-top: 6px;
+    cursor: pointer;
+}
+
+#chatboard-table{
+	height: 330px;
+    width: 80%;
+    margin: 10px auto;	
+    font-family: 'Nanum Gothic', sans-serif;
+    font-size: 15px;
+}
+
+.chatboard-content-title{
+    width: 220px;
+}
+
+#diSelect-option-text{
+	padding-top: 10px;
+}
+
+#chatboard-title{
+	width: 260px;
+	font-family: 'Nanum Gothic', sans-serif;
+    color: #9f9d9d;
+    border-radius: 8px;
+    outline: none;
+    border: 0.5px solid #9f9d9d;
+    text-align: center;
+    font-size: 14px;
+    padding: 2px 10px;
+}
+
+#chatboardNo-select{
+    width: 115px;
+    font-family: 'Nanum Gothic', sans-serif;
+    color: #9f9d9d;
+    border-radius: 8px;
+    outline: none;
+    border: 0.5px solid #9f9d9d;
+    text-align: center;
+    font-size: 14px;
+}
+
+.iBtns{
+	width: 10px;
+}
+
+.up-padding-div{
+	padding-top: 10px;
+}
+
+#chatboard-content{
+	width: 330px;
+    height: 180px;
+    font-family: 'Nanum Gothic', sans-serif;
+    color: #9f9d9d;
+    border-radius: 8px;
+    outline: none;
+    border: 0.5px solid #9f9d9d;
+    text-align: center;
+    font-size: 14px;
+    padding: 2px 10px;
+}
+
+#diSelect-content-text{
+    font-size: 20px;
+    padding-top: 18px;
+}
+
+#idBtns{
+    display: flex;
+    justify-content: space-around;	
+}
+
+.idBtns{
+    width: 120px;
+    height: 40px;
+    font-family: 'Nanum Gothic', sans-serif;
+    color: #9f9d9d;
+    border-radius: 8px;
+    outline: none;
+    border: 0.5px solid #9f9d9d;
+    cursor: pointer;
+    text-align: center;
+    font-size: 20px;
+    font-weight: bold;
+    background: none;
+    padding: 3px;
+}
+
+#chattingBoardList{	
+    display: grid;
+    grid-template-columns: repeat(auto-fit,minmax(280px, auto));
+    margin-left: 60px;
+    margin-top: 30px;
+}
+
+.chatBoard-all-div{	
+	font-family: 'Nanum Gothic', sans-serif;
+	width: 280px;
+    margin-bottom: 40px;
+    border-radius: 12px;
+    box-shadow: 0 4px 8px rgb(155 152 152);
+    transition: transform 0.2s ease-in-out;
+    height: 200px;
+    cursor: pointer;
+}
+
+.chatBoard-all-div:hover{
+	transform: translateY(-8px);
+}
+
+.chatBoard-header-header{
+display: flex;
+    justify-content: space-between;
+    height: 45px;
+    margin-bottom: 4px;
+    padding: 10px;
+    border-bottom: 1px solid #53b12e;;
+}
+
+.chatBoard-temp-no{
+	display: grid;
+    text-align: center;
+    font-size: 12px;
+}
+
+.chatBoard-temp-no-span{
+	font-weight: bold;
+    color: #53b12e;	
+}
+
+.chatBoard-title-span{
+	font-weight: bold;
+    font-size: 16px;
+}
+
+.chatBoard-content{
+	width: 100%;
+    height: 100px;
+    font-size: 13px;
+    padding: 5px;
+    overflow: hidden;
+}
+
+.chatBoard-header-content{
+    display: flex;
+	text-align: center;
+    justify-content: center;
+}
+
+.chatBoard-header-content{
+	background-color: #53b12e;
+    height: 51px;
+    display: flex;
+    color: white;
+    font-size: 15px;
+}
+
+.chatBoard-date{
+	padding-right: 10px;
+    padding-left: 10px;
+}
+
+#ddContainer{
+    width: 55%;
+    height: 65%;
+    margin: 155px 70px 110px 365px;
+    background-color: white;
+    border-radius: 20px;
+    position: relative;
+    transition: width 0.5s ease;
+    display: flex;
+    font-family: 'Nanum Gothic', sans-serif
+}
+
+
+.ddmodal-profile{	
+    width: 37px;
+    height: 37px;
+    border-radius: 50%;
+    border: 2px solid #4dac27;
+}
+
+.bbtn{
+    position: absolute;
+    top: -90px;
+    font-size: 80px;
+    left: 900px;
+    color: white;
+    cursor: pointer;
+}
+
+#ddmodal-all-div{
+	flex:55;
+}
+
+#ddmodal-apply-div{
+	flex:45;
+	border-left: 1px solid #53b12e;
+}
+
+#ddmodal-title{
+    font-weight: bold;
+    padding: 15px 12px 2px 12px;
+    font-size: 20px;
+    height: 70px;
+}
+
+#ddmodal-update-div{
+	font-size: 15px;
+    display: flex;
+    justify-content: right;
+    font-weight: bold;
+    color: #2b930a;
+    padding: 0px 15px 3px 15px;
+}
+
+#ddmodal-update{
+	cursor: pointer;
+	margin-right: 10px;
+}
+
+#ddmodal-delete{
+	cursor: pointer;	
+}
+
+#ddmodal-content-div{
+    padding: 10px;
+    height: 395px;
+    border-top: 1px solid #53b12e;
+    border-bottom: 1px solid #53b12e;
+}
+
+#ddmodal-sub-title-div{
+	display: flex;
+}
+
+#ddmodal-sub-title-div{
+    display: flex;
+    justify-content: space-between;
+    padding: 6px 15px 6px 15px;	
+}
+
+#ddmodal-profile-div{
+	display: flex;
+}
+
+#ddmodal-nicknm{
+	margin-top: 13px;
+    margin-left: 6px;
+    font-size: 16px;
+}
+
+#ddmodal-data-div{
+	display: flex;
+    text-align: center;
+    font-size: 13px;
+}
+
+#ddmodal-reply-list{
+	height: 455px;
+	padding: 15px 0px 1px 0px;
+	z-index: 5;
+    overflow: scroll;
+    
+    -ms-overflow-style: none; 
+    scrollbar-width: none; 
+}
+
+#ddmodal-reply-list::-webkit-scrollbar {
+    display: none; 
+}
+
+#ddmodal-reply-state{
+	display: flex;
+	border-bottom: 1px solid #53b12e;
+	border-top: 1px solid #53b12e;
+    font-family: 'Nanum Gothic', sans-serif;
+    font-weight: bold;
+    font-size: 13px;
+    justify-content: space-between; 
+}
+
+#reply-status{
+	display: flex;
+    padding: 0px 10px;
+    color: #7c7b7b;
+	height: 35px;
+    align-items: center;
+    background-color: white;
+    width: 260px;
+    justify-content: space-between;
+}
+
+#reply-open-status{
+	padding: 10px;
+    align-items: center;
+    border-left: 1px solid #53b12e;
+}
+
+#reply-open{
+	cursor: pointer;
+	margin-right: 10px;
+	color: #2b930a;
+}
+
+#reply-no-open{
+	cursor: pointer;	
+}
+
+.table-padding{
+	padding-left: 5px;
+	padding-right: 5px;
+}
+
+#dApplyText{
+	font-family: 'Nanum Gothic', sans-serif;
+    padding: 8px;
+    font-weight: bold;
+    font-size: 13px;
+    color: #7c7b7b;
+    border: none;
+    width: 85%;
+    height: 40px;
+    outline: none;	
+}
+
+#reply-insert{
+	font-family: 'Nanum Gothic', sans-serif;
+    color: #53b12e;
+    font-weight: bold;
+    font-size: 15px;
+    align-items: center;
+    margin-top: 15px;
+    cursor: pointer;
+}
+.dReplyTitleList{
+    padding: 8px 1px;
+    position: relative;
+}
+
+#dReplyTitle {
+    display: flex;
+    justify-content: space-between;
+    padding: 0px 10px 0px 10px;
+    align-items: center;
+}
+
+#dReplyProfile {
+    display: flex;
+}
+
+.dReplyProimg {
+    width: 37px;
+    height: 37px;
+    border-radius: 50%;
+    border: 2px solid #4dac27;
+}
+
+#dReplyProfile-all {
+    position: relative;
+    display: block;
+    margin: 0px 10px 0px 10px;
+    width: 210px;
+}
+
+#dReplyProfile-nick {
+    font-weight: bold;
+    font-family: 'Nanum Gothic', sans-serif;
+    font-size: 11px;
+    padding: 3px;
+}
+
+#dReplyProfile-content {
+    font-family: 'Nanum Gothic', sans-serif;
+    font-size: 12px;
+    display: inline;
+}
+
+#dReplyProfile-one{
+    font-family: 'Nanum Gothic', sans-serif;
+    font-size: 12px;
+    display: inline;	
+}
+
+#dReplyStatus {
+    font-family: 'Nanum Gothic', sans-serif;
+    font-size: 12px;
+    font-weight: bold;
+    color: #7c7b7b;
+}
+
+#dReplyUpdate {
+    cursor: pointer;
+}
+
+#dReplyDelete {
+    cursor: pointer;
+}
+
+#digComent-div {
+    display: flex;
+    justify-content: space-between;
+    padding: 0px 8px;
+    font-family: 'Nanum Gothic', sans-serif;
+    font-size: 10px;
+    margin-top: 4px;
+    font-weight: bold;
+    color: #7c7b7b;
+}
+
+#dReplyInsert {
+    cursor: pointer;
+    margin-left: 10px;
+}
+
+#dReplyView{
+	cursor: pointer;
+}
+
+#dReplyClose{
+	cursor: pointer;
+}
+
+#reply-check{
+	display: flex;
+	justify-content: space-between;
+}
+
+.secret-reply{
+	color: red;
+	font-weight: bold;
+}
+
+#dReply-open-reply{
+	cursor: pointer;
+	margin-left: 5px;
+}
+
+.commnet-append {
+    font-weight: bold;
+    font-family: 'Nanum Gothic', sans-serif;
+    font-size: 14px;
+    padding: 0px;
+    cursor: pointer;
+}
+
+#reply-close{
+	font-size: 23px;
+	color: black;
+	cursor: pointer;
+}
+
+.dSubReplyDate {
+    padding: 0px 8px;
+    font-family: 'Nanum Gothic', sans-serif;
+    font-size: 10px;
+    margin-top: 4px;
+    font-weight: bold;
+    color: #7c7b7b;
+    margin-left: 15px;
+    display: flex;
+    justify-content: space-between;
+}
+
+
+#dReplyStatus {
+    font-family: 'Nanum Gothic', sans-serif;
+    font-size: 12px;
+    font-weight: bold;
+    color: #7c7b7b;
+}
+
+#dReplyUpdate {
+    cursor: pointer;
+}
+
+#dReplyDelete {
+    cursor: pointer;
+}
+
+.dReplyTitleList {
+    padding: 10px 5px;
+    position: relative;
+}
+
+.sub-reply-append {
+    font-weight: bold;
+    font-family: 'Nanum Gothic', sans-serif;
+    font-size: 11px;
+    padding: 0px;
+    cursor: pointer;
+}
+
+.dReplyProfile-king-content{
+	color: #ff1111;
+	cursor: pointer;
+}
+
+#uModal{
+	position: fixed; /* 위치 고정 */
+	left: 0px;
+	top: 0px;
+	width: 100vw; /* 사이즈 고정 */
+	height: 100vh;
+	z-index: 100; /* 클 수록 앞으로 나옴 */
+	display: none; /* 처음엔 안 보여야 함 */
+	background-color: #5b5a5ac2;
+}
+
+
+.uContainer {
+    padding: 5px;
+    width: 30%;
+    height: 60%;
+    margin: 135px auto;
+    background-color: white;
+    border-radius: 20px;
+    position: relative;
+    transition: width 0.5s ease;
+}
+
+#uHeader{
+	font-size: 35px;
+    margin-left: 375px;
+}
+
+.uTitle{
+	text-align: center;	
+}
+
+#uText{
+	width: 80%;
+    border: none;
+    border-bottom: 1px solid #9f9d9d;
+    text-align: center;
+    font-size: 14px;
+    padding-bottom: 6px;
+    outline: none;
+    font-family: 'Nanum Gothic', sans-serif;
+}
+
+#uContent{
+	width: 100%;
+    height: 260px;
+    margin: 20px auto;
+    border: none;
+    text-align: center;
+    font-size: 14px;
+    resize: none;
+    outline: none;
+    border-bottom: 1px solid #9f9d9d;
+    font-family: 'Nanum Gothic', sans-serif;
+}
+
+#uBtns{
+	display: flex;
+	justify-content: center;
+}
+
+#uBtns input[type=button]{
+    font-family: 'Nanum Gothic', sans-serif;
+    border-radius: 8px;
+    padding: 10px;
+    color: #9f9d9d;
+    border: 0.5px solid #9f9d9d;
+    cursor: pointer;
+    margin: 11px;
+    width: 100px;
+    font-weight: bold;
+}
+
+#rModal{
+	position: fixed; /* 위치 고정 */
+	left: 0px;
+	top: 0px;
+	width: 100vw; /* 사이즈 고정 */
+	height: 100vh;
+	z-index: 100; /* 클 수록 앞으로 나옴 */
+	display: none; /* 처음엔 안 보여야 함 */
+	background-color: #5b5a5ac2;
+}
+
+.rContainer {
+	padding: 5px;
+    width: 20%;
+    height: 30%;
+    margin: 270px auto;
+    background-color: white;
+    border-radius: 20px;
+    position: relative;
+    transition: width 0.5s ease;
+    text-align: center;
+}
+
+#rHeader{
+	font-size: 35px;
+    margin-left: 240px;
+    cursor: pointer;
+}
+
+#rText{
+    width: 90%;
+    text-align: center;
+    height: 100px;
+    border: none;
+    border-bottom: 1px solid #9f9d9d;
+    border-top: 1px solid #9f9d9d;
+    font-size: 14px;
+    padding-bottom: 6px;
+    outline: none;
+    font-family: 'Nanum Gothic', sans-serif;
+    margin-top: 15px;
+    margin-bottom: 10px;
+}
+
+#rBtns input[type=button] {
+    font-family: 'Nanum Gothic', sans-serif;
+    border-radius: 8px;
+    padding: 10px;
+    color: #9f9d9d;
+    border: 0.5px solid #9f9d9d;
+    cursor: pointer;
+    margin: 11px;
+    width: 100px;
+    font-weight: bold;
+}

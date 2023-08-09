@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+ <mapper namespace="kr.or.ddit.mapper.kmw.ReviewMapper">
+	<!-- alias (reviewVO) -->
+	<insert id="insertReview" parameterType="reviewVO">
+		insert into review (
+								book_no
+								,ae_id
+								,review_scr
+								,review_title
+								,review_content
+								,review_wrt_ymd
+								,review_mdfcn_ymd
+								,ua_no
+							)
+							values(
+									#{book_no}
+									,#{ae_id}
+									,#{review_scr}
+									,#{review_title}
+									,#{review_content}
+									,sysdate
+									,'-'
+									,#{ua_no}
+							)
+							
+	</insert>
+	
+	<!-- 리뷰 정보리스트 가져오기 -->
+	<select id="reviewList" parameterType="String" resultType="reviewVO">
+		select 
+		    book_no
+		    ,ae_id
+		    ,review_scr
+		    ,review_title
+		    ,review_content
+		    ,review_wrt_ymd
+		    ,review_mdfcn_ymd
+		    ,ua_no
+		from review
+		where book_no = #{book_no}
+	</select>
+	
+	<!-- 리뷰총개수 -->
+	<select id="reviewCnt" parameterType="String" resultType="int">
+		select count(*)
+		from review
+		where book_no = #{book_no}
+	</select>
+	
+	<!-- 리뷰 별점 총합 -->
+	<select id="reviewTotalScore" parameterType="String" resultType="int">
+		select COALESCE(SUM(review_scr), 0)
+		from review
+		where book_no = #{book_no}
+	</select>
+	
+	<!-- 각각의 별점의 대한 개수 -->
+	<select id="scrList" parameterType="String" resultType="reviewVO">
+		select review_scr, count(*)as scr_cnt
+		from review
+		where book_no = #{book_no}
+		group by review_scr	
+	</select>
+	
+	<!-- 리뷰 삭제 -->
+	<delete id="deleteReview" parameterType="reviewVO">
+		delete
+		from review
+		where ae_id = #{ae_id}
+		and book_no = #{book_no}
+	</delete>
+	
+	<!-- 리뷰테이블 ua_no조회 -->
+	<select id="selectUaNo" parameterType="reviewVO" resultType="String">
+		select ua_no
+		from review
+		where ae_id = #{ae_id}
+		and book_no = #{book_no}
+	</select>
+ </mapper>

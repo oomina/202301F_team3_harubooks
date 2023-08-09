@@ -1,0 +1,9 @@
+package kr.or.ddit.service.kmw;
+
+import kr.or.ddit.vo.kmw.RefundVO;
+
+public interface RefundService {
+
+	int insertRefund(RefundVO refundVO);
+
+}

@@ -1,0 +1,125 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+<!-- content wrapper -->
+<div class="content-wrapper" style="padding : 10px;">
+	<div class="row" style=" padding : 10px;">
+		<div class="col-lg-12 grid-margin stretch-card">
+			<div class="card">
+				<div class="card-body">
+					<div class="card-title-wrapper">
+						<h4 class="card-title" style="font-size:1.25rem; font-family: 'orbit', sans-serif;">발주 내역</h4>
+						<div style="float:left;">
+							<p class="card-description">
+								전체 <code id="total"></code>건
+							</p>
+						</div>
+					</div>
+					<div class="table-responsive">
+						<table class="table table-hover">
+							<thead>
+								<tr class="table-primary">
+									<th style="width : 5%;">번호</th>
+									<th style="width : 10%;">발주일자</th>
+									<th style="width : 15%;">상품번호</th>
+									<th style="padding-left : 5px;">도서명</th>
+									<th style="padding-left : 5px; width : 10%;">발주 수량</th>
+									<th style="width : 35px;"><input type="checkbox" id="chkAll"></th>
+								</tr>
+							</thead>
+							<tbody id="tblDisp">
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<div>
+					<div class="row" style="float:right; margin-right: 30px; margin-bottom: 18px">
+						<button type="button" class="btn btn-primary mr-2" id="downBtn">출력</button>
+						<button type="button" class="btn btn-primary mr-2" id="poBtn">발주</button>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<script>
+const tblDisp = document.querySelector("#tblDisp");
+const poBtn	= document.querySelector("#poBtn");					// 발주 버튼
+
+$(function(){
+	fPoPubList();
+
+	// 전체 체크
+	$("#chkAll").on("click", function(){
+		if($(this).is(":checked")){ //전체 체크
+			$(".chkSub").attr("checked", true);
+		}else{ //전체 해제
+			$(".chkSub").attr("checked", false);
+		}	
+	});
+
+	poBtn.addEventListener("click", function(){
+		alert("체킁");
+		let poList = [];
+		let checkCnt = $(".chk")
+		$(".chkSub:checked").each(function(){
+			let bookNo = $(this).closest('tr').find('td').eq(2).text();
+			let bookQty = $(this).closest('tr').find('td').eq(4).text();
+			let poData = {
+				"book_no" : bookNo, 
+				"book_qty" : bookQty 
+			}
+			poList.push(poData);
+		});
+		fPoReqPubList(poList);
+	})
+
+
+
+});
+
+function fPoPubList(){
+	let xhr = new XMLHttpRequest();
+	xhr.open("GET", "/pub/remain/polist", true);
+	xhr.onreadystatechange = function(){
+		if(xhr.readyState == 4 && xhr.status == 200){
+			let poPubList = JSON.parse(xhr.responseText); 
+			console.log(poPubList);
+			let tblstr = "";
+			if(poPubList.length == 0){
+				tblstr += "<tr><td colspan='6' style='text-align : center;'>발주내역이 존재하지 않습니다.</td></tr>"
+			} else {
+				for(let i= 0; i<poPubList.length; i++){
+					tblstr += `<tr onclick="">`
+					tblstr += 	`<td>\${poPubList.startRow + i}</td>`
+					tblstr += 	`<td>\${poPubList[i].br_ymd}</td>` 
+					tblstr += 	`<td>\${poPubList[i].book_no}</td>` 
+					tblstr += 	`<td style="padding : 3px; word-wrap: break-word; white-space: pre-wrap; height : auto;">\${poPubList[i].book_title}</td>` 
+					tblstr += 	`<td>\${poPubList[i].book_qty}</td>`
+					tblstr +=	'<td style="width : 35px; text-align : center">';
+					tblstr +=			'<input type="checkbox" class="chkSub">';
+					tblstr += 	'</td>'
+					tblstr += "</tr>";
+				}
+			}
+			tblDisp.innerHTML = tblstr;
+			let total = document.querySelector("#total");
+			total.innerText = poPubList.length;
+		}
+	}
+	xhr.send();
+}
+
+function fPoReqPubList(poList){
+	let xhr = new XMLHttpRequest();
+	xhr.open("POST", "/pub/remain/poreq", true);
+	xhr.setRequestHeader("Content-Type", "application/json; charset=UTF-8");
+	xhr.setRequestHeader("${_csrf.headerName}", "${_csrf.token}"); 
+	xhr.onreadystatechange = function(){
+		if(xhr.readyState == 4 && xhr.status == 200){
+			let res = xhr.responseText;
+			console.log(res);
+		}
+	};
+	xhr.send(JSON.stringify(poList));
+}
+</script>

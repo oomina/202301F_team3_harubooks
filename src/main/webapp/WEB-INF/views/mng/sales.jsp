@@ -1,0 +1,433 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+<div class="content-wrapper" style="padding: 10px;">
+	<div class="row" style="padding: 10px;">
+		<div class="col-lg-12 grid-margin stretch-card">
+			<div class="card">
+				<div class="card-body">
+					<h4 class="card-title" style="font-size:1.25rem; font-family: 'orbit', sans-serif;">판매 관리</h4>
+					<div class="row">
+						<div class="col-md-12 grid-margin stretch-card">
+							<div class="card position-relative">
+								<div class="card-body">
+									<div id="detailedReports" class="carousel slide detailed-report-carousel position-static pt-2" data-ride="carousel">
+										<div class="carousel-inner">
+											<div class="carousel-item active">
+												<div class="row">
+													<div class="col-md-12 col-xl-2 d-flex flex-column justify-content-start">
+														<div class="ml-xl-4 mt-3">
+															<p class="card-title text-primary" style="margin-bottom: 0.5rem;">출판사 매출액</p>
+															<h2 class="text-primary">Best 5</h2>
+														</div>
+													</div>
+													<div class="col-md-12 col-xl-10">
+														<div class="row">
+															<div class="col-md-6 mt-3">
+																<div id="" style="width: 400px; height: 400px;">
+																	<canvas id="bestPublisher" width="300" height="300"></canvas>
+																</div>
+															</div>
+															<div class="col-md-6 mt-3">
+																<div id="" style="width: 400px; height: 400px;">
+																	<canvas id="monthlySales" width="300" height="300"></canvas>
+																</div>
+															</div>
+														</div>
+													</div>
+												</div>
+											</div>
+											<div class="carousel-item">
+												<div class="row">
+													<div class="col-md-12 col-xl-2 d-flex flex-column justify-content-start">
+														<div class="ml-xl-4 mt-3">
+															<p class="card-title text-primary" style="margin-bottom: 0.5rem;">도서 판매량</p>
+															<h2 class="text-primary">Best 5</h2>
+														</div>  
+													</div>
+													<div class="col-md-12 col-xl-10">
+														<div class="row">
+															<div class="col-md-6 mt-3">
+																<div id="" style="width: 400px; height: 400px;">
+																	<canvas id="bestBooks" width="300" height="300"></canvas>
+																</div>
+															</div>
+															<div class="col-md-6 mt-3">
+																<div id="" style="width: 400px; height: 400px;">
+																	<canvas id="monthlyCnt" width="300" height="300"></canvas>
+																</div>
+															</div>
+														</div>
+													</div>
+												</div>
+											</div>
+										</div>
+										<a class="carousel-control-prev" href="#detailedReports" role="button" data-slide="prev">
+											<span class="carousel-control-prev-icon" aria-hidden="true"></span>
+											<span class="sr-only">Previous</span>
+										</a>
+										<a class="carousel-control-next" href="#detailedReports" role="button" data-slide="next">
+											<span class="carousel-control-next-icon" aria-hidden="true"></span>
+											<span class="sr-only">Next</span>
+										</a>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+					<form action="" method="post" id="searchForm">
+						<input type="hidden" name="page" id="page"/>
+						<div class="col-lg-12">
+							<div class="row dropdown" style="float:right; margin-bottom: 5px; margin-right: -22px;">
+								<select id="option" name="searchType" style="width: 100px; border: 1px solid lightgray;">
+									<option value="title">도서명</option>
+									<option value="publisher">출판사</option>
+								</select>
+								<ul class="navbar-nav mr-lg-2">
+									<li class="nav-item nav-search d-none d-lg-block">
+										<div class="input-group">
+											<input type="text" class="form-control" name="searchWord" id="searchWord" placeholder="검색" aria-label="search" aria-describedby="search"/>
+											<div class="input-group-prepend hover-cursor" id="navbar-search-icon">
+												<button type="button" id="search" style="width: 100px; border: 1px solid lightgray;">검색
+													<i class="icon-search"></i>
+												</button>
+											</div>
+										</div>
+									</li>
+								</ul>
+							</div>
+						</div>
+					</form>
+					<p class="card-description">전체 <code><span id="salesCount"></span></code>건</p>
+					<div class="table-responsive">
+						<table class="table">
+							<thead>
+								<tr class="table-primary">
+									<th style="width : 5%; text-align : center;">번호</th>
+									<th style="width : 10%; text-align : center;">주문번호</th>
+									<th style="width : 10%; text-align : center;">주문일자</th>
+									<th style="width : 40%; text-align : center;">도서명</th>
+									<th style="width : 20%; text-align : center;">출판사</th>
+									<th style="width : 10%; text-align : center;">매출액</th>
+									<th style="width : 5%; text-align : center;">판매량</th>
+								</tr>
+							</thead>
+							<tbody id="salesList">
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<div id="pagingArea" style="margin-bottom: 20px;"></div>
+			</div>
+		</div>
+	</div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@3.7.1/dist/chart.min.js"></script>
+<script type="text/javascript">
+var salesList = document.querySelector("#salesList");
+var salesCount = document.querySelector("#salesCount");
+var search = document.querySelector("#search");
+var option = document.querySelector("#option");
+var searchInput = document.querySelector("#searchWord");
+var pagingArea = document.querySelector("#pagingArea");
+var page = 1;
+
+window.onload = function(){
+	list();
+	pagingArea.addEventListener("click", function(event) {
+		if(event.target.tagName === "A") {
+			event.preventDefault();
+			page = event.target.getAttribute("data-page");
+			list();
+		}
+	});
+}
+
+search.addEventListener("click", function() {
+	page = 1;
+	list();
+});
+
+function list() {
+	var list = document.querySelector("#salesList");
+	var searchType = option.value;
+	var searchWord = searchInput.value;
+	list.innerHTML = '';
+	$.ajax({
+		type : "get",
+		url : "sales/selectSalesList",
+		data : {
+			searchType:searchType,
+			searchWord:searchWord,
+			page:page
+		},
+		contentType : "application/json; charset=utf-8",
+		beforeSend : function(xhr) {
+			xhr.setRequestHeader("${_csrf.headerName}", "${_csrf.token}");
+		},
+		success : function(result){
+			console.log(JSON.stringify(result));
+			var html = "";
+			if(result.pagingVO.dataList.length == 0){
+				html += "<tr>"
+				html += `<td colspan="7" align="center">매출 목록이 존재하지 않습니다.</td>`
+				html += "</tr>"
+			} else {
+				for (var i = 0; i < result.pagingVO.dataList.length; i++) {
+					console.log(result.pagingVO.dataList[i].book_title);
+					console.log(result.pagingVO.dataList[i].pl_prchs_amt);
+					console.log(result.pagingVO.dataList[i].pl_prchs_amt.toLocaleString());
+					html += "<tr>"
+					html += "<td style='text-align : center;'>"+ result.pagingVO.dataList[i].rnum +"</td>"
+					html += "<td style='text-align : center;'>"+ result.pagingVO.dataList[i].order_no +"</td>"
+					html += "<td style='text-align : center;'>"+ result.pagingVO.dataList[i].order_ymd +"</td>"
+					html += "<td style='text-align : left;'>"+ result.pagingVO.dataList[i].book_title +"</td>"
+					html += "<td style='text-align : center;'>"+ result.pagingVO.dataList[i].pub_nm +"</td>"
+					html += "<td style='text-align : right;'>"+ result.pagingVO.dataList[i].pl_prchs_amt.toLocaleString() +"</td>"
+					html += "<td style='text-align : right;'>"+ result.pagingVO.dataList[i].pl_cnt.toLocaleString() +"</td>"
+					html += "</tr>"
+				}
+				salesList.innerHTML += html;
+			}
+			pagingArea.innerHTML = result.pagingVO.pagingHTML;
+			salesCount.innerText = result.pagingVO.totalRecord;
+			getBestPublisher();
+			getMonthlySales();
+			getBestBooks();
+			getMonthlyCnt();
+		},
+		error: function(error) {
+			console.log("error");
+		}
+	});
+}
+
+// 출판사 매출액 Best5
+function getBestPublisher() {
+	let publisherList = [];
+	let totalSalesList = [];
+	$.ajax({
+		type : "get",
+		url : "sales/bestPublisher",
+		data : "",
+		contentType : "application/json; charset=utf-8",
+		beforeSend : function(xhr) {
+			xhr.setRequestHeader("${_csrf.headerName}", "${_csrf.token}");
+		},
+		success : function(data){
+			console.log(JSON.stringify(data));
+			for(let i = 0; i < data.length; i++){
+				publisherList.push(data[i].pub_nm);
+				totalSalesList.push(data[i].total_sales);
+			}
+			console.log(publisherList);
+			console.log(totalSalesList);
+			const ctx1 = document.getElementById('bestPublisher').getContext('2d');
+			const bestPublisher = new Chart(ctx1, {
+				type: 'doughnut',
+				data: {
+					labels: publisherList,
+					datasets: [{
+						label: '# of Votes',
+						data: totalSalesList,
+						backgroundColor: [
+							'rgba(255, 99, 132, 0.2)',
+							'rgba(54, 162, 235, 0.2)',
+							'rgba(255, 206, 86, 0.2)',
+							'rgba(75, 192, 192, 0.2)',
+							'rgba(153, 102, 255, 0.2)'
+						],
+						borderColor: [
+							'rgba(255, 99, 132, 1)',
+							'rgba(54, 162, 235, 1)',
+							'rgba(255, 206, 86, 1)',
+							'rgba(75, 192, 192, 1)',
+							'rgba(153, 102, 255, 1)'
+						],
+						borderWidth: 1
+					}]
+				},
+			});
+		},
+		error: function(error) {
+			console.log("error");
+		}
+	});
+}
+
+// 월별 매출액
+function getMonthlySales() {
+	let monthlyList = [];
+	let totalSalesList = [];
+	$.ajax({
+		type : "get",
+		url : "sales/monthlySales",
+		data : "",
+		contentType : "application/json; charset=utf-8",
+		beforeSend : function(xhr) {
+			xhr.setRequestHeader("${_csrf.headerName}", "${_csrf.token}");
+		},
+		success : function(data){
+			console.log(JSON.stringify(data));
+			for(let i = 0; i < data.length; i++){
+				monthlyList.push(data[i].month + "월");
+				totalSalesList.push(data[i].total_sales);
+			}
+			console.log(monthlyList);
+			console.log(totalSalesList);
+			const ctx2 = document.getElementById('monthlySales').getContext('2d');
+			const monthlySales = new Chart(ctx2, {
+				type: 'bar',
+				data: {
+					labels: monthlyList,
+					datasets: [{
+						label: '매출액',
+						data: totalSalesList,
+						backgroundColor: [
+							'rgba(255, 99, 132, 0.2)',
+							'rgba(54, 162, 235, 0.2)',
+							'rgba(255, 206, 86, 0.2)',
+							'rgba(75, 192, 192, 0.2)',
+							'rgba(153, 102, 255, 0.2)',
+							'rgba(255, 159, 64, 0.2)',
+							'rgba(255, 99, 132, 0.2)',
+							'rgba(54, 162, 235, 0.2)',
+							'rgba(255, 206, 86, 0.2)',
+							'rgba(75, 192, 192, 0.2)',
+							'rgba(153, 102, 255, 0.2)',
+							'rgba(255, 159, 64, 0.2)'
+						],
+						borderWidth: 1
+					}]
+				},
+				options: {
+					scales: {
+						yAxes : [ {
+							ticks : {
+								beginAtZero : true,
+							}
+						} ]
+					}
+				}
+			});
+		},
+		error: function(error) {
+			console.log("error");
+		}
+	});	
+}
+
+// 도서 판매량 Best5
+function getBestBooks() {
+	let bookTitleList = [];
+	let totalCntList = [];
+	$.ajax({
+		type : "get",
+		url : "sales/bestBooks",
+		data : "",
+		contentType : "application/json; charset=utf-8",
+		beforeSend : function(xhr) {
+			xhr.setRequestHeader("${_csrf.headerName}", "${_csrf.token}");
+		},
+		success : function(data){
+			console.log(JSON.stringify(data));
+			for(let i = 0; i < data.length; i++){
+				bookTitleList.push(data[i].book_title);
+				totalCntList.push(data[i].total_cnt);
+			}
+			console.log(bookTitleList);
+			console.log(totalCntList);
+			const ctx3 = document.getElementById('bestBooks').getContext('2d');
+			const bestBooks = new Chart(ctx3, {
+				type: 'doughnut',
+				data: {
+					labels: bookTitleList,
+					datasets: [{
+						label: '# of Votes',
+						data: totalCntList,
+						backgroundColor: [
+							'rgba(255, 99, 132, 0.2)',
+							'rgba(54, 162, 235, 0.2)',
+							'rgba(255, 206, 86, 0.2)',
+							'rgba(75, 192, 192, 0.2)',
+							'rgba(153, 102, 255, 0.2)'
+						],
+						borderColor: [
+							'rgba(255, 99, 132, 1)',
+							'rgba(54, 162, 235, 1)',
+							'rgba(255, 206, 86, 1)',
+							'rgba(75, 192, 192, 1)',
+							'rgba(153, 102, 255, 1)'
+						],
+						borderWidth: 1
+					}]
+				},
+			});
+		},
+		error: function(error) {
+			console.log("error");
+		}
+	});
+}
+
+// 월별 판매량
+function getMonthlyCnt() {
+	let monthlyList = [];
+	let totalCntList = [];
+	$.ajax({
+		type : "get",
+		url : "sales/monthlyCnt",
+		data : "",
+		contentType : "application/json; charset=utf-8",
+		beforeSend : function(xhr) {
+			xhr.setRequestHeader("${_csrf.headerName}", "${_csrf.token}");
+		},
+		success : function(data){
+			console.log(JSON.stringify(data));
+			for(let i = 0; i < data.length; i++){
+				monthlyList.push(data[i].month + "월");
+				totalCntList.push(data[i].total_cnt);
+			}
+			console.log(monthlyList);
+			console.log(totalCntList);
+			const ctx4 = document.getElementById('monthlyCnt').getContext('2d');
+			const monthlyCnt = new Chart(ctx4, {
+				type: 'bar',
+				data: {
+					labels: monthlyList,
+					datasets: [{
+						label: '판매량',
+						data: totalCntList,
+						backgroundColor: [
+							'rgba(255, 99, 132, 0.2)',
+							'rgba(54, 162, 235, 0.2)',
+							'rgba(255, 206, 86, 0.2)',
+							'rgba(75, 192, 192, 0.2)',
+							'rgba(153, 102, 255, 0.2)',
+							'rgba(255, 159, 64, 0.2)',
+							'rgba(255, 99, 132, 0.2)',
+							'rgba(54, 162, 235, 0.2)',
+							'rgba(255, 206, 86, 0.2)',
+							'rgba(75, 192, 192, 0.2)',
+							'rgba(153, 102, 255, 0.2)',
+							'rgba(255, 159, 64, 0.2)'
+						],
+						borderWidth: 1
+					}]
+				},
+				options: {
+					scales: {
+						yAxes : [ {
+							ticks : {
+								beginAtZero : true,
+							}
+						} ]
+					}
+				}
+			});
+		},
+		error: function(error) {
+			console.log("error");
+		}
+	});	
+}
+</script>

@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+<mapper namespace="kr.or.ddit.mapper.ljy.RefundMngMapper">
+	<!-- 환불내역  -->
+	<resultMap type="refundMngVO" id="refundMngMap">
+		<result property="order_no" column="order_no"/>
+		<result property="book_no" column="book_no"/>
+		<result property="ae_id" column="ae_id"/>
+		<result property="rr_actno" column="rr_actno"/>
+		<result property="rr_ymd" column="rr_ymd"/>
+		<result property="rr_content" column="rr_content"/>
+		<result property="ua_no" column="ua_no"/>
+		<result property="rr_bank" column="rr_bank"/>
+		<result property="ccg_i001" column="ccg_i001"/>
+		<collection property="purchsMngVO" resultMap="purchsMngVO"/>
+	</resultMap>
+	
+	<resultMap type="purchsMngVO" id="purchsMngVO">
+		<result property="order_no" column="order_no"/>
+		<result property="book_no" column="book_no"/>
+		<result property="ae_id" column= "ae_id"/>
+		<result property="pl_cnt" column="pl_cnt"/>
+		<result property="book_ntsl_amt" column="book_ntsl_amt"/>
+		<result property="pl_refund_yn" column="pl_refund_yn"/>
+		<result property="pl_dcsn_yn" column= "pl_dcsn_yn"/>
+		<result property="expected_mileage" column="expected_mileage"/>
+		<result property="book_title" column= "book_title"/>
+		<result property="pub_nm" column="pub_nm"/>
+		<result property="ccg_b001" column="ccg_b001"/>
+	</resultMap>
+	
+	
+	<select id="refundList" parameterType="refundMngVO" resultMap="refundMngMap">
+		<include refid="commonMapper.pagingHeader"/>
+			SELECT
+			    r.order_no			-- 주문번호
+			    ,r.book_no			-- 책번호
+			    ,r.ae_id			-- 사용자 아이디
+			    ,r.rr_actno			-- 환불계좌
+			    ,r.rr_ymd			-- 환불요청일자
+			    ,r.rr_content		-- 환불요청내용
+			    ,r.ua_no			-- 통합첨부파일 번호
+			    ,r.rr_bank			-- 환불은행
+			    ,r.ccg_i001    	 	-- 1. 대기, 2. 완료 
+			    ,p.pl_cnt 			-- 수량
+			    ,p.pl_prchs_amt 	-- 판매금액
+			    ,p.book_ntsl_amt	-- 구매금액(구매자)
+			    ,p.pl_refund_yn		-- 환불여부 - 1. 환불미정 2. 환불 대기 3. 환불완료  4.환불불가
+			    ,p.pl_dcsn_yn		-- 구매확정여부
+			    ,p.expected_mileage	-- 사용마일리지
+			    ,b.book_title 		-- 책이름
+			    ,b.pub_nm			-- 출판사 이름
+			    ,b.ccg_b001     	-- 종이책, e북
+			FROM 	
+			    refund_request r
+			    INNER JOIN purchs_list p ON r.order_no = p.order_no AND r.book_no = p.book_no
+			    INNER JOIN books b ON b.book_no = r.book_no
+			ORDER BY 
+				r.ccg_i001, r.order_no desc, r.book_no desc
+		<include refid="commonMapper.pagingFooter"/>
+	</select>
+	
+	<update id="refundOne" parameterType="refundMngVO">
+		UPDATE
+			refund_request
+		SET
+			ccg_i001 = '완료'
+		WHERE 
+			order_no = #{order_no}
+			AND book_no = #{book_no}
+	</update>
+	
+	<update id="refundPurchs" parameterType="refundMngVO">
+		UPDATE
+			purchs_list
+		SET 
+			pl_refund_yn = '환불완료'
+		WHERE
+			order_no = #{order_no}
+			AND book_no = #{book_no}
+	</update>
+	
+	<update id="incrementRemain" parameterType="refundMngVO">
+		UPDATE
+			books_manager
+		SET 
+			bm_cnt = bm_cnt + (
+                                SELECT 
+                                	pl_cnt
+                                FROM 
+                                	purchs_list
+                                WHERE 
+                                	order_no = #{order_no}
+                                	AND book_no = #{book_no}
+            					)
+		WHERE
+			book_no = #{book_no}
+	</update>
+	
+	<select id="refundDetail" parameterType="refundMngVO" resultMap="refundMngMap">
+		SELECT
+		    r.order_no			-- 주문번호
+		    ,r.book_no			-- 책번호
+		    ,r.ae_id			-- 사용자 아이디
+		    ,r.rr_actno			-- 환불계좌
+		    ,r.rr_ymd			-- 환불요청일자
+		    ,r.rr_content		-- 환불요청내용
+		    ,r.ua_no			-- 통합첨부파일 번호
+		    ,r.rr_bank			-- 환불은행
+		    ,r.ccg_i001    	 	-- 1. 대기, 2. 완료 
+		    ,p.pl_cnt 			-- 수량
+		    ,p.pl_prchs_amt 	-- 판매금액
+		    ,p.book_ntsl_amt	-- 구매금액(구매자)
+		    ,p.pl_refund_yn		-- 환불여부 - 1. 환불미정 2. 환불 대기 3. 환불완료  4.환불불가
+		    ,p.pl_dcsn_yn		-- 구매확정여부
+		    ,p.expected_mileage	-- 사용마일리지
+		    ,b.book_title 		-- 책이름
+		    ,b.pub_nm			-- 출판사 이름
+		    ,b.ccg_b001     	-- 종이책, e북
+		FROM 	
+		    refund_request r
+		    INNER JOIN purchs_list p ON r.order_no = p.order_no AND r.book_no = p.book_no
+		    INNER JOIN books b ON b.book_no = r.book_no
+		WHERE
+			r.order_no = #{order_no}
+			AND r.book_no = #{book_no}
+	</select>
+	
+	<select id="refundListCnt" parameterType="refundMngVO" resultType="int">
+		SELECT
+		    count(order_no)
+		FROM 	
+		    refund_request r
+	</select>
+	
+	<select id="countWaitingRefund" resultType="int">
+		SELECT
+		    count(order_no)
+		FROM 	
+		    refund_request r
+		WHERE
+		    ccg_i001 = '대기'
+	</select>
+</mapper>

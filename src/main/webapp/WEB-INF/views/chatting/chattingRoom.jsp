@@ -1,0 +1,707 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+<%@ taglib uri="http://www.springframework.org/security/tags" prefix="sec"%>
+<!DOCTYPE html>
+<html>
+<head>
+<link rel="stylesheet" href="/resources/asset/css/chatting.css">
+<link href="https://cdn.jsdelivr.net/npm/remixicon@3.4.0/fonts/remixicon.css" rel="stylesheet">
+<meta charset="UTF-8">
+<title>채팅</title>
+</head>
+<body>
+<input type="hidden" value="<sec:authentication property="name"/>" id="sec-name">
+<input type="hidden" id="crNo" value="${member.cr_no }">
+<input type="hidden" id="crMaster" value="${member.cm_master_yn}">
+<input type="hidden" id="crNick" value="${member.mem_nicknm}">
+
+<!-- 채팅방 -->
+<div id="chat">
+	<div id="chat-div">
+    	<div id="chatMessage"></div>
+    	<div id="whisper-send">
+    		대상 : <span id="whisper-user">all</span> 
+    		<span id='whisper-user-cancle'>귓속말 취소</span>
+    	</div>
+    	<div id="chatMessage-send">
+	   		<input type="text"   id="message" class="form-control" placeholder="메시지 내용" maxlength="300"/>
+   			<input type="button" id="btnSendMessage" class="btn btn-success btn-sm my-3" value="메시지보내기" />
+    	</div>
+	</div>
+	<div id="chat-info-div">
+		<div id="chat-info"></div>	
+	   	<div id="chat-user-info">
+	   		<div id="online-user" class='all-user'></div>
+	   		<div id='no-online-user' class='all-user'></div>
+	   	</div>
+	   	<div id="chat-btns">
+	   		<input type="button" id="chat-leave" value="채팅 종료">
+	   		<input type="button" id="chat-out" value="채팅방 나가기">
+	   	</div>
+	</div>
+</div>
+
+<!-- 채팅방 상세 모달 -->
+<div id="dChatModal">
+	<div class="dChatContainer">
+		<div id="chatting-detail-div">
+			<div id="div-title" class="chatting-divs">
+				<div id="dClose-div">
+					<i onclick="dmodalClose()" class="ri-close-line dbtn"></i>
+				</div>
+				<h2>채팅방 정보</h2>
+			</div>
+			<div id="chatting-info-div"></div>
+		</div>
+	</div>
+</div>
+
+</body>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script>
+var chatInfo = $("#chat-info");	// 채팅방 정보가 담기는 div
+var dChatModal = $("#dChatModal");		// 채팅방 상세 div
+var chattingInfoDiv = $("#chatting-info-div")	// 채팅방 상세가 들어갈 곳
+
+$(function(){
+
+var url = window.location.host;
+var pathname = window.location.pathname; 
+console.log("url : " + url)
+
+var appCtx = pathname.substring(0, pathname.lastIndexOf("/") );
+var root = url+appCtx;
+
+var wsUrl = "ws://192.168.146.66/chatting"
+var websocket = new WebSocket(wsUrl);
+
+ 	    
+  	var messageObj = {};
+	  	
+	websocket.onopen = function(){
+		messageObj = { message : "<span>${member.mem_nicknm}님이 채팅방에 입장했습니다</span>",
+					   type : "notice",
+					   to : "all"
+					};
+	
+	   websocket.send(JSON.stringify(messageObj));
+	   
+	   chatRoomSetting();
+
+	};  
+
+	websocket.onmessage = function(event){
+		var message = event.data;
+		var firstColonIndex = message.indexOf(":");
+		
+		var messageType = message.substring(0, firstColonIndex);
+		var messageContent = message.substring(firstColonIndex + 1);
+		
+		console.log("messageType : " + messageType)
+		console.log("messageContent : " + messageContent)
+		
+		$("div#chatMessage").append(messageContent);
+		$("div#chatMessage").append("<br>");
+		$("div#chatMessage").scrollTop(9999999);	
+		
+		
+		if(messageType == 'state1'){
+			chatRoomSetting();	
+		}
+		
+		if(messageType == 'state2'){
+			Swal.fire("강퇴 당했습니다.");
+			websocket.close();
+		 	window.close();		
+		}
+	    
+	};
+
+	// 메세지 보내기
+	var isOnlyOneDialog = false; 
+	$("#btnSendMessage").click(function(){
+		
+		if($("#message").val() != ""){
+			
+	            var messageVal = $("input#message").val();
+	            messageVal = messageVal.replaceAll("<script>", ""); 
+	        
+	            
+	            messageObj = { message : messageVal,
+	      						  type : "all",
+								    to : "all"};
+	            
+	            var to = $("#whisper-user").text();
+	            if ( to != "all" ) {
+	                messageObj.type = "one";
+	                messageObj.to = to;
+	            }
+	            
+	            websocket.send(JSON.stringify(messageObj));                
+	      
+	         
+	            var now = new Date();
+	            var ampm = "오전 ";
+	            var hours = now.getHours();
+	            
+	            if(hours > 12) {
+	               hours = hours - 12;
+	               ampm = "오후 ";
+	            }
+	            
+	            if(hours == 0) {
+	               hours = 12;
+	            }
+	            if(hours == 12){
+	            	ampm = "오후"
+	            }
+	            
+	           var minutes = now.getMinutes();
+	           if(minutes < 10) {
+	             minutes = "0"+minutes;
+	           }
+	            
+	           var currentTime = ampm + hours + ":" + minutes;
+	           if(isOnlyOneDialog == false){ 
+	           	$("#chatMessage").append(
+	           			"<div class='my-all-chatting'>"
+	           		   +"	<div class='my-chatting'>"
+	           		   + 		messageVal 
+	           		   +"		<div class='my-chatting-date'>"
+	           		   +			currentTime
+	           		   +"		</div>"
+					   +"	</div>"
+					   +"</div>"
+					   +"<div style='clear: both;'>&nbsp;</div>");                    
+	           } else {
+	           	$("div#chatMessage").append(
+           				"<div class='my-all-chatting'>"
+	           		   +"	<div class='my-chatting' style='color: red;'>"
+	           		   + 		messageVal 
+	           		   +"		<div class='my-chatting-date' style='color: black;'>"
+	           		   +			currentTime
+	           		   +"		</div>"
+					   +"	</div>"
+					   +"</div>"
+					   +"<div style='clear: both;'>&nbsp;</div>");                   
+	           }
+	           $("#chatMessage").scrollTop(9999999);
+	           $("input#message").val("");
+	           $("input#message").focus();
+		  }
+	});
+		
+	// 엔터를 쳐도 메세지 전송이 된다
+	  $("#message").keyup((event) => {
+		if(event.keyCode == 13){
+			$("#btnSendMessage").click();
+		 }
+	  });
+      
+	  
+	  // 채팅방 아예 나가기
+      $("#chat-out").click(function(){
+    	var crNo = $("#crNo").val();
+    	var aeId = $("#sec-name").val();
+    	var crNick = $("#crNick").val();
+    	
+    	if($("#crMaster").val() == 'Y'){
+    	  	Swal.fire({
+    	   		  title: '방장이 나가면 채팅방이 사라집니다. 그래도 나가시겠습니까?',
+    	   		  showDenyButton: true,
+    	   		  confirmButtonText: '네',
+    	   		  denyButtonText: '아니요',
+    	   		}).then((result) => {
+    	   		  /* Read more about isConfirmed, isDenied below */
+    	   		  if (result.isConfirmed) {
+    		    	  $.ajax({
+      	    			type : "get",
+      	    			url : "/haruter/deleteChatRoom",
+      	    			data: {
+      	    				'cr_no':crNo,
+      	    				'ae_id':aeId
+      	    			}, 
+      	    			beforeSend : function(xhr){
+      	    				xhr.setRequestHeader("${_csrf.headerName}", "${_csrf.token}");
+      	    			},
+      	    			success: function(res){
+      	    				if(res=='OK'){
+  	    	  		    		dChatModal.css("display", "none");
+  	    	  			 		window.opener.location.reload();
+  	    	  		  	 		websocket.close();
+  	    	  			 		window.close();    	    					
+      	    				}else{
+      	    					Swal.fire("실패!");
+      	    				}
+      	    	     	},
+      	    	     	error: function(ex){
+      	    	     		console.log("error");
+      	    	     	}
+      	    	    }); 
+    	   		  }
+    	   		})
+    	}else{
+    	  	Swal.fire({
+  	   		  title: '채팅방에 나가면 채팅 기록이 모두 사라집니다. 그래도 나가시겠습니까?',
+  	   		  showDenyButton: true,
+  	   		  confirmButtonText: '네',
+  	   		  denyButtonText: '아니요',
+  	   		}).then((result) => {
+  	   		  /* Read more about isConfirmed, isDenied below */
+  	   		  if (result.isConfirmed) {
+  		    	  $.ajax({
+    	    			type : "get",
+    	    			url : "/haruter/outChatRoom",
+    	    			data: {
+    	    				'cr_no':crNo,
+    	    				'ae_id':aeId
+    	    			}, 
+    	    			beforeSend : function(xhr){
+    	    				xhr.setRequestHeader("${_csrf.headerName}", "${_csrf.token}");
+    	    			},
+    	    			success: function(res){
+    	    				if(res=='OK'){
+    							messageObj = { message : "<span>"+crNick+"님이 채팅방에 퇴장하셨습니다.</span>",
+					   					   				 type : "notice",
+					   					  				 to : 'all'
+											 };
+   								websocket.send(JSON.stringify(messageObj));
+    	  		    			dChatModal.css("display", "none");
+    	  					 	window.opener.location.reload();
+    	  		  	 			websocket.close();
+    	  			 			window.close();    	    					
+    	    				
+    	    				}
+    	    	     	},
+    	    	     	error: function(ex){
+    	    	     		console.log("error");
+    	    	     	}
+    	    	    }); 
+  	   		  }
+  	   		})	
+    	}
+   
+
+      })
+      
+      // 채팅방 종료
+      $("#chat-leave").click(function(){
+	 	websocket.close();
+	 	window.close();
+      })
+
+//	  채팅방 수정 모달 창
+	  $(document).on("click", "#chat-update-btn", function(){
+		  $("#last-update-btn").css('display', 'initial');
+		  $("#last-cancle-btn").css('display', 'initial');
+		  $("#chat-update-btn").css('display', 'none');
+		  $("#chat-delete-btn").css('display', 'none');	  
+		  
+		  $("#update-ccg-r003").val($("#ccg-r003-text").text())
+		  $("#ccg-r003-text").css('display', 'none');
+		  $("#ccg-r003-input").css('display', 'revert');
+		  $("#cr-nm-text").css('display', 'none');
+		  $("#cr-nm-input").css('display', 'revert');
+		  $("#cr-max-text").css('display', 'none');
+		  $("#cr-max-input").css('display', 'revert');
+		  $("#detail-info").css('display', 'none');
+		  $("#detail-info-input").css('display', 'revert');
+		  $("#detail-pw").css('display', 'none');
+		  $("#detail-pw-input").css('display', 'revert');
+		  
+	  })
+      
+//	  채팅방 수정 모달 닫기
+	  $(document).on("click", "#last-cancle-btn", function(){
+		  $("#last-update-btn").css('display', 'none');
+		  $("#last-cancle-btn").css('display', 'none');
+		  $("#chat-update-btn").css('display', 'initial');
+		  $("#chat-delete-btn").css('display', 'initial'); 
+		  
+		  $("#ccg-r003-text").css('display', 'revert');
+		  $("#ccg-r003-input").css('display', 'none');
+		  $("#update-ccg-r003").val($("#ccg-r003-text").text())
+		  
+		  $("#cr-nm-text").css('display', 'revert');
+		  $("#cr-nm-input").css('display', 'none');
+		  $("#update-cr-nm").val($("#cr-nm-text").text())	  
+		  
+		  $("#cr-max-text").css('display', 'revert');
+		  $("#cr-max-input").css('display', 'none');
+		  $("#update-cr-max-cope").val($("#cr-max-text").text());
+		  
+		  $("#detail-info").css('display', 'revert');
+		  $("#detail-info-input").css('display', 'none');
+		  $("#update-cr-info").val($("#detail-info").text());
+		  
+		  $("#detail-pw").css('display', 'revert');
+		  $("#detail-pw-input").css('display', 'none');
+		  $("#detail-pw-input").val($("#detail-pw").text());
+		  
+		  if($("#update-ccg-r003").val()=='공개'){
+			 $("#pw-div").css('display', 'none')  
+		  }
+	  })
+	  
+//    채팅방 상세 모달 창
+      $(document).on("click", "#chat-temp-span", function(){
+    	  dChatModal.css("display", "block");
+    	  var crNo = $("#crNo").val();
+    	  var aeId = $("#sec-name").val();
+    	  
+    		$.ajax({
+    			type : "get",
+    			url : "/haruter/getChatOne",
+    			data: {
+    				'cr_no':crNo
+    			}, 
+    			beforeSend : function(xhr){
+    				xhr.setRequestHeader("${_csrf.headerName}", "${_csrf.token}");
+    			},
+    			success: function(res){
+    				console.log("res",res);
+    				var nm = res.cr_nm.replaceAll(/<script>/gi, ""); 
+    				nm = nm.replaceAll(/<\/script>/gi, "");
+    				var info = res.cr_info.replaceAll(/<script>/gi, ""); 
+    				info = info.replaceAll(/<\/script>/gi, "");
+    				var tempDiv = "";
+    				tempDiv += "<table id='detail-table' data-no = '"+res.cr_no+"'>";
+    				tempDiv += "	<tr>";
+    				tempDiv += "		<th>방번호</th>";			
+    				tempDiv += "		<td>"+res.cr_temp_no+"번</td>";			
+    				tempDiv += "		<th>방종류</th>";			
+    				tempDiv += "		<td id='ccg-r003-text'>"+res.ccg_r003+"</td>";
+    				tempDiv += "		<td id='ccg-r003-input' style='display: none;'>";			
+    				tempDiv += "			<select id='update-ccg-r003'>";			
+    				tempDiv += "				<option>공개</option><option>비공개</option>";			
+    				tempDiv += "			</select>";			
+    				tempDiv += "		</td>";			
+    				tempDiv += "	</tr>";	
+    				tempDiv += "	<tr>";
+    				tempDiv += "		<th>제목</th>";		
+    				tempDiv += "		<td colspan='3' id='cr-nm-text'>"+nm+"</td>";				
+    				tempDiv += "		<td colspan='3' id='cr-nm-input' style='display: none;'><input type='text' id='update-cr-nm' value='"+nm+"' maxlength='30'></td>";			
+    				tempDiv += "	</tr>";	
+    				tempDiv += "	<tr>";
+    				tempDiv += "		<th>가입인원</th>";
+    				tempDiv += "		<th colspan='2'>접속가능인원</th>";
+    				tempDiv += "		<th>현접속인원</th>";			
+    				tempDiv += "	</tr>";			
+    				tempDiv += "	<tr>";			
+    				tempDiv += "		<td id='cr-nope-text'>"+res.cr_nope+"</td>";			
+    				tempDiv += "		<td colspan='2' id='cr-max-text'>"+res.cr_max_nope+"</td>";			
+    				tempDiv += "		<td colspan='2' style='display:none;' id='cr-max-input'><input type='number' id='update-cr-max-cope' value="+res.cr_max_nope+" max='10' min='"+res.cr_nope+"'></td>";
+    				tempDiv += "		<td>"+res.cr_cntn_nope+"</td>";									
+    				tempDiv += "	<tr>";		
+    				tempDiv += "	<tr>";
+    				tempDiv += "		<th colspan='4'>소개글</th>";
+    				tempDiv += "	</tr>";
+    				tempDiv += "	<tr>";
+    				tempDiv += "		<td colspan='4' id='detail-info'>"+info+"</td>";
+    				tempDiv += "		<td colspan='4' style='display: none;' id='detail-info-input'><textarea id='update-cr-info' rows='' cols='' maxlength='150'>"+info+"</textarea></td>";
+    				tempDiv += "	</tr>";
+    				if(res.ccg_r003=='비공개'){	
+    				tempDiv += "	<tr id='pw-div' style ='display: revert;'>";
+    				}
+    				if(res.ccg_r003=='공개'){
+    				tempDiv += "	<tr id='pw-div' style ='display: none;'>";    					
+    				}
+    				tempDiv += "		<th>비밀번호</th>";
+    				tempDiv += "		<td colspan='3'>";
+    				if(res.ccg_r003=='비공개'){
+        			var pw = res.cr_pw.replaceAll("<script>", ""); 
+    				tempDiv += "				<input type='text' id='detail-pw' placeholder='비밀번호를 입력하세요' value='"+pw+"' readonly='readonly'>";    					
+    				tempDiv += "				<input type='text' style='display:none; width: 80%;' id='detail-pw-input' placeholder='비밀번호를 입력하세요' maxlength='10' value='"+pw+"'>";
+    				}else{
+    				tempDiv += "				<input type='text' id='detail-pw' placeholder='비밀번호를 입력하세요' value='' readonly='readonly'>";    					    					
+    				tempDiv += "				<input type='text' style='display:none; width: 80%;' id='detail-pw-input' placeholder='비밀번호를 입력하세요' maxlength='10' value=''>";
+    				}
+    				tempDiv += "		</td>";
+    				tempDiv += "	</tr>";
+    				tempDiv += "</table>";
+    				if(aeId==res.ae_id){
+    				tempDiv += "		<div id='detail-div'>"
+    				tempDiv += "			<input type='button' class='chat-btn' id='chat-update-btn' value='채팅방 수정' maxlength='10'>";
+    				tempDiv += "			<input type='button' class='chat-btn' id='chat-delete-btn' value='채팅방 삭제' maxlength='10'>";    					
+    				tempDiv += "			<input style='display:none;' type='button' class='chat-btn' id='last-update-btn' value='수정하기' maxlength='10'>";    					
+    				tempDiv += "			<input style='display:none;' type='button' class='chat-btn' id='last-cancle-btn' value='수정취소' maxlength='10'>";    					
+    				tempDiv += "		</div>";    					
+    				}
+    				chattingInfoDiv.html(tempDiv);
+    				if(res.ccg_r003=='비공개'){	
+    				$('#chat-btn').css("margin-top", "13px");				
+    				}else{
+    				$('#chat-btn').css("margin-top", "22px");								
+    				}
+    	     	},
+    	     	error: function(ex){
+    	     		console.log("error");
+    	     	}
+    	    });
+      })
+      
+      // 공개, 비공개 설정
+      $(document).on("change", "#update-ccg-r003", function(){
+    	  if($(this).val()=='비공개'){
+    		  $("#pw-div").css('display', 'revert')
+    		  $("#detail-pw").css("display", 'none')
+    		  $("#detail-pw-input").css("display", 'revert')
+    	  }else if($(this).val()=='공개'){
+    		  $("#pw-div").css('display', 'none')
+    		  $("#detail-pw").css("display", 'revert')
+    		  $("#detail-pw-input").css("display", 'none')  		  
+    	  }
+      })
+      
+      // 채팅방 수정
+      $(document).on("click", "#last-update-btn", function(){
+    	  var crNo = $("#crNo").val();
+    	  var aeId = $("#sec-name").val();
+    	  
+    	  if($("#update-cr-nm").val().trim() == ""){
+    		  Swal.fire("제목을 입력하세요!");
+    		  return false;
+    	  }
+
+    	  if($("#update-cr-info").val().trim() == ""){
+    		  Swal.fire("소개를 입력하세요!");
+    		  return false;
+    	  }
+		
+    	  if($("#update-cr-max-cope").val() < $("#cr-nope-text").text() || $("#update-cr-max-cope").val() > 10 ||$("#update-cr-max-cope").val() < 2 ){
+    		  Swal.fire("정해진 인원이 맞지 않습니다!");
+    		  return false;
+    	  }
+    	  
+    	  if($("#update-ccg-r003").val() == "비공개" && $("#detail-pw-input").val().trim() == ""){    		  
+    		  Swal.fire("비밀번호가 맞지 않습니다!");
+    		  return false;
+    	  }
+    	  
+    	  $.ajax({
+  			type : "get",
+  			url : "/haruter/updateChatRoom",
+  			data: {
+  				"cr_no":crNo,
+				"cr_nm":$("#update-cr-nm").val(),
+				"cr_info":$("#update-cr-info").val(),
+				"cr_pw":$("#detail-pw-input").val(),
+				"cr_max_nope":$("#update-cr-max-cope").val(),
+				"ccg_r003":$("#update-ccg-r003").val()
+  			}, 
+  			beforeSend : function(xhr){
+  				xhr.setRequestHeader("${_csrf.headerName}", "${_csrf.token}");
+  			},
+  			success: function(res){
+  				if(res=='OK'){	  		    	
+	  			 	window.location.reload();  	    					
+	  			 	window.opener.location.reload();  	    					
+  				}
+  	     	},
+  	     	error: function(ex){
+  	     		console.log("error");
+  	     	}
+  	     }); 
+    	  
+      })
+      
+      
+      // 채팅방 삭제
+      $(document).on("click", "#chat-delete-btn", function(){
+    	  var crNo = $("#crNo").val();
+    	  var aeId = $("#sec-name").val();
+    	  Swal.fire({
+    		  title: '해당 채팅방을 삭제하시겠습니까?',
+    		  showDenyButton: true,
+    		  confirmButtonText: '네',
+    		  denyButtonText: '아니요',
+    		}).then((result) => {
+    		  /* Read more about isConfirmed, isDenied below */
+    		  if (result.isConfirmed) {
+    	    	  $.ajax({
+    	    			type : "get",
+    	    			url : "/haruter/deleteChatRoom",
+    	    			data: {
+    	    				'cr_no':crNo,
+    	    				'ae_id':aeId
+    	    			}, 
+    	    			beforeSend : function(xhr){
+    	    				xhr.setRequestHeader("${_csrf.headerName}", "${_csrf.token}");
+    	    			},
+    	    			success: function(res){
+    	    				if(res=='OK'){
+	    	  		    		dChatModal.css("display", "none");
+	    	  			 		window.opener.location.reload();
+	    	  		  	 		websocket.close();
+	    	  			 		window.close();    	    					
+    	    				}
+    	    	     	},
+    	    	     	error: function(ex){
+    	    	     		console.log("error");
+    	    	     	}
+    	    	    }); 
+    		  }
+    		})
+      })
+      
+      //귓속말 하기
+      $(document).on("click", "#user-check-one", function(){
+    	  var whisperId =  $(this).parent().attr("data-one");
+    	  var check = $(this).parent();
+    	  check.css("display", "none");
+    	  $("#whisper-user").css('color', '#53eb59');
+    	  $("#whisper-user").text(whisperId);
+    	  $("#whisper-user-cancle").css('display', 'flex');
+    	  isOnlyOneDialog = true;
+      })
+      
+      //귓속말 취소
+      $("#whisper-user-cancle").on('click', function(){
+    	  $("#whisper-user").css('color', 'black');
+    	  $("#whisper-user").text('all');
+    	  $("#whisper-user-cancle").css('display', 'none');
+    	  isOnlyOneDialog = false;
+      })
+      
+      //강퇴하기
+      $(document).on("click", "#user-check-out", function(){
+    	  var userNick = $(this).parent().parent().find(".user-check-nick").text();
+    	  var crNo = $("#crNo").val();
+    	  var outId = $(this).parent().attr("data-one");
+    	  
+    	  Swal.fire({
+    		  title: userNick+"님을 강퇴시키겠습니까?",
+    		  showDenyButton: true,
+    		  confirmButtonText: '네',
+    		  denyButtonText: '아니요',
+    		}).then((result) => {
+    		  /* Read more about isConfirmed, isDenied below */
+    		  if (result.isConfirmed) {
+    				$.ajax({
+    					type : "get",
+    					url : "/haruter/outUser",
+    					data: {
+    						'cr_no':crNo,
+    						'ae_id':outId
+    					}, 
+    					beforeSend : function(xhr){
+    						xhr.setRequestHeader("${_csrf.headerName}", "${_csrf.token}");
+    					},
+    					success: function(res){
+							
+							messageObj = { message : "<span>"+userNick+"님이 채팅방에 강퇴 당했습니다</span>",
+					   					   type : "out",
+					   					   to : outId
+							};
+	
+	   						websocket.send(JSON.stringify(messageObj));
+							chatRoomSetting();
+    			     	},
+    			     	error: function(ex){
+    			     		console.log("error");
+    			     	}
+    			    });
+    		  } 
+    		})
+      })
+      
+      // 강퇴 / 귓속말 불러오기
+      $(document).on("click", ".user-check-nick", function(){
+		var check = $(this).parent().find(".user-check");
+		if(check.css("display") === "block"){
+			check.css("display", "none");
+		}else{
+			check.css("display", "block");		
+		}	
+      })
+
+})
+
+// 채팅방 정보 셋팅
+function chatRoomSetting(){
+	var aeId = $("#sec-name").val();
+	var crNo = $("#crNo").val();
+	
+	$.ajax({
+		type : "get",
+		url : "/haruter/getChat",
+		data: {
+			'cr_no':crNo,
+			'ae_id':aeId
+		}, 
+		beforeSend : function(xhr){
+			xhr.setRequestHeader("${_csrf.headerName}", "${_csrf.token}");
+		},
+		success: function(res){
+			chatInfo.html("");
+			$("#online-user").html("");
+			$("#no-online-user").html("");
+			var nm = res.chatRoom.cr_nm.replaceAll(/<script>/gi, "");
+			tempChatInfo = "";
+			tempChatMemOnlieInfo = "";
+			tempChatMemNoOnlieInfo = "";
+			tempChatInfo += "<div id='chat-temp-span'><input type='button' id='chat-temp-no-span' value='"+res.chatRoom.cr_temp_no+"번'></div>"
+			if(res.chatRoom.cr_nm.length > 10){				
+			tempChatInfo += "<div id='chat-crnm-span'><span id='chat-cr-nm'>"+ nm.substring(0, 10) + "..." +"</span></div>"			
+			}else{
+			tempChatInfo += "<div id='chat-crnm-span'><span id='chat-cr-nm'>"+ nm +"</span></div>"							
+			}
+			tempChatMemOnlieInfo += "<div class='user-online-info'><span>온라인 사용자</span></div>"
+			tempChatMemNoOnlieInfo += "<div class='user-online-info' style='margin-top: 35px;'><span>오프라인 사용자</span></div>"
+			for(let i = 0; i < res.chatMem.length; i++){
+				if(res.chatMem[i].cn_cntn_yn == 'Y'){
+					tempChatMemOnlieInfo += "<div class='users'>";
+					if(aeId != res.chatMem[i].ae_id){
+					tempChatMemOnlieInfo += "	<div class='user-check' data-one='"+res.chatMem[i].ae_id+"'>";						
+					tempChatMemOnlieInfo += "		<span id='user-check-one'>귓속말</span>";
+					if(aeId == res.chatRoom.ae_id){
+					tempChatMemOnlieInfo += "		<span id='user-check-out' class='room-king-out'>강퇴하기</span>";
+					}
+					tempChatMemOnlieInfo += "	</div>";	
+					}	
+					if(res.chatMem[i].cm_master_yn == 'Y'){
+					tempChatMemOnlieInfo += "	<i class='ri-vip-crown-2-fill char-room-king'></i>"	
+					}
+					if(aeId == res.chatMem[i].ae_id){
+					tempChatMemOnlieInfo += "	<span class='user-check-nick' style='color: #04c92f;'>"+res.chatMem[i].mem_nicknm+"</span>";
+					}else{
+					tempChatMemOnlieInfo += "	<span class='user-check-nick'>"+res.chatMem[i].mem_nicknm+"</span>";						
+					}
+					tempChatMemOnlieInfo += "</div>";
+				}else{
+					tempChatMemNoOnlieInfo += "<div class='users'>";		
+					if(aeId == res.chatRoom.ae_id){
+					tempChatMemNoOnlieInfo += "		<div class='user-check' data-one='"+res.chatMem[i].ae_id+"'>";											
+					tempChatMemNoOnlieInfo += "			<span id='user-check-out'>강퇴하기</span>";						
+					tempChatMemNoOnlieInfo += "		</div>";
+					}
+					if(res.chatMem[i].cm_master_yn == 'Y'){
+					tempChatMemNoOnlieInfo += "		<i class='ri-vip-crown-2-fill char-room-king' ></i>"	
+					}
+					if(aeId == res.chatMem[i].ae_id){
+					tempChatMemNoOnlieInfo  += "	<span class='user-check-nick' style='color: #04c92f;'>"+res.chatMem[i].mem_nicknm+"</span>";
+					}else{
+					tempChatMemNoOnlieInfo  += "	<span class='user-check-nick'>"+res.chatMem[i].mem_nicknm+"</span>";						
+					}						
+					tempChatMemNoOnlieInfo += "</div>";
+				}
+			}
+			$("#online-user").append(tempChatMemOnlieInfo);
+			$("#no-online-user").append(tempChatMemNoOnlieInfo);					
+			chatInfo.html(tempChatInfo);
+     	},
+     	error: function(ex){
+     		console.log("error");
+     	}
+    });	
+}
+
+// 채팅방 상세 모달 닫기
+function dmodalClose(){
+	dChatModal.css("display", "none");
+}
+
+
+</script>
+</html>

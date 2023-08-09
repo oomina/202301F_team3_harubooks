@@ -1,0 +1,50 @@
+package kr.or.ddit.mapper.bmk;
+
+import java.util.List;
+
+import org.apache.ibatis.annotations.Mapper;
+
+import kr.or.ddit.vo.bmk.BoardVO;
+import kr.or.ddit.vo.bmk.ReplyVO;
+
+@Mapper
+public interface HarustroyMapper {
+
+	public List<BoardVO> boardList(BoardVO vo);
+
+	public int storyInsert(BoardVO boardVO);
+
+	public BoardVO boardOne(BoardVO vo);
+
+	public BoardVO boardOne(String board_no);
+
+	public int updateHarustory(BoardVO boardVO);
+
+	public int deleteHarustory(BoardVO vo);
+
+	public String likeCehck(BoardVO vo);
+
+	public int likeAdd(BoardVO vo);
+
+	public int likeN(BoardVO vo);
+
+	public int upHit(String board_no);
+
+	public int likeY(BoardVO vo);
+
+	public int getLike(BoardVO vo);
+
+	public int deleteLike(BoardVO vo);
+
+	public int replyInsert(ReplyVO vo);
+
+	public int deleteReply(String ua_no);
+
+	public List<ReplyVO> getReplyList(ReplyVO vo);
+
+	public List<ReplyVO> getSubReplyList(ReplyVO vo);
+
+	public int replyDelete(ReplyVO vo);
+
+	
+}

@@ -1,0 +1,19 @@
+package kr.or.ddit.mapper;
+
+import kr.or.ddit.vo.UserInfoVO;
+
+public interface LoginMapper {
+
+	public int idCheck(String idVal);
+
+	public void insertAllEmplyr(UserInfoVO user);
+
+	public void insertUsers(UserInfoVO user);
+
+	public void insertAuthor(String ae_id);
+
+	public int insertMember(UserInfoVO user);
+
+	public UserInfoVO readByUserId(String username);
+
+}

@@ -1,0 +1,127 @@
+package kr.or.ddit.service.ljy;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.List;
+
+import javax.annotation.Resource;
+
+import org.apache.commons.io.FilenameUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+
+import kr.or.ddit.controller.file.UploadFileUtils;
+import kr.or.ddit.mapper.FileMapper;
+import kr.or.ddit.mapper.ljy.NoticeMapper;
+import kr.or.ddit.vo.FileVO;
+import kr.or.ddit.vo.ljy.NoticeVO;
+import lombok.extern.slf4j.Slf4j;
+
+@Service
+@Slf4j
+public class NoticeServiceImpl implements NoticeService {
+	
+	// 첨부 파일 저장 경로 - root-context.xml에 설정
+	@Resource(name="uploadFiles")
+	private String uploadPath;
+	
+	@Autowired
+	private NoticeMapper noticeMapper;
+	@Autowired
+	private FileMapper fileMapper;
+	
+	@Override
+	public List<NoticeVO> noticeList() {
+		return noticeMapper.noticeList();
+	}
+
+	@Override
+	public NoticeVO noticeOne(String notice_no) {
+		noticeMapper.incrementHit(notice_no);
+		return noticeMapper.noticeOne(notice_no);
+	}
+
+	@Override
+	public int noticeInsert(NoticeVO noticeVO) {
+		try {
+			if(noticeVO.getNotice_file() != null) {
+				MultipartFile nFile = noticeVO.getNotice_file();
+				log.info("file.name" + nFile.getOriginalFilename());	// 파일 이름
+				String uploadedFileName = UploadFileUtils.uploadFile(uploadPath, nFile.getOriginalFilename(), nFile.getBytes());
+				String savedName = uploadedFileName.substring(uploadedFileName.lastIndexOf("/") + 1) ;
+				log.info("savedName" + savedName);	// 저장 이름 : uuid_파일 이름
+				log.info("uploadedFileName : " + uploadedFileName);	// 저장 경로 + 저장 이름 : /unityUpload/files/10f82e57-018c-4eb2-a884-1349792f2d4e_406호 최종프로젝트 일정.jpg
+				log.info("uploadPath : " + uploadPath);
+				String destPath = uploadedFileName;   
+				log.info("destPath : " + destPath);
+				String fileType = nFile.getOriginalFilename().substring(nFile.getOriginalFilename().lastIndexOf(".") + 1);// 확장자
+				log.info("fileType : " + fileType);                   
+					nFile.transferTo(new File(destPath));
+				log.info(FilenameUtils.getExtension(nFile.getOriginalFilename()));	// 확장자 추출하는 방법
+				log.info("파일 복사 성공");
+				// 파일 업로드
+				FileVO fileVO = new FileVO();
+				fileVO.setUa_sn("1");
+				fileVO.setUa_type("NOTICE");
+				fileVO.setUa_path(destPath);
+				fileVO.setUa_nm(nFile.getOriginalFilename());
+				fileVO.setUa_stre_nm(savedName);
+				fileVO.setUa_file_type(fileType);
+				fileVO.setUa_size(nFile.getSize());
+				fileVO.setUa_regist_id("admin");	// 나중에 등록자 id로 바꿀 부분
+				int cnt = fileMapper.fileInsert(fileVO);
+				if(cnt > 0) {// 파일 등록 성공
+					noticeVO.setUa_no(fileVO.getUa_no());
+				} else {// 파일 없을 때
+					noticeVO.setUa_no("0");
+				}
+			}
+		} catch (IllegalStateException | IOException e) {
+			log.error("{}", e);
+		}
+		return noticeMapper.noticeInsert(noticeVO);
+	}
+	
+	@Override
+	public int noticeUpdate(NoticeVO noticeVO) {
+		log.info("service update noticeVO"+ noticeVO);
+		NoticeVO noticeOne = noticeMapper.noticeOne(noticeVO.getNotice_no());
+		try {
+			// 수정한 파일 업로드
+			if(noticeVO.getNotice_file() != null) {
+				MultipartFile nFile = noticeVO.getNotice_file();
+				String uploadedFileName = UploadFileUtils.uploadFile(uploadPath, nFile.getOriginalFilename(), nFile.getBytes());
+				String savedName = uploadedFileName.substring(uploadedFileName.lastIndexOf("/") + 1) ;
+				String destPath = uploadedFileName;
+				String fileType = nFile.getOriginalFilename().substring(nFile.getOriginalFilename().lastIndexOf(".") + 1);// 확장자
+				nFile.transferTo(new File(destPath));
+				FileVO fileVO = new FileVO();
+				fileVO.setUa_sn("1");
+				fileVO.setUa_type("NOTICE");
+				fileVO.setUa_path(destPath);
+				fileVO.setUa_nm(nFile.getOriginalFilename());
+				fileVO.setUa_stre_nm(savedName);
+				fileVO.setUa_file_type(fileType);
+				fileVO.setUa_size(nFile.getSize());
+				fileVO.setUa_regist_id("admin");	// 나중에 등록자 id로 바꿀 부분
+				int cnt = fileMapper.fileInsert(fileVO);
+				if(cnt > 0) {// 파일 등록 성공
+					noticeVO.setUa_no(fileVO.getUa_no());
+				}
+			} else {
+				noticeVO.setUa_no(noticeOne.getUa_no());
+			}
+		} catch (IllegalStateException | IOException e) {
+			log.error("{}", e);
+		}
+		return noticeMapper.noticeUpdate(noticeVO);
+	}
+
+	@Override
+	public int noticeDelete(String notice_no) {
+		NoticeVO noticeVO = noticeMapper.noticeOne(notice_no);
+		fileMapper.deleteFile(noticeVO.getUa_no());
+		return noticeMapper.noticeDelete(notice_no);
+	}
+}

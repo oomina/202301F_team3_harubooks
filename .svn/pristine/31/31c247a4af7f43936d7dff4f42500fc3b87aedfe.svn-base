@@ -1,0 +1,36 @@
+package kr.or.ddit.vo.kmw;
+
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
+
+@Getter
+@Setter
+@ToString
+public class OrderVO {
+	private String order_no;	//주문번호
+	private String ae_id;		// 사용자 아이디
+	private String order_ymd;	// 주문 일자
+	private String order_dmnd_nocs;	// 총 요청 건수 
+	private String ccg_o001;	// 이건 카드 결제만 한다
+	private int order_mileage;	// 마일리지 사용 금액
+	private String book_no;		// 책번호
+	private String pl_cnt;			// 책권당 수량
+	private String pl_prchs_amt;	// 책 원가
+	private String book_ntsl_amt;	// 책 할인율 적용 가격
+	private String pl_refund_yn;//환불여부
+	private String pl_dcsn_yn;	// 구매 확정여부
+	private String user_addr;	// 주문자 주소
+	private String user_daddr;	// 주문자 상세주소
+	private String user_zip;	// 주문자 우편번호
+	private String user_telno;	// 주문자 전화번호
+	private String user_nm;		// 주문자 이름
+	private String delevery_ymd;// 배송 도착 일자
+	private String ccg_d001;	// 1.배송준비,2.배송중,3.배송완료
+	private String expected_mileage; // 구매확정 후 받을 마일리지
+	private String ccg_b001; // 종이책, E북 구분
+	private String ae_pw; // 비회원 비밀번호 설정
+	private String book_title;
+	private String book_cover;
+	
+}

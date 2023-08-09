@@ -1,0 +1,23 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+ <div class="header">
+       <div class="search">
+           <i class="ri-search-line"></i>
+           <input type="text" placeholder="search">
+       </div>
+       <div class="header-content">
+           <i class="ri-notification-4-fill"></i>
+           <i class="ri-mail-unread-fill"></i>
+           <!--버튼-->
+           <a href="/harubooks/main" class="btn" id="go-back1">
+               <div class="btn-text">하루북스로 이동</div>
+           </a>
+           <a href="/myHaru/myHaruMain" class="btn" id="go-back2">
+               <div class="btn-text">오늘하루로 이동</div>
+           </a>
+<!--            <a href="#" class="btn"> -->
+<!--                <i class="ri-add-circle-fill"></i> -->
+<!--                <div class="btn-text">하루피드 작성하기</div> -->
+<!--            </a> -->
+       </div>
+ </div>

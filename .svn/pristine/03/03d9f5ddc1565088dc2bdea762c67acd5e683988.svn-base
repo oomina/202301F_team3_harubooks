@@ -1,0 +1,49 @@
+package kr.or.ddit.service.ljy;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import kr.or.ddit.mapper.FileMapper;
+import kr.or.ddit.mapper.ljy.NoticeMapper;
+import kr.or.ddit.service.ljy.NoticeService;
+import kr.or.ddit.vo.ljy.NoticeVO;
+
+@Service
+public class NoticeServiceImpl implements NoticeService {
+	
+	@Autowired
+	private NoticeMapper noticeMapper;
+	@Autowired
+	private FileMapper fileMapper;
+	
+	@Override
+	public List<NoticeVO> noticeList() {
+		return noticeMapper.noticeList();
+	}
+
+	@Override
+	public NoticeVO noticeOne(String notice_no) {
+		noticeMapper.incrementHit(notice_no);
+		return noticeMapper.noticeOne(notice_no);
+	}
+
+	@Override
+	public int noticeInsert(NoticeVO noticeVO) {
+		return noticeMapper.noticeInsert(noticeVO);
+	}
+
+	@Override
+	public int noticeUpdate(NoticeVO noticeVO) {
+		return noticeMapper.noticeUpdate(noticeVO);
+	}
+
+	@Override
+	public int noticeDelete(String notice_no) {
+		NoticeVO noticeVO = noticeMapper.noticeOne(notice_no);
+		fileMapper.deleteFile(noticeVO.getUa_no());
+		return noticeMapper.noticeDelete(notice_no);
+	}
+
+}

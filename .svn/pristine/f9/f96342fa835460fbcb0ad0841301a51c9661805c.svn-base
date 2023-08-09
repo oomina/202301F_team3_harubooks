@@ -1,0 +1,30 @@
+package kr.or.ddit.controller.omn.books;
+
+import java.util.List;
+
+import javax.inject.Inject;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import kr.or.ddit.service.omn.books.IMngBookRequestService;
+import kr.or.ddit.vo.omn.NewBookRequestVO;
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
+@Controller
+@RequestMapping("/mng/bookRequest")
+public class MngBookRequestController {
+	
+	@Inject
+	private IMngBookRequestService service;
+	
+	@ResponseBody
+	@GetMapping(value = "/requestList", produces = "application/json;charset=utf-8")
+	public List<NewBookRequestVO> requestList(){
+		log.info("requestList()실행");
+		return service.requestList();
+	}
+}

@@ -1,0 +1,16 @@
+package kr.or.ddit.service.omn.sales;
+
+import java.util.List;
+
+import kr.or.ddit.vo.omn.MngPaginationInfoVO;
+import kr.or.ddit.vo.omn.SalesVO;
+
+public interface IPubSalesService {
+	public int salesCount(MngPaginationInfoVO<SalesVO> pagingVO);
+	public int salesAllCount(String order_no);
+	public List<SalesVO> selectSalesList(MngPaginationInfoVO<SalesVO> pagingVO);
+	public List<SalesVO> bestPublisher(SalesVO salesVO);
+	public List<SalesVO> bestBooks(SalesVO salesVO);
+	public List<SalesVO> monthlySales(SalesVO salesVO);
+	public List<SalesVO> monthlyCnt(SalesVO salesVO);
+}

@@ -1,0 +1,48 @@
+package kr.or.ddit.controller.jhs.haruter;
+
+import java.util.List;
+
+import javax.inject.Inject;
+
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import kr.or.ddit.service.jhs.IChattingService;
+import kr.or.ddit.vo.jhs.Chat_RoomVO;
+
+@Controller
+@RequestMapping("/haruter")
+public class chattingController {
+	
+	@Inject
+	private IChattingService service;
+	
+	// 채팅방으로 이동
+	@PreAuthorize("hasRole('ROLE_MEMBER')")
+	@GetMapping(value="/chatting")
+	public String chattingList(Model model) {	
+		return "haruter/chattingList";
+	}
+	
+	// 채팅방 생성
+	@PreAuthorize("hasRole('ROLE_MEMBER')")
+	@ResponseBody
+	@PostMapping(value="/insertChat")
+	public String insertChat(Chat_RoomVO vo) {
+		return service.insertChat(vo);
+	}
+	
+	//채팅방 가져오기
+	@PreAuthorize("hasRole('ROLE_MEMBER')")
+	@ResponseBody
+	@GetMapping(value="/getChatList")
+	public List<Chat_RoomVO> getChatList(Chat_RoomVO vo) {
+		return service.getChatList(vo);
+	}
+	
+}

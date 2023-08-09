@@ -1,0 +1,36 @@
+package kr.or.ddit.service.kmw;
+
+import java.util.List;
+
+import javax.inject.Inject;
+
+import org.springframework.stereotype.Service;
+
+import kr.or.ddit.mapper.kmw.BookMapper;
+import kr.or.ddit.vo.kmw.BookInfoVO;
+import kr.or.ddit.vo.kmw.PaginationVO;
+
+@Service
+public class BookServiceImpl implements BookService{
+
+	@Inject 
+	private BookMapper mapper;
+	
+	// 책 대분류 / 소분류로 나눈 책 리스트 가져오기
+	@Override
+	public List<BookInfoVO> bookInfo(BookInfoVO vo) {
+		return mapper.bookInfo(vo);
+	}
+
+
+	@Override
+	public int bookCount(PaginationVO<BookInfoVO> pagingVO) {
+		return mapper.bookCount(pagingVO);
+	}
+
+
+	@Override
+	public List<BookInfoVO> selectBookList(PaginationVO<BookInfoVO> pagingVO) {
+		return mapper.selectBookList(pagingVO);
+	}
+}

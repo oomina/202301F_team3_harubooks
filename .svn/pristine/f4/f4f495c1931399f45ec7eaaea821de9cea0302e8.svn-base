@@ -1,0 +1,78 @@
+package kr.or.ddit.controller.omn.books;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.inject.Inject;
+
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import kr.or.ddit.service.omn.books.IMngBooksService;
+import kr.or.ddit.vo.omn.MngBooksVO;
+import kr.or.ddit.vo.omn.MngPaginationInfoVO;
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
+@Controller
+@RequestMapping("/mng/books")
+public class MngBooksController {
+	
+	@Inject
+	private IMngBooksService service;
+	
+	@ResponseBody
+	@GetMapping(value = "/selectBooksList", produces = "application/json;charset=utf-8")
+	public Map<String, Object> selectBooksList(
+			@RequestParam(name = "page", required = false, defaultValue = "1") int currentPage,
+			@RequestParam(required = false, defaultValue = "title") String searchType,
+			@RequestParam(required = false, defaultValue = "") String searchWord,
+			String book_no){
+		
+		log.info("selectBooksList()실행");
+		
+		Map<String, Object> map = new HashMap<>();
+		MngPaginationInfoVO<MngBooksVO> pagingVO = new MngPaginationInfoVO<>();
+		
+		if(StringUtils.isNotBlank(searchWord)) {
+			pagingVO.setSearchType(searchType);
+			pagingVO.setSearchWord(searchWord);
+			map.put("searchType", searchType);
+			map.put("searchWord", searchWord);
+		}
+		
+		pagingVO.setCurrentPage(currentPage);
+		pagingVO.setBook_no(book_no);
+		int totalRecord = service.booksCount(pagingVO);
+		pagingVO.setTotalRecord(totalRecord);
+		int allRecord = service.booksAllCount(book_no);
+		pagingVO.setAllRecord(allRecord);
+		List<MngBooksVO> dataList = service.selectBooksList(pagingVO);
+		pagingVO.setDataList(dataList);
+		map.put("pagingVO", pagingVO);
+		
+		return map;
+	}
+	
+	@ResponseBody
+	@GetMapping(value = "/booksInfo/{no}", produces = "application/json;charset=utf-8")
+	public MngBooksVO booksInfo(@PathVariable("no") String book_no){
+		log.info("booksInfo()실행");
+		return service.booksInfo(book_no);
+	}
+	
+	@ResponseBody
+	@PutMapping(value = "", produces = "application/json;charset=utf-8")
+	public int booksUpdate(@RequestBody MngBooksVO mngBooksVO){
+		log.info("booksUpdate()실행");
+		return service.booksUpdate(mngBooksVO);
+	}
+}

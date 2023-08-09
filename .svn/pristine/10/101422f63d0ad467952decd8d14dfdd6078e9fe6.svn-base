@@ -1,0 +1,308 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+<mapper namespace="kr.or.ddit.mapper.ljy.RemainMngMapper">
+	<sql id="search">
+		<if test="searchType != null and searchType == 'title'">
+			and (book_title like '%'||#{searchWord}||'%')
+		</if>
+		<if test="searchType != null and searchType == 'author'">
+			and (book_author like '%'||#{searchWord}||'%')
+		</if>
+		<if test="searchType != null and searchType == 'publisher'">
+			and (pub_nm like '%'||#{searchWord}||'%')
+		</if>
+	</sql>
+	<sql id="bmCntStatus">
+		<if test="bm_cnt_status == 1">
+			<![CDATA[
+			and (bm_cnt <= bm_cnt_indct2)
+			]]>	
+		</if>
+		<if test="bm_cnt_status == 2">
+			<![CDATA[
+			and (bm_cnt <= bm_cnt_indct1) 
+			and (bm_cnt > bm_cnt_indct2)
+			]]>	
+		</if>
+	</sql>
+	
+	<select id="remainList" resultType="remainMngVO" parameterType="mngPaginationInfoVO">
+		SELECT z.*
+		FROM(	
+			SELECT
+				y. *, row_number() over(order by y.bm_cnt) rnum
+			FROM(
+				SELECT
+				    b.book_no
+				    , bm.bm_cnt
+				    , bm.bm_bsc_cnt
+				    , bm.bm_cnt_indct1
+				    , bm.bm_cnt_indct2
+				    , CASE 
+				    <![CDATA[
+				        WHEN BM_CNT <= BM_CNT_INDCT2 THEN 1
+				        WHEN BM_CNT <= BM_CNT_INDCT1 THEN 2
+				       ]]>
+				        ELSE 0
+				    END AS bm_cnt_status
+				    , b.book_title
+				    , b.book_cover
+				    , b.book_author
+				    , b.BOOK_SPMT_YMD
+				    , b.pub_nm
+				    , b.book_talt
+				    , b.ccg_b001
+				    , b.ccg_b002
+				    , b.ccg_b003
+				    , CASE WHEN b.ccg_b001 = '종이책' THEN pb.book_amt ELSE eb.book_amt END AS book_amt
+				    , CASE WHEN b.ccg_b001 = '종이책' THEN pb.book_discount ELSE eb.book_discount END AS book_discount
+				    , CASE WHEN b.ccg_b001 = '종이책' THEN pb.book_ntsl_amt ELSE eb.book_ntsl_amt END AS book_ntsl_amt
+				FROM
+				    books b
+				    INNER JOIN books_manager bm ON b.book_no = bm.book_no
+				    LEFT JOIN paper_book pb ON b.book_no = pb.book_no
+				    LEFT JOIN ebook eb ON b.book_no = eb.book_no
+				WHERE 
+					1=1
+					<include refid="search"/>
+					<include refid="bmCntStatus"/>
+					<if test="ae_id != null">
+						and b.pub_nm = (
+											SELECT 
+												pub_nm
+											FROM 
+												publisher
+											WHERE
+												ae_id = #{ae_id}
+										)
+					</if> 
+				ORDER BY 
+					bm.bm_cnt
+				) y
+			) z	
+			<![CDATA[
+			WHERE
+				z.rnum >=#{startRow} and z.rnum <= #{endRow}
+			]]>	 
+	</select>
+	
+	<select id="remainListCnt" parameterType="mngPaginationInfoVO" resultType="int">
+		SELECT
+		    COUNT(*)
+		FROM
+		    books b
+		    INNER JOIN books_manager bm ON b.book_no = bm.book_no
+		    LEFT JOIN paper_book pb ON b.book_no = pb.book_no
+		    LEFT JOIN ebook eb ON b.book_no = eb.book_no
+		WHERE 
+			1=1
+			<include refid="search"/>
+			<include refid="bmCntStatus"/>
+			<if test="ae_id != null">
+				and b.pub_nm = (
+									SELECT 
+										pub_nm
+									FROM 
+										publisher
+									WHERE
+										ae_id = #{ae_id}
+								)
+			</if> 
+	</select>
+	
+	<select id="remainOne" parameterType="String" resultType="remainMngVO">
+		SELECT
+		    b.book_no
+		    , bm.bm_cnt
+		    , bm.bm_bsc_cnt
+		    , bm.bm_cnt_indct1
+		    , bm.bm_cnt_indct2
+		    , b.book_title
+		    , b.book_cover
+		    , b.book_author
+		    , b.BOOK_SPMT_YMD
+		    , b.pub_nm
+		    , b.book_talt
+		    , b.ccg_b001
+		    , b.ccg_b002
+		    , b.ccg_b003
+		    , CASE WHEN b.ccg_b001 = '종이책' THEN pb.book_amt ELSE eb.book_amt END AS book_amt
+		    , CASE WHEN b.ccg_b001 = '종이책' THEN pb.book_discount ELSE eb.book_discount END AS book_discount
+		    , CASE WHEN b.ccg_b001 = '종이책' THEN pb.book_ntsl_amt ELSE eb.book_ntsl_amt END AS book_ntsl_amt
+		FROM
+		    books b
+		    INNER JOIN books_manager bm ON b.book_no = bm.book_no
+		    LEFT JOIN paper_book pb ON b.book_no = pb.book_no
+		    LEFT JOIN ebook eb ON b.book_no = eb.book_no
+		WHERE 
+      	    b.book_no = #{book_no}
+	</select>
+	
+	<select id="remainDangerList" resultType="remainMngVO">
+		SELECT
+		    b.book_no
+		    , bm.bm_cnt
+		    , bm.bm_bsc_cnt
+		    , bm.bm_cnt_indct1
+		    , bm.bm_cnt_indct2
+		    , b.book_title
+		    , b.book_cover
+		    , b.book_author
+		    , b.BOOK_SPMT_YMD
+		    , b.pub_nm
+		    , b.book_talt
+		    , b.ccg_b001
+		    , b.ccg_b002
+		    , b.ccg_b003
+		    , CASE WHEN b.ccg_b001 = '종이책' THEN pb.book_amt ELSE eb.book_amt END AS book_amt
+		    , CASE WHEN b.ccg_b001 = '종이책' THEN pb.book_discount ELSE eb.book_discount END AS book_discount
+		    , CASE WHEN b.ccg_b001 = '종이책' THEN pb.book_ntsl_amt ELSE eb.book_ntsl_amt END AS book_ntsl_amt
+		FROM
+		    books b
+		    INNER JOIN books_manager bm ON b.book_no = bm.book_no
+		    LEFT JOIN paper_book pb ON b.book_no = pb.book_no
+		    LEFT JOIN ebook eb ON b.book_no = eb.book_no
+		<![CDATA[
+		WHERE 
+			1=1
+			and (bm_cnt <= bm_cnt_indct2)
+		]]>	 
+	</select>
+	
+	<select id="remainPubList" parameterType="remainMngVO" resultType="remainMngVO">
+		<!-- SELECT z.*
+		FROM(	
+			SELECT
+				y. *, row_number() over(order by y.bm_cnt) rnum, count(*) over() as totalRecord 
+			FROM( -->
+			<include refid="commonMapper.pagingHeader"/>
+				SELECT
+				    b.book_no
+				    , bm.bm_cnt
+				    , bm.bm_bsc_cnt
+				    , bm.bm_cnt_indct1
+				    , bm.bm_cnt_indct2
+				    , b.book_title
+				    , b.book_cover
+				    , b.book_author
+				    , b.BOOK_SPMT_YMD
+				    , b.pub_nm
+				    , b.book_talt
+				    , b.ccg_b001
+				    , b.ccg_b002
+				    , b.ccg_b003
+				    , CASE WHEN b.ccg_b001 = '종이책' THEN pb.book_amt ELSE eb.book_amt END AS book_amt
+				    , CASE WHEN b.ccg_b001 = '종이책' THEN pb.book_discount ELSE eb.book_discount END AS book_discount
+				    , CASE WHEN b.ccg_b001 = '종이책' THEN pb.book_ntsl_amt ELSE eb.book_ntsl_amt END AS book_ntsl_amt
+				FROM
+				    books b
+				    INNER JOIN books_manager bm ON b.book_no = bm.book_no
+				    LEFT JOIN paper_book pb ON b.book_no = pb.book_no
+				    LEFT JOIN ebook eb ON b.book_no = eb.book_no
+				WHERE 
+					1=1
+					and b.pub_nm = (
+										SELECT 
+											pub_nm
+										FROM 
+											publisher
+										WHERE
+											ae_id = #{ae_id}
+									)
+					<!-- 검색 -->
+					<if test="searchType != null and searchType == 'title'">
+						and (book_title like '%'||#{searchWord}||'%')
+					</if>
+					<if test="searchType != null and searchType == 'author'">
+						and (book_author like '%'||#{searchWord}||'%')
+					</if>
+					<if test="searchType != null and searchType == 'publisher'">
+						and (pub_nm like '%'||#{searchWord}||'%')
+					</if>
+					<!-- 재고상태 -->
+					<if test="bm_cnt_status == 1">
+						<![CDATA[
+						and (bm_cnt <= bm_cnt_indct2)
+						]]>	
+					</if>
+					<if test="bm_cnt_status == 2">
+						<![CDATA[
+						and (bm_cnt <= bm_cnt_indct1) 
+						and (bm_cnt > bm_cnt_indct2)
+						]]>	
+					</if>
+				ORDER BY 
+					bm.bm_cnt
+			<include refid="commonMapper.pagingFooter"/>
+	</select>
+	
+	<update id="updateBmCnt" parameterType="hashMap"> 
+		UPDATE books_manager
+		SET 
+		    bm_cnt = bm_cnt + #{book_qty}
+		WHERE
+		    book_no = #{book_no}
+	</update>
+	
+	<select id="remainPubListCnt" parameterType="remainMngVO" resultType="int">
+		SELECT
+		    COUNT(*)
+		FROM
+		    books b
+		    INNER JOIN books_manager bm ON b.book_no = bm.book_no
+		    LEFT JOIN paper_book pb ON b.book_no = pb.book_no
+		    LEFT JOIN ebook eb ON b.book_no = eb.book_no
+		WHERE 
+			1=1
+			AND b.pub_nm = (
+							SELECT 
+								pub_nm
+							FROM 
+								publisher
+							WHERE
+								ae_id = #{ae_id}
+							)
+			<!-- 검색 -->
+			<if test="searchType != null and searchType == 'title'">
+				and (book_title like '%'||#{searchWord}||'%')
+			</if>
+			<if test="searchType != null and searchType == 'author'">
+				and (book_author like '%'||#{searchWord}||'%')
+			</if>
+			<if test="searchType != null and searchType == 'publisher'">
+				and (pub_nm like '%'||#{searchWord}||'%')
+			</if>
+			<!-- 재고상태 -->
+			<if test="bm_cnt_status == 1">
+				<![CDATA[
+				and (bm_cnt <= bm_cnt_indct2)
+				]]>	
+			</if>
+			<if test="bm_cnt_status == 2">
+				<![CDATA[
+				and (bm_cnt <= bm_cnt_indct1) 
+				and (bm_cnt > bm_cnt_indct2)
+				]]>	
+			</if>
+	</select>
+	
+	<insert id="booksInsert" parameterType="string">
+		INSERT INTO books_manager(
+			book_no
+		  , bm_cnt
+		  , bm_bsc_cnt
+		  , bm_cnt_indct1
+		  , bm_cnt_indct2
+		)
+		VALUES (
+			#{book_no}
+		  , 0
+		  , 80
+		  , 40
+		  , 20
+		)
+	</insert>
+</mapper>

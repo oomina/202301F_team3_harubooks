@@ -1,0 +1,26 @@
+package kr.or.ddit.mapper;
+
+import java.util.List;
+
+import kr.or.ddit.vo.FileVO;
+import kr.or.ddit.vo.kmw.ReviewVO;
+
+public interface FileMapper {
+
+	public int fileInsert(FileVO fileVO);
+
+	public List<FileVO> fileList(String ua_no);
+
+	public int filesFilterInsert(FileVO vo);
+
+	public String getUaNo();
+
+	public List<FileVO> getFiles(String ua_no);
+
+	public int filesInsert(FileVO vo);
+
+	public int deleteFile(String ua_no);
+
+	public List<FileVO> reviewImgList(String bookNo);
+
+}

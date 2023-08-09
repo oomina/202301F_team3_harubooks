@@ -1,0 +1,10 @@
+package kr.or.ddit.mapper.kmw;
+
+import kr.or.ddit.vo.kmw.RefundVO;
+
+public interface RefundMapper {
+
+	int insertRefund(RefundVO refundVO);
+
+
+}

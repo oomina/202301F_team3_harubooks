@@ -1,0 +1,25 @@
+package kr.or.ddit.service.bmk;
+
+import java.io.IOException;
+import java.util.List;
+import java.util.Map;
+
+import kr.or.ddit.vo.bmk.BoardVO;
+
+public interface IHarustoryService {
+
+	public List<BoardVO> boardList(BoardVO vo);
+
+	public int storyInsert(BoardVO boardVO);
+
+	public Map<String,Object> boardOne(BoardVO vo);
+
+	public int updateHarustory(BoardVO boardVO);
+
+	public String insertFeed(BoardVO bvo) throws IOException;
+
+	public String deleteHarustory(BoardVO vo);
+
+	public String likeCehck(BoardVO vo);
+	
+}

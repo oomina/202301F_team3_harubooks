@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+<mapper namespace="kr.or.ddit.mapper.ljy.InquiryMapper">
+	<select id="inquiryList" parameterType="inquiryVO" resultType="inquiryVO">
+		<include refid="commonMapper.pagingHeader"/>
+			SELECT
+				inquiry_no
+				, ae_id
+				, inquiry_title
+				, inquiry_content
+				, inquiry_ymd
+				, ua_no
+				, ccg_i001
+				, inquiry_reply
+				, ccg_i002
+			FROM 
+				inquiry
+			ORDER BY 
+				ccg_i001, inquiry_no desc
+		<include refid="commonMapper.pagingFooter"/>
+	</select>
+	<select id="inquiryOne" parameterType="String" resultType="inquiryVO">
+		SELECT
+			inquiry_no
+			, ae_id
+			, inquiry_title
+			, inquiry_content
+			, inquiry_ymd
+			, ua_no
+			, ccg_i001
+			, inquiry_reply
+			, ccg_i002
+		FROM 
+			inquiry
+		WHERE 
+			inquiry_no = #{inquiry_no}
+	</select>
+	
+	<update id="inqRepUpdate" parameterType="InquiryVO">
+		UPDATE 
+			inquiry
+		SET
+			inquiry_reply = #{inquiry_reply}
+		WHERE 
+			inquiry_no = #{inquiry_no}
+	</update>
+	
+	<update id="inqStatUpdate" parameterType="String">
+		UPDATE 
+			inquiry
+		SET
+			ccg_i001 = '문의완료'
+		WHERE 
+			inquiry_no = #{inquiry_no}
+	</update>
+	
+	<select id="countInq" resultType="int">
+		SELECT
+		    count(inquiry_no)
+		FROM
+		    inquiry
+		WHERE
+		    ccg_i001 = '문의대기'
+	
+	</select>
+</mapper>

@@ -1,0 +1,258 @@
+package kr.or.ddit.controller.ljy.pub;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.annotation.Resource;
+
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import kr.or.ddit.controller.ljy.excel.ExcelUtils;
+import kr.or.ddit.service.ljy.RemainMngService;
+import kr.or.ddit.vo.ljy.PoMngVO;
+import kr.or.ddit.vo.ljy.RemainMngVO;
+import lombok.extern.slf4j.Slf4j;
+
+@Controller
+@Slf4j
+@RequestMapping("/pub/remain")
+@PreAuthorize("hasRole('ROLE_PUBLISHER')")
+public class RemainPubRestController {
+	// 발주서 저장 경로
+	@Resource(name="uploadExcel")
+	private String filePath;
+	
+	@Autowired
+	private RemainMngService remainService;
+	
+	// 출판사 재고 내역 가져오기
+	@ResponseBody
+	@GetMapping("/list")
+	public RemainMngVO remainPubList(
+			@RequestParam(name = "page", required = false, defaultValue = "1") int currentPage,
+			@RequestParam(name="searchType", required = false, defaultValue = "title") String searchType,
+			@RequestParam(name="searchWord",required = false, defaultValue = "") String searchWord
+			) {
+		String id = SecurityContextHolder.getContext().getAuthentication().getName();
+		log.info("remainPubList controller 도착");
+		log.info("출판사 로그인 id : {}", id);
+		log.info("page " + currentPage);
+		RemainMngVO remainMngVO = new RemainMngVO();
+		// 검색했을 때 검색 타입, 검색어 setting
+		if(StringUtils.isNotBlank(searchWord)) {	
+			remainMngVO.setSearchType(searchType);
+			remainMngVO.setSearchWord(searchWord);
+		}
+		// 출판사 id setting
+		remainMngVO.setAe_id(id);
+		remainMngVO.setCurrentPage(currentPage);
+		// 전체 list 개수 setting
+		int totalRecord = remainService.remainPubListCnt(remainMngVO);
+		log.info("totalRecord : " + totalRecord);
+		remainMngVO.setTotalRecord(totalRecord);
+		List<RemainMngVO> dataList = remainService.remainPubList(remainMngVO); 
+		log.info("dataList : " + dataList);
+		remainMngVO.setDataList(dataList);
+		log.info("id" + id);
+		log.info("" + remainMngVO);
+		return remainMngVO;
+	}
+	
+	// 출판사 발주 내역 가져오기
+	@ResponseBody
+	@GetMapping("/polist")
+	public PoMngVO poPubList(
+			@RequestParam(name = "page", required = false, defaultValue = "1") int currentPage
+			){
+		String id = SecurityContextHolder.getContext().getAuthentication().getName();
+		PoMngVO poMngVO = new PoMngVO();
+		poMngVO.setAe_id(id);
+		poMngVO.setCurrentPage(currentPage);
+		
+		List<PoMngVO> dataList = remainService.poPubList(poMngVO);
+		if(dataList == null || dataList.size() == 0) {
+			poMngVO.setTotalRecord(0);
+		} else {
+			poMngVO.setTotalRecord(dataList.get(0).getTotalRecord());
+		}
+		poMngVO.setDataList(dataList);
+		return poMngVO;
+	}
+	
+	// 발주 승인 
+	@ResponseBody
+	@PostMapping("/poreq")
+	public String poReqPub(@RequestBody List<PoMngVO> poreqPubList) throws IOException {
+		String id = SecurityContextHolder.getContext().getAuthentication().getName();
+		log.info("poreq controller 도착" );
+		for (PoMngVO poMngVO : poreqPubList) {
+			poMngVO.setAe_id(id);
+		}
+		String res = remainService.poReqPub(poreqPubList);
+		log.info("poreqList " + poreqPubList);
+		return res;
+	}
+	
+	// 발주 거절
+	@ResponseBody
+	@PostMapping("/porej")
+	public String poRejPub(@RequestBody List<PoMngVO> porejPubList) throws IOException {
+		String id = SecurityContextHolder.getContext().getAuthentication().getName();
+		log.info("porej controller 도착" );
+		log.info("porejList " + porejPubList);
+		for (PoMngVO poMngVO : porejPubList) {
+			poMngVO.setAe_id(id);
+		}
+		String res = remainService.poRejPub(porejPubList);
+		log.info("porejPubList"+porejPubList);
+		return res;
+	}
+	
+	// 출판사 재고 상태에 따른 재고 리스트 가져오기
+	@ResponseBody
+	@GetMapping("/list/{bm_cnt_status}")
+	public RemainMngVO remainPubListCntStatus(
+			@PathVariable("bm_cnt_status") int bm_cnt_status,
+			@RequestParam(name = "page", required = false, defaultValue = "1") int currentPage
+			) {
+		log.info("remainPubListCntStatus controller 도착");
+		String id = SecurityContextHolder.getContext().getAuthentication().getName();
+		log.info("출판사 로그인 id : {}", id);
+		log.info("page " + currentPage);
+		log.info("bm_cnt_status " + bm_cnt_status);
+		RemainMngVO remainMngVO = new RemainMngVO();
+		// 출판사 id setting
+		remainMngVO.setAe_id(id);
+		remainMngVO.setCurrentPage(currentPage);
+		// 재고 상태 설정
+		remainMngVO.setBm_cnt_status(bm_cnt_status);
+		log.info("" + remainMngVO);
+		// 전체 list 개수 setting
+		int totalRecord = remainService.remainPubListCnt(remainMngVO);
+		log.info("totalRecord " + totalRecord);
+		remainMngVO.setTotalRecord(totalRecord);
+		List<RemainMngVO> dataList = remainService.remainPubList(remainMngVO); 
+		log.info("dataList : " + dataList);
+		remainMngVO.setDataList(dataList);
+		return remainMngVO;
+	}
+	
+	// 발주 내역서 가져오기
+	@ResponseBody
+	@GetMapping("/poFileList")
+	public Map<String, Object> poFileList() {
+		String id= SecurityContextHolder.getContext().getAuthentication().getName();
+		File file = new File(filePath + "\\" + id);
+		String[] fileList = file.list(); // 폴더에 있는 파일 제목들 가져옴
+		
+		Map<String,Object> poFileMap = new HashMap<String, Object>();	
+		poFileMap.put("fileList", fileList);
+		return poFileMap;
+	}
+	
+	// 요청 대기 개수
+	@ResponseBody
+	@GetMapping("/waitCnt")
+	public int waitCnt(PoMngVO poMngVO) {
+		log.info("waitCnt");
+		String id = SecurityContextHolder.getContext().getAuthentication().getName();
+		poMngVO.setAe_id(id);
+		return remainService.waitCnt(poMngVO);
+	}
+	
+	// 요청 수락 개수
+	@ResponseBody
+	@GetMapping("/acceptCnt")
+	public int acceptCnt(PoMngVO poMngVO) {
+		log.info("acceptCnt");
+		String id = SecurityContextHolder.getContext().getAuthentication().getName();
+		poMngVO.setAe_id(id);
+		return remainService.acceptCnt(poMngVO);
+	}
+	
+	// 요청 거절 개수
+	@ResponseBody
+	@GetMapping("/refuseCnt")
+	public int refuseCnt(PoMngVO poMngVO) {
+		log.info("refuseCnt");
+		String id = SecurityContextHolder.getContext().getAuthentication().getName();
+		poMngVO.setAe_id(id);
+		return remainService.refuseCnt(poMngVO);
+	}
+	
+	// 발주서 요청 확인
+	@ResponseBody
+	@PostMapping("/checkpo")
+	public Map<String, Object> checkPo(@RequestBody List<String> brNoList) {
+		log.info("checkPo brNoList : " + brNoList);
+		Map<String,Object> poFileMap = new HashMap<String, Object>();
+		for (int i = 0; i < brNoList.size(); i++) {
+			String br_no = brNoList.get(i);
+			PoMngVO poMngVO = remainService.getPo(br_no);
+			poFileMap.put(br_no, poMngVO);
+		}
+		
+//		List<PoMngVO> poMngVOList = remainService.
+		
+//		String[] splitFileName = fileName.split("_");
+//		List<String> brNolist = new ArrayList<String>();
+//		for(int i = 2; i<splitFileName.length; i++) {
+//			if(i == (splitFileName.length-1)){
+//				String delextName = splitFileName[i].substring(0, 12);
+//				splitFileName[i] = delextName;
+//				log.info("delextName" + delextName);
+//			}
+//			brNolist.add(splitFileName[i]);
+//		}
+//			poFileMap.put(fileName, brNolist);// file이름 - brNo list
+//			List<PoMngVO> poMngVOList  = remainService.getPoFileList(poFileMap);// list<poMngVO>
+//			poFileMap.put(fileName + "_brNolist", poMngVOList);
+//		}
+		return poFileMap;
+	}
+	
+	// 출판사 발주서 다운
+	@ResponseBody
+	@PostMapping("/podown")
+	public String poDown(@RequestBody PoMngVO poMngVO) {
+		log.info("발주서 다운에서 poMngVO" + poMngVO);
+		String excelPoFileName = ExcelUtils.getExcelPo(filePath, poMngVO.getBr_no(), poMngVO.getAe_id());
+		return excelPoFileName;
+	}
+	
+	// 발주서 검색
+	@ResponseBody
+	@GetMapping("/posearch")
+	//@PostMapping("/posearch")
+	//public List<PoMngVO> poSearch(@RequestBody Map<String, String> jyMap) {
+	public List<PoMngVO> poSearch(String start_day,  String end_day) {
+		log.info("start_day, end_day" + start_day + " : " + end_day);
+		
+		//log.info("start_day, end_day" + jyMap.get("start_day"));
+		String id = SecurityContextHolder.getContext().getAuthentication().getName();
+		Map<String,String> poSearchMap = new HashMap<String, String>();
+		//poSearchMap.put("start_day", jyMap.get("start_day"));
+		poSearchMap.put("start_day", start_day);
+		//poSearchMap.put("end_day", jyMap.get("end_day"));
+		poSearchMap.put("end_day", end_day);
+		poSearchMap.put("ae_id", id);
+		poSearchMap.put("currentPage", "1");
+		log.info("poSearchMap" + poSearchMap);
+		List<PoMngVO> poSearchList = remainService.poSearch(poSearchMap);
+		return poSearchList;
+	}
+}

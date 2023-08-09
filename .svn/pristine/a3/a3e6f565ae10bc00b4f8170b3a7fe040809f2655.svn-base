@@ -1,0 +1,13 @@
+package kr.or.ddit.service.omn.sales;
+
+import java.util.List;
+
+import kr.or.ddit.vo.omn.MngPaginationInfoVO;
+import kr.or.ddit.vo.omn.SalesVO;
+
+public interface IMngSalesService {
+	public List<SalesVO> salesList();
+	public List<SalesVO> selectSalesList(MngPaginationInfoVO<SalesVO> pagingVO);
+	public int salesCount(MngPaginationInfoVO<SalesVO> pagingVO);
+	public int salesAllCount(String order_no);
+}

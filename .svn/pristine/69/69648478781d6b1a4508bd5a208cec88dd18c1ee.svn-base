@@ -1,0 +1,103 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+<div class="content-wrapper">
+	<div class="row" style="padding: 20px;">
+		<div class="col-lg-12 grid-margin stretch-card">
+			<div class="card">
+				<div class="card-body">
+					<h4 class="card-title">카테고리 관리</h4>
+					<div class="col-lg-6 table-responsive" style="float: left; width: 50%;">대분류</div>
+					<div class="col-lg-6 table-responsive" style="float: left; width: 50%;">소분류</div>
+					<div class="col-lg-12">&nbsp;</div>
+					<div class="col-lg-6 table-responsive" style="float: left; width: 50%;">
+						<table class="table table-hover">
+							<tbody id="mainList">
+							</tbody>
+						</table>
+					</div>
+					<div class="col-lg-6 table-responsive" style="float: left; width: 50%;">
+						<table class="table table-hover">
+							<tbody id="midList">
+							</tbody>
+						</table>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<script type="text/javascript">
+window.onload = function(){
+	const CC_NM = "";
+	mainList();
+	midList();
+}
+
+function mainList() {
+	var mainList = document.querySelector("#mainList");
+	$.ajax({
+		type : "get",
+		url : "category/categoryMainList",
+		data : "",
+		contentType : "application/json; charset=utf-8",
+		success : function(result){
+			console.log("result : " + result);
+			console.log(JSON.stringify(result));
+			var html = "";
+			if(result.length == 0){
+				html += "<tr>"
+				html += "<td colspan='8' align='center'>요청 목록이 존재하지 않습니다.</td>"
+				html += "</tr>"
+			} else {
+				for (var i = 0; i < result.length; i++) {
+					console.log(result[i].CC_NM);
+					html += "<tr>"
+					html += "<td>"+ (i+1) +"</td>"
+					html += `<td class='ccnm' data-nm = \${result[i].CC_NM}>\${result[i].CC_NM}</td>`
+					html += "<td><label class='badge badge-info'>수정</label></td>"
+					html += "<td><label class='badge badge-danger'>삭제</label></td>"
+					html += "</tr>"
+				}
+				$(document).on('click','.ccnm',function(){
+					alert($(this).data('nm'))
+					let nm = $(this).data('nm');
+					midList();
+				});
+			}
+			$("#mainList").append(html);
+		}
+	});
+}
+
+function midList() {
+	var mainList = document.querySelector("#midList");
+	const CC_NM = "";
+	$.ajax({
+		type : "get",
+		url : "category/categoryMidList",
+		data : "",
+		contentType : "application/json; charset=utf-8",
+		success : function(result){
+			console.log("result : " + result);
+			console.log(JSON.stringify(result));
+			var html = "";
+			if(result.length == 0){
+				html += "<tr>"
+				html += "<td colspan='8' align='center'>요청 목록이 존재하지 않습니다.</td>"
+				html += "</tr>"
+			} else {
+				for (var i = 0; i < result.length; i++) {
+					console.log(result[i].CC_NM);
+					html += "<tr>"
+					html += "<td>"+ (i+1) +"</td>"
+					html += "<td>"+ result[i].CC_NM +"</td>"
+					html += "<td><label class='badge badge-info'>수정</label></td>"
+					html += "<td><label class='badge badge-danger'>삭제</label></td>"
+					html += "</tr>"
+				}
+			}
+			$("#midList").append(html);
+		}
+	});
+}
+</script>

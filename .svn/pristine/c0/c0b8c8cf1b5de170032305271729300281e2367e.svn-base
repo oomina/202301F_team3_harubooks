@@ -1,0 +1,94 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+        <!--게시물 나오는곳-->
+        <div class="stories-title">
+            <h1>하루 스토리</h1>
+            <a href="#" class="btn">
+                <i class="ri-play-circle-line"></i>
+                <div class="text">모두 보기</div>
+            </a>
+        </div>
+        <!--스토리 내용-->
+        <div class="stories">
+            <div id="story-info">
+                <span id="si1">하루하루 설레는 독서인의 쉼터 </span><span id="si2">하루터</span>
+            </div>
+            <img id="si-img" src="/resources/asset/image/남녀.png">
+        </div>
+        <!--메인 피드 -->
+        <div class="feed">
+            <h1>하루피드</h1>
+            <div class="feed-text">
+                <h2>최신글</h2>
+                <span>핫 피드</span>
+            </div>
+        </div>
+      <!--게시물-->
+   	  	<div class="main-posts"> 
+            <div class="post-box">
+                <img src="/resources/asset/image/남녀.png" alt="">
+                <div class="post-info">
+                    <div class="post-profile">
+                        <div class="post-img">
+                            <img src="/resources/asset/image/profile.jpg">
+                        </div>
+                        <h3>여행</h3>
+                    </div>
+                    <div class="likes">
+                        <i class="ri-heart-line"></i>
+                        <span>99</span>
+                        <i class="ri-chat-3-line"></i>
+                        <spna>12</spna>
+                    </div>
+                </div>
+            </div>
+            <div class="post-box">
+                <img src="/resources/asset/image/post2.jpg" alt="">
+                <div class="post-info">
+                    <div class="post-profile">
+                        <div class="post-img">
+                            <img src="/resources/asset/image/profile.jpg">
+                        </div>
+                        <h3>여행</h3>
+                    </div>
+                    <div class="likes">
+                        <i class="ri-heart-line"></i>
+                        <span>43</span>
+                        <i class="ri-chat-3-line"></i>
+                        <spna>5</spna>
+                    </div>
+                </div>
+            </div>
+       	</div>
+       	<div id="list"></div>
+       	
+<script type="text/javascript">
+	const myList = document.querySelector("#list"); 
+		
+	function storyList() {
+		let xhr = new XMLHttpRequest();
+        xhr.open("get", "/haruter/harustory", true);
+        xhr.onreadystatechange = function(){
+            if(xhr.readyState == 4 && xhr.status == 200){
+            	console.log("json데이터 체크 : ",xhr.responseText);
+                let dataList = JSON.parse(xhr.responseText);
+                let tblStr = "<div class='main-posts'>";
+                for(let i=0; i<dataList.length; i++){
+                    tblStr += "<div class='post-box'>";
+                   	tblStr += "<img src='/resources/asset/image/post3.jpg' alt=''>";
+                	tblStr += "<div class='post-info'>";
+               		tblStr += "<div class='post-profile'>";
+               		tblStr += "<div class='post-img'>";
+               		tblStr += "<img src='/resources/asset/image/profile.jpg'></div>";
+                    tblStr += `<h3>${dataList[i].aeId}</h3>`
+                    tblStr += "</div><div class='likes'><i class='ri-heart-line'></i>";
+                   	tblStr += "<span>991</span><i class='ri-chat-3-line'></i><spna>123</spna></div></div></div>";
+                }
+                    tblStr += "</div>";
+                    myList.innerHTML = tblStr;
+            }
+        }
+        xhr.send();
+	}
+	window.addEventListener("DOMContentLoaded", storyList);
+</script>

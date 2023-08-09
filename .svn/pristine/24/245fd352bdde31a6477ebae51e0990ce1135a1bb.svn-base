@@ -1,0 +1,170 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+<%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<link rel="stylesheet" href="/resources/asset/css/myLibrary.css">
+
+	<input type="hidden" value="<sec:authentication property="name"/>" id="sec-name">
+   	<div id="ebook-select">
+	      <div id="ebook-my">
+	         총 보유 E북 : <span id="ebook-count"></span>권
+	      </div>
+      	  <input type="hidden" name="page" id="page">
+	      <div id="ebook-input">
+	         <input type="text" name="searchWord" id="searchWord" placeholder="e북 제목을 검색하세요">
+	      	 <button type="button" id="search">검색</button>
+	      </div>
+	      <div id="ebook-options">
+	         <select id="ebook_option" name="searchType">
+	            <option value="order-old" selected>마지막 읽은 순</option>
+	            <option value="order-young" >구매순</option>
+	         </select>
+	      </div>    
+   	</div>
+   <div id="ebookLists"></div>
+   <div id="pagingArea"></div>
+<script type="text/javascript" src="../resources/js/qrjs/qrcode.js"></script>
+<script type="text/javascript">
+   var name = document.querySelector("#sec-name").value;
+   var ebookLists = document.querySelector("#ebookLists");
+   var ebookCount = document.querySelector("#ebook-count");
+   var search = document.querySelector("#search");
+   ebook_option = document.querySelector("#ebook_option");
+   searchWord = document.querySelector("#searchWord").value;
+   searchType = document.querySelector("#ebook_option").value;
+   page = 1;
+
+   
+	$(function(){
+	    var pagingArea = $("#pagingArea");
+		ebookList();
+		
+		// 페이지 누를 때 마다 번호 추가
+		pagingArea.on("click", function (event) {
+            if (event.target.tagName === "A") {
+                event.preventDefault();
+                page = event.target.getAttribute("data-page");
+                ebookList();
+            }
+        });
+		
+
+		
+	});
+   
+   search.addEventListener("click", function(){
+	   searchWord = document.querySelector("#searchWord").value;
+	   ebookList();
+   });  
+   
+   ebook_option.addEventListener("change", function(){
+	   searchType = document.querySelector("#ebook_option").value;
+	   ebookList();
+   });
+
+	
+   function ebookList(){   
+	   var ebookList = document.querySelector("#ebookLists");
+	   ebookList.innerHTML = '';
+		$.ajax({
+			type : "get",
+			url : "/myHaru/getEbookList",
+			data: {
+				id:name,
+				searchWord:searchWord,
+				searchType:searchType,
+				page:page
+			},
+			contentType: "application/json",
+			beforeSend : function(xhr){
+				xhr.setRequestHeader("${_csrf.headerName}", "${_csrf.token}");
+			},
+			success: function(res){
+				if(res.ebook.dataList.length != 0){
+					for(let i = 0; i < res.ebook.dataList.length; i++){
+			               var list = `<div class="ebookList">`;
+			               list += `<div id="ebook-image">`
+						   list += "        <img src= '"+res.ebook.dataList[i].book_cover+"' alt=''>"
+						   list += `     </div>`;
+			               list += `  <div id="ebook-info">`;
+			               list += `      <div id="ebook_title">`;
+			               if (res.ebook.dataList[i].book_title.length > 9) {
+			            	    list += res.ebook.dataList[i].book_title.substring(0, 9) + "...";
+			            	} else {
+			            	    list += res.ebook.dataList[i].book_title;
+			            	}
+			               list += `      </div>`;
+			               var gauge = Math.floor((res.ebook.dataList[i].em_read_page/res.ebook.dataList[i].book_page)*100)
+			               list += "      <div id='ebook-gauge-div'><div id='ebook-gauge' style='width:"+gauge+"%;'></div></div>";
+			               list += "      <p id='ebook-gauge-p'>"+ gauge +"%</p>";
+			               list += `      <div id="ebook-date">`;
+			               list += "         <span class='date-info'>구매날짜</span><br><span>: "+res.ebook.dataList[i].em_date +"</span><br><br>";
+			               if(res.ebook.dataList[i].book_read_ymd == '0'){
+				               list += "         <span class='date-info'>마지막 읽은 날짜</span><br><span>"+ "-" +"</span><br>";	            	   
+			               }else{
+				               list += "         <span class='date-info'>마지막 읽은 날짜</span><br><span>: "+res.ebook.dataList[i].book_read_ymd+"</span>";	            	   
+			               }
+			               list += `      </div>`;
+			               list += "      <button class ='ebook-see' onclick='ebookDetail(\""+res.ebook.dataList[i].book_no+"\")'> E북 보기</button>";	               
+			               list += `   </div>`;
+			               list += `   <div class ="ebook-url">`;
+			               list += "      <div id='url' class='urls'></div>";
+			               list += `   </div></div>`;
+			               
+		
+			               ebookLists.innerHTML += list;
+			            }
+				    }
+					if(res.ebook.totalPage == page){
+						var list = `<div class="ebookList">`;
+						list += `<div id="no-ebook-img-div"><div id="no-ebook-img"><div id="no-ebook-plus"><p>+</p></div></div></div>`
+						list += `<div id="no-ebook-text">E북을 추가하세요!</div>`
+						list += `</div>`;
+						ebookLists.innerHTML += list;						
+					}
+					pagingArea.innerHTML = res.ebook.pagingHTML;
+					ebookCount.innerText = res.ebook.allRecord;
+					ebookUrl = document.querySelectorAll(".ebook-url");
+					for (let i = 0; i < ebookUrl.length; i++) {
+						var id = document.querySelectorAll(".urls")[i];
+						var qrcode = new QRCode(
+								id,
+								{
+									text : "localhost/myHaru/ebookDetail?book_no=BK0000000866",
+									width : 70,
+									height : 70,
+									colorDark : "#000000",
+									colorLight : "#ffffff",
+									correctLevel : QRCode.CorrectLevel.H
+								});
+					}
+
+					},
+					error : function(ex) {
+						console.log("error");
+					}
+				})
+
+	};
+
+	function ebookDetail(ebook) {
+		var width = 1200;
+		var height = 750;
+
+		var left = (window.screen.width - width) / 2;
+		var top = (window.screen.height - height) / 2;
+
+		var newWindow = window.open("/myHaru/ebookDetail?book_no=" + ebook,
+				"_blank", "width=" + width + ", height=" + height + ", left="
+						+ left + ", top=" + top);
+
+		newWindow.onresize = function() {
+			newWindow.resizeTo(width, height + 70);
+		};
+
+		// 새 창을 고정합니다.
+		newWindow.onbeforeunload = function() {
+			newWindow.scrollTo(0, 0);
+		};
+	}
+</script>

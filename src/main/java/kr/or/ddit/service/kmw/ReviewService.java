@@ -1,0 +1,24 @@
+package kr.or.ddit.service.kmw;
+
+import java.io.IOException;
+import java.util.List;
+
+import kr.or.ddit.vo.kmw.ReviewVO;
+
+public interface ReviewService {
+
+	String insertReview(ReviewVO reviewVO) throws IOException;
+
+	List<ReviewVO> reviewList(String bookNo);
+
+	int reviewCnt(String bookNo);
+
+	int reviewTotalScore(String bookNo);
+
+	List<ReviewVO> scrList(String bookNo);
+
+	int deleteReview(ReviewVO rVO);
+
+	ReviewVO reviewAvg(String book_no);
+
+}

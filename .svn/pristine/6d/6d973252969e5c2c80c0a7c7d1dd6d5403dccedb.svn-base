@@ -1,0 +1,24 @@
+package kr.or.ddit.mapper.bmk;
+
+import java.util.List;
+
+import org.apache.ibatis.annotations.Mapper;
+
+import kr.or.ddit.vo.bmk.CalendarVO;
+
+@Mapper
+public interface MyCalMapper {
+
+	public List<CalendarVO> getCal(String ae_id);
+
+	public int insertCal(CalendarVO calVO);
+
+	public CalendarVO getDetailCal(String cal_no);
+
+	public int updateCal(CalendarVO calVO);
+
+	public int updateMove(CalendarVO calVO);
+
+	public int deleteCal(String calNo);
+
+}

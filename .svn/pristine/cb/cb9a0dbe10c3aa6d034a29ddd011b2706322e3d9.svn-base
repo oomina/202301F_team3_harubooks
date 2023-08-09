@@ -1,0 +1,43 @@
+package kr.or.ddit.controller.kmw.harubooks;
+
+import java.util.Collection;
+
+import javax.inject.Inject;
+
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+
+
+import lombok.extern.slf4j.Slf4j;
+
+
+@Slf4j
+@Controller
+@RequestMapping("/harubooks")
+public class HaruBooksController {
+	
+	@GetMapping("")
+	public String firstPage() {
+		return "bookstore/harufirst";
+	}
+	
+	@GetMapping("/main")
+	public String mainPage(Model model) {
+		log.debug("유저 정보 : "+ SecurityContextHolder.getContext().getAuthentication());
+		// 시큐리티 세션에 존재하는 유저 ID가져오는 변수
+		String userId =  SecurityContextHolder.getContext().getAuthentication().getName();	
+		if(userId != null) {
+			model.addAttribute("userId",userId);
+			return "bookstore/home/home";
+		}
+		return "bookstore/home/home";	
+		
+	}
+}

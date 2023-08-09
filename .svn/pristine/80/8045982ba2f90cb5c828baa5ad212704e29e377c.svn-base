@@ -1,0 +1,248 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+<div class="content-wrapper" style="padding: 10px;">
+	<div class="row" style="padding: 10px;">
+		<div class="col-lg-12 grid-margin stretch-card">
+			<div class="card">
+				<div class="card-body">
+					<h4 class="card-title" style="font-size:1.25rem; font-family: 'orbit', sans-serif;">도서 등록</h4>
+					<form action="" method="post" id="searchForm">
+						<input type="hidden" name="page" id="page"/>
+						<div class="col-lg-12">
+							<div class="row dropdown" style="float:right; margin-bottom: 5px; margin-right: -22px;">
+								<select id="option" name="searchType" style="width: 100px; border: 1px solid lightgray;">
+									<option value="title" selected>도서명</option>
+									<option value="author">저자</option>
+									<option value="publisher">출판사</option>
+								</select>
+								<ul class="navbar-nav mr-lg-2">
+									<li class="nav-item nav-search d-none d-lg-block">
+										<div class="input-group">
+											<input type="text" class="form-control" name="searchWord" id="searchWord" placeholder="검색" aria-label="search" aria-describedby="search"/>
+											<div class="input-group-prepend hover-cursor" id="navbar-search-icon">
+												<button type="button" id="search" style="width: 100px; border: 1px solid lightgray;">검색
+													<i class="icon-search"></i>
+												</button>
+											</div>
+										</div>
+									</li>
+								</ul>
+							</div>
+						</div>
+					</form>
+					<p class="card-description">전체 <code><span id="requestCount"></span></code>건</p>
+					<div class="table-responsive">
+						<table class="table table-hover">
+							<thead>
+								<tr class="table-primary">
+									<th style="text-align : center;">번호</th>
+									<th style="text-align : center;">요청번호</th>
+									<th style="text-align : center;">도서명</th>
+									<th style="text-align : center;">저자</th>
+									<th style="text-align : center;">출판사</th>
+									<th style="text-align : center;">요청일자</th>
+									<th style="text-align : center;">요청상태</th>
+									<th style="text-align : center;"><input type="checkbox" id="checkAll" onclick="checkAll()"></th>
+								</tr>
+							</thead>
+							<tbody id="requestList"></tbody>
+						</table>
+					</div>
+				</div>
+				<div class="row" style="float:right; margin: 0px 0px 0px 1000px;">
+					<button type="button" class="btn btn-outline-primary btn-sm" id="requestApproval">승인</button>&nbsp;&nbsp;
+					<button type="button" class="btn btn-outline-danger btn-sm" id="requestRefuse">거절</button>
+				</div>
+				<div id="pagingArea"></div>
+			</div>
+		</div>
+	</div>
+</div>
+<script type="text/javascript">
+var requestList = document.querySelector("#requestList");
+var requestCount = document.querySelector("#requestCount");
+var search = document.querySelector("#search");
+var option = document.querySelector("#option");
+var searchInput = document.querySelector("#searchWord");
+var pagingArea = document.querySelector("#pagingArea");
+var page = 1;
+
+window.onload = function(){
+	list();
+	pagingArea.addEventListener("click", function(event) {
+		if(event.target.tagName === "A") {
+			event.preventDefault();
+			page = event.target.getAttribute("data-page");
+			list();
+		}
+	});
+}
+
+search.addEventListener("click", function() {
+	page = 1;
+	list();
+});
+
+function list(){
+	var list = document.querySelector("#requestList");
+	var searchType = option.value;
+	var searchWord = searchInput.value;
+	list.innerHTML = '';
+	$.ajax({
+		type : "get",
+		url : "/mng/bookRequest/selectRequestList",
+		data : {
+			searchType:searchType,
+			searchWord:searchWord,
+			page:page
+		},
+		contentType : "application/json; charset=utf-8",
+		beforeSend : function(xhr) {
+			xhr.setRequestHeader("${_csrf.headerName}", "${_csrf.token}");
+		},
+		success : function(result){
+			console.log("result : " + result);
+			console.log(JSON.stringify(result));
+			var html = "";
+			if(result.pagingVO.dataList.length == 0){
+				html += "<tr>"
+				html += `<td colspan='8' align='center'>요청 목록이 존재하지 않습니다.</td>`
+				html += "</tr>"
+			} else {
+				for (var i = 0; i < result.pagingVO.dataList.length; i++) {
+					console.log(result.pagingVO.dataList[i].nbr_no);
+					html += "<tr>"
+					html += "<td style='text-align : center;'>"+ result.pagingVO.dataList[i].rnum +"</td>"
+					html += "<td style='text-align : center;'>"+ result.pagingVO.dataList[i].nbr_no +"</td>"
+					html += "<td>"+ result.pagingVO.dataList[i].nbr_nm +"</td>"
+					html += "<td style='text-align : center;'>"+ result.pagingVO.dataList[i].nbr_author +"</td>"
+					html += "<td style='text-align : center;'>"+ result.pagingVO.dataList[i].pub_nm +"</td>"
+					html += "<td style='text-align : center;'>"+ result.pagingVO.dataList[i].nbr_ymd +"</td>"
+					html += "<td style='text-align : center;'>"+ result.pagingVO.dataList[i].ccg_r001 +"</td>"
+					if(result.pagingVO.dataList[i].ccg_r001 == "요청대기"){
+						html += `<td style='text-align : center;'><input type='checkbox' name='checkSelect' class='checkSelect'></td>`
+					} else {
+						html += `<td style='text-align : center;'><input type='checkbox' name='checkSelect' class='checkSelect' disabled></td>`
+					}
+					html += "</tr>"
+				}
+			}
+			$("table tbody").append(html);
+			pagingArea.innerHTML = result.pagingVO.pagingHTML;
+			requestCount.innerText = result.pagingVO.totalRecord;
+		},
+		error: function(error) {
+			console.log("error");
+		}
+	});
+}
+
+function checkAll() {
+    if ($("#checkAll").is(":checked")) {
+        $(".checkSelect:not(:disabled)").prop("checked", true);
+    } else {
+        $(".checkSelect:not(:disabled)").prop("checked", false);
+    }
+}
+
+$(document).on("click", ".checkSelect", function (event) {
+    var check = document.getElementsByName("checkSelect");
+    var checkChecked = 0;
+    var totalCheck = 0;
+    for (var i = 0; i < check.length; i++) {
+        var checkSelect = check[i];
+        if (!checkSelect.disabled) {
+        	totalCheck++;
+            if (checkSelect.checked) {
+                checkChecked++;
+            }
+        }
+    }
+    if (totalCheck == checkChecked) {
+        $("#checkAll").prop("checked", true);
+    } else {
+        $("#checkAll").prop("checked", false);
+    }
+});
+
+// 요청 승인
+$(document).on("click", "#requestApproval", function(){
+	let approvalList = [];
+	$(".checkSelect:checked").each(function() {
+		let nbr_no = $(this).closest('tr').find('td').eq(1).text();
+		let approvalData = {
+				"nbr_no" : nbr_no,
+		}
+		approvalList.push(approvalData);
+	});
+	requestApprovalList(approvalList);
+});
+
+// 도서 등록
+function requestApprovalList(booksList) {
+	$.ajax({
+		url : "/mng/bookRequest/booksInsert",
+		type : "POST",
+		beforeSend : function(xhr){
+			xhr.setRequestHeader("${_csrf.headerName}", "${_csrf.token}");
+		},
+		data : JSON.stringify(booksList),
+		contentType : "application/json;charset=utf-8",
+		success : function(res){
+			if(res == "success"){
+				Swal.fire({
+					title : '승인되었습니다.', 
+					text : '도서 정보에서 확인해주세요.', 
+					icon : 'success',
+					confirmButtonText: '확인'
+				}).then(function (result) {
+					if (result.isConfirmed) {
+						// 확인 버튼을 클릭한 경우
+						location.href="/mng/bookRequest";
+					}
+				}); 
+			}
+		}
+	});
+}
+
+// 요청 거절
+$(document).on("click", "#requestRefuse", function(){
+	let refuseList = [];
+	$(".checkSelect:checked").each(function() {
+		let nbr_no = $(this).closest('tr').find('td').eq(1).text();
+		let requestData = {
+				"nbr_no" : nbr_no,
+		}
+		refuseList.push(requestData);
+	});
+	requestRefuseList(refuseList);
+});
+
+function requestRefuseList(refuseList) {
+	$.ajax({
+		type : "put",
+		url : "/mng/bookRequest/requestRefuse",
+		beforeSend : function(xhr){
+			xhr.setRequestHeader("${_csrf.headerName}", "${_csrf.token}");
+		},
+		data : JSON.stringify(refuseList),
+		contentType : "application/json;charset=utf-8",
+		success : function(res){
+			if(res == "success"){
+				Swal.fire({
+					title : '거절되었습니다.', 
+					text : '도서 정보에서 확인해주세요.', 
+					icon : 'success',
+					confirmButtonText: '확인'
+				}).then(function (result) {
+					if (result.isConfirmed) {
+						// 확인 버튼을 클릭한 경우
+						location.href="/mng/bookRequest";
+					}
+				}); 
+			}
+		}
+	});
+}
+</script>

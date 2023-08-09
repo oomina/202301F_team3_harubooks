@@ -1,0 +1,70 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+    <div class="content-wrapper" style="padding : 10px;">
+		<div class="row" style=" padding : 10px;">
+            <div class="col-12 grid-margin stretch-card">
+                <div class="card">
+                    <div class="card-body">
+                        <h4 class="card-title" style="font-size:1.25rem; font-family: 'orbit', sans-serif;">공지사항 등록</h4>
+                        <form class="forms-sample" action="/mng/board/notice" method="post" enctype="multipart/form-data">
+                            <div class="form-group">
+                                <label for="nTitle">제목</label>
+                                <input type="text" class="form-control" id="nTitle" name="notice_title"placeholder="제목을 입력해주세요.">
+                            </div>
+                            <div class="form-group">
+                                <label for="nContent">내용</label>
+                                <textarea class="form-control" id="nContent" rows="4" name="notice_content"></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label for="nFile">파일</label><br>
+                                <input type="file" id="nFile" name="notice_file">
+                            </div>
+                            <div style="float : right; ">
+	                            <button type="button" onclick="fNoticeInsert()" class="btn btn-primary mr-2">등록</button>
+	                            <button type="button" class="btn btn-outline-primary" onclick="location.href='/mng/notice'">목록</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script>
+const nFile = document.querySelector("#nFile");   // input file
+const nFileUpload = document.querySelector("#nFileUpload"); // button file upload
+const nTitle = document.querySelector("#nTitle");         // 공지사항 제목
+const nContent = document.querySelector("#nContent");    // 공지사항 내용
+const nFileName = document.querySelector("#nFileName"); // 첨부파일 이름 뜨는 곳
+
+function fNoticeInsert(){
+	let formData = new FormData();
+    formData.append("notice_title", nTitle.value);
+    formData.append("notice_content", nContent.value);
+      
+	if(nFile.files[0] != undefined){
+		formData.append("notice_file", nFile.files[0]);
+	}
+      
+    $.ajax({
+		type : "post",
+		url : "/mng/board/notice",
+		beforeSend : function(xhr){
+			xhr.setRequestHeader("${_csrf.headerName}", "${_csrf.token}");
+		},
+		data : formData,
+		dataType : "text",
+		processData : false,
+		contentType : false,
+		success : function(data){
+			if(data == "fail"){
+				alert("등록 실패하였습니다. 다시 시도해주세요.");
+			} else {
+				alert("등록되었습니다.");
+				location.href="/mng/notice/"+data;
+			}
+		}
+  })
+}
+   
+</script>

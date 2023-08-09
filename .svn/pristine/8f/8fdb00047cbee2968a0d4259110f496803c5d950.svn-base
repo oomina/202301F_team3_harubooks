@@ -1,0 +1,43 @@
+package kr.or.ddit.service.omn.books;
+
+import java.util.List;
+
+import javax.inject.Inject;
+
+import org.springframework.stereotype.Service;
+
+import kr.or.ddit.mapper.omn.books.PubBookRequestMapper;
+import kr.or.ddit.vo.omn.MngPaginationInfoVO;
+import kr.or.ddit.vo.omn.NewBookRequestVO;
+
+@Service
+public class PubBookRequestServiceImpl implements IPubBookRequestService{
+	
+	@Inject
+	private PubBookRequestMapper mapper;
+
+	@Override
+	public List<NewBookRequestVO> requestList() {
+		return mapper.requestList();
+	}
+
+	@Override
+	public int requestCount(MngPaginationInfoVO<NewBookRequestVO> pagingVO) {
+		return mapper.requestCount(pagingVO);
+	}
+
+	@Override
+	public int requestAllCount(String nbr_no) {
+		return mapper.requestAllCount(nbr_no);
+	}
+
+	@Override
+	public List<NewBookRequestVO> selectRequestList(MngPaginationInfoVO<NewBookRequestVO> pagingVO) {
+		return mapper.selectRequestList(pagingVO);
+	}
+
+	@Override
+	public String bookRequestInsert() {
+		return mapper.bookRequestInsert();
+	}
+}

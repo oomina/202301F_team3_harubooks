@@ -1,0 +1,16 @@
+package kr.or.ddit.vo.ljy;
+
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
+
+@Getter
+@Setter
+@ToString
+public class PubMngVO {
+	private String ae_id;			// 출판사 id
+	private String pub_nm;			// 출판사 이름
+	private String pub_addr;		// 출판사 주소
+	private String pub_telno;		// 출판사 전화번호
+	private String pub_eml_addr;	// 출판사 이메일
+}

@@ -1,0 +1,232 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.or.ddit.mapper.kmw.BookMapper">
+	<!-- 책정보 가져오는 쿼리 -->
+	<select id="detailBook" parameterType="String" resultType="bookVO">
+		select
+		a.book_no
+		,a.book_title
+		,a.book_content
+		,a.book_cover
+		,a.book_spmt_ymd
+		,a.book_author
+		,a.pub_nm
+		,a.book_talt
+		,a.book_margin
+		,a.book_mileage
+		,a.ccg_b001
+		,a.ccg_b002
+		,a.ccg_b003
+		,b.book_page_cnt
+		,b.book_amt
+		,b.book_discount
+		,b.book_ntsl_amt
+		,b.book_isbn
+		from 
+		<if test="ccg_b002 == null and ccg_b001 == '종이책'">
+			books a, paper_book b
+		</if>
+		<if test="ccg_b002 == null and ccg_b001 == 'E북'">
+			books a, ebook b
+		</if>
+		<if test="ccg_b002 == '국내도서' or ccg_b002 == '해외도서'">
+			books a, paper_book b
+		</if>
+		<if test="ccg_b002 == '인터넷도서'">
+			books a, ebook b
+		</if>
+		where a.BOOK_NO = b.BOOK_NO
+		and a.book_no = #{book_no}
+		
+	</select>
+
+	<!-- 책 검색 및 페이징 -->
+
+	<sql id="bookSearch">
+		<if test="searchWord != null">
+			and(book_title like '%'||#{searchWord}||'%' or book_author
+			like '%'||#{searchWord}||'%')
+		</if>
+	</sql>
+	<!-- 카테고리별 책 수량 -->
+	<select id="bookCount" parameterType="pagingVO" resultType="int">
+		select count(*)
+		from books
+		where
+		<if test="ccg_b002 != null and ccg_b003 != null">
+			ccg_b002 = #{ccg_b002} and ccg_b003 = #{ccg_b003}
+			<include refid="bookSearch" />
+		</if>
+		<if test="ccg_b002 != null and ccg_b003 == null">
+		
+			ccg_b002 = #{ccg_b002}
+			<include refid="bookSearch" />
+		</if>
+		<if test="ccg_b003 != null and ccg_b002 == null">
+			ccg_b003 = #{ccg_b003}
+			<include refid="bookSearch" />
+		</if>
+		<if test="searchWord != null and ccg_b002 == null and ccg_b003 == null">
+			book_title like '%'||#{searchWord}||'%' or book_author
+			like '%'||#{searchWord}||'%'		
+		</if>
+	</select>
+
+	<select id="selectBookList" parameterType="pagingVO" resultType="bookVO">
+		select
+		b.*
+		from(
+		select
+		a.*,row_number() over (order by a.book_no ) rnum
+		from(
+		select
+		c.book_no
+		,c.book_title
+		,c.book_content
+		,c.book_cover
+		,c.book_spmt_ymd
+		,c.book_author
+		,c.pub_nm
+		,c.book_talt
+		,c.book_margin
+		,c.book_mileage
+		,c.ccg_b001
+		,c.ccg_b002
+		,c.ccg_b003
+		,d.book_page_cnt
+		,d.book_amt
+		,d.book_discount
+		,d.book_ntsl_amt
+		,d.book_isbn
+		from books c,
+		<if test="ccg_b002 == '국내도서' or ccg_b002 == '해외도서'">
+			paper_book d
+		</if>
+		<if test="ccg_b002 == '인터넷도서'">
+			ebook d
+		</if>
+		where c.book_no = d.book_no
+		<if test="ccg_b002 != null and ccg_b003 != null">
+			and c.ccg_b002 = #{ccg_b002} and
+			c.ccg_b003 = #{ccg_b003}
+			<include refid="bookSearch"/>		
+		</if>
+		<if test="ccg_b002 != null and ccg_b003 == null">
+			and c.ccg_b002 = #{ccg_b002} 
+			<include refid="bookSearch"/>		
+		</if>
+		<if test="ccg_b003 != null and ccg_b002 == null">
+			and c.ccg_b003 = #{ccg_b003} 
+			<include refid="bookSearch"/>		
+		</if>
+		<include refid="bookSearch"/>
+		order by c.book_no
+		)a
+		)b
+		<![CDATA[
+			where b.rnum >= #{startRow} and b.rnum <= #{endRow}
+		]]>
+	</select>
+	
+	<!-- 책 종류 별 카테고리 분류 -->
+	<select id="kindBycategory" parameterType="String" resultType="String">
+		select distinct ccg_b003
+		from books
+		where ccg_b002 = #{ccg_b002}
+	</select>
+	
+	<!-- 찜한 책 존재 여부 확인 -->
+	<select id="existWisthList" parameterType="bookVO" resultType="int">
+		select count(*)
+		from BOOK_WISHLIST
+		where ae_id = #{ae_id} and book_no = #{book_no}
+	</select>
+	
+	<!-- 찜한 책 추가하기 -->
+	<insert id="inputWishList" parameterType="bookVO">
+		insert into book_wishlist (ae_id, book_no)
+		values(#{ae_id},#{book_no})
+	</insert>
+	
+	<!-- 장바구니 추가하기 -->
+	<insert id="inputCart" parameterType="cartVO">
+		insert into cart (ae_id, book_no,cart_cnt)
+		values(#{ae_id},#{book_no},#{cart_cnt})
+	</insert>
+	
+	<!-- 장바구니에 존재 여부 확인하기 -->
+	<select id="existCart" parameterType="cartVO" resultType="int">
+		select count(*)
+		from cart
+		where ae_id = #{ae_id} and book_no = #{book_no}
+	</select>
+	
+	<!-- 장바구니 리스트 출력 -->
+	<resultMap type="bookVO" id="bookVO">
+		<id property="book_no" column="book_no"/>
+		<result column="book_title" property="book_title"/>
+		<result column="book_cover" property="book_cover"/>
+		<result column="book_spmt_ymd" property="book_spmt_ymd"/>
+		<result column="book_author" property="book_author"/>
+		<result column="pub_nm" property="pub_nm"/>
+		<result column="ccg_b001" property="ccg_b001"/>
+		<result column="ccg_b002" property="ccg_b002"/>
+		<result column="ccg_b003" property="ccg_b003"/>
+		<result column="book_amt" property="book_amt"/>
+		<result column="book_ntsl_amt" property="book_ntsl_amt"/>
+		<collection property="cartVO" resultMap="cartVO"/>
+	</resultMap>
+	<resultMap type="cartVO" id="cartVO">
+		<result property="book_no" column="book_no"/>
+		<result property="cart_cnt" column="cart_cnt"/>
+	</resultMap>
+	
+	<select id="cartList" parameterType="String" resultMap="bookVO">
+		select 
+    		 a.book_no
+    		,a.book_title
+    		,a.book_cover
+    		,a.book_spmt_ymd
+    		,a.book_author
+    		,a.pub_nm
+    		,a.ccg_b001
+    		,a.ccg_b002
+    		,a.ccg_b003
+    		,b.cart_cnt
+    		,c.book_ntsl_amt
+    		,c.book_amt
+		from books a, cart b, paper_book c
+		where a.book_no = b.book_no
+      		and a.book_no = c.book_no
+      		and b.ae_id = #{ae_id}
+	</select>
+	
+	<select id="cartCnt" parameterType="String" resultType="int">
+		select count(*)
+		from cart
+		where ae_id = #{ae_id}
+	</select>
+	
+	<!-- 장바구니 목록 삭제 -->
+	<delete id="cartDel" parameterType="bookVO">
+		delete 
+		from cart
+		where 
+		<if test="ae_id != null and book_no != null">
+			book_no = #{book_no} and ae_id = #{ae_id}		
+		</if>
+		<!-- 장바구니에 있는 상품들을 구매시 전체 삭제를 진행해야함 -->
+		<if test="ae_id != null and book_no == null">
+			ae_id = #{ae_id}
+		</if>
+	</delete>
+	
+	<select id="selectBook" parameterType="String" resultType="bookVO">
+		select *
+		from books
+		where book_no = #{book_no}
+	</select>
+</mapper>

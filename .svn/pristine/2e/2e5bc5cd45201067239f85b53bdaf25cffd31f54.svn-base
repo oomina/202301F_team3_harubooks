@@ -1,0 +1,65 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+	pageEncoding="UTF-8"%>
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="/resources/asset/css/myHaru.css">
+    <!--아이콘-->
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@3.4.0/fonts/remixicon.css" rel="stylesheet">
+</head>
+<body>
+	<!-- 헤더 -->
+	
+	
+	<div id="main"> 
+		<!-- 사이드바 프로필 -->
+		<div id="sidebar">
+			<div class="profile">
+	            <div class="profile-img">
+	                <img src="/resources/asset/image/profile.jpg">
+	            </div>
+	            <div class="name">
+	                <h1>배루키님 환영합니다!</h1>
+	           </div>
+	           <span>beluki@naver.com</span>
+	           <div id="side-btns">
+		           <a href="#">
+			           <div class="side-btn">로그아웃</div>        
+		           </a>
+		           <a href="#">
+			           <div class="side-btn">정보수정</div>        
+		           </a>
+	           </div>
+        	</div>
+		</div>
+
+		<!-- 메인 -->
+		<div id="home"></div>
+		
+		<!-- 사이드바 위치 북마크 -->
+		<div id="bookmark">
+			<div id="marks">
+				<a href="#">
+					<div class="mark" id="mark-red">
+						<p>나의 서재</p>
+					</div>
+				</a>
+				<a href="#">
+					<div class="mark" id="mark-blue">
+						<p>나의 일기</p>
+					</div>
+				</a>
+				<a href="#">
+					<div class="mark" id="mark-yellow">
+						<p>나의 일정</p>
+					</div>
+				</a>
+			</div>
+		</div>
+	</div>
+</body>
+</html>

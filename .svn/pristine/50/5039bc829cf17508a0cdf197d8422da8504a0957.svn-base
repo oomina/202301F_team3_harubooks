@@ -1,0 +1,269 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+ <mapper namespace="kr.or.ddit.mapper.jhs.MyLibraryMapper">
+ 	
+ 	<!-- 정렬한 타입 -->
+ 	<sql id="ebookType">
+		<if test="searchType != null and searchType == 'order-young'">
+			order by em_date desc
+		</if>
+		<if test="searchType != null and searchType == 'order-old'">
+			order by book_read_ymd desc
+		</if>
+	</sql>
+	
+ 	<!-- 나의 하루 사용자 정보 가져오기 -->
+ 	<select id="callComMember" parameterType="string" resultType="comMemberVO">
+ 			select 
+ 			 	ae_id			<!-- 사용자 아이디 -->
+ 			  , mem_profile		<!-- 사용자 프로필 -->	
+ 			  , mem_nicknm		<!-- 사용자 닉네임 -->
+ 			from
+ 			 	com_member
+ 			where
+ 				ae_id = #{ae_id}
+ 	</select>
+	
+ 	<!-- 페이징에 맞추어서 사용자가 가지고 있는 ebook리스트 꺼내오기 -->
+ 	<select id="getEbookList" parameterType="ebookPageVO" resultType="ebookManagerVO">
+		  select
+			  b.ae_id			 <!-- 사용자 아이디 -->
+               , b.book_no			 <!-- 책 번호 -->
+               , b.book_page		 <!-- 책 페이지-->
+               , b.book_read_ymd	 <!-- 책 마지막 읽은 날짜 -->
+               , b.em_date			 <!-- 책 구매날짜 -->
+               , b.em_read_page	 <!-- 책 읽은 페이지 -->
+               , b.ebook_file		 <!-- 책 파일명 -->
+               , b.ebook_coordinate <!-- 사용자 아이디 -->
+               , b.book_title		 <!-- 책 제목 -->
+               , b.book_cover		 <!-- 책 커버 -->
+		from(
+			select
+                      a.*, row_number() over (<include refid="ebookType"/>) rnum
+			from(
+				select
+						c.ae_id
+					, c.book_no
+					, c.book_page
+					, c.book_read_ymd
+					, c.em_date
+					, c.em_read_page
+					, c.ebook_file
+					, c.ebook_coordinate
+                       , d.book_title
+                       , d.book_cover
+				from 
+					ebook_manage c, books d
+				where
+                       c.book_no = d.book_no
+                   and    
+					ae_id = #{ae_id}
+                   and 
+                   	d.book_title LIKE '%${searchWord}%'
+			) a
+		) b
+		<![CDATA[
+			where 
+				b.rnum >= #{startRow} and b.rnum <= #{endRow}	
+		]]>
+ 	</select>
+ 	
+ 	<!-- 추가적으로 필요한 책제목과 책커버 정보 가져오기 -->
+ 	<select id="getEbookDetailList" parameterType="string" resultType="ebookManagerVO">
+	 	select 
+	        book_title
+	    ,   book_cover
+		from
+	    	books
+		where
+	    	book_no = #{book_no}
+ 	</select>
+ 	
+ 	<!-- 현재 페이지의 ebook list의 갯수 가져오기 -->
+ 	<select id="selectEbookListCount" parameterType="ebookPageVO" resultType="int">
+		select 
+			count(a.book_no)
+		from 
+			ebook_manage a, books b
+		where
+		    a.book_no = b.book_no
+		and
+		    ae_id = #{ae_id}
+		and 
+            book_title LIKE '%${searchWord}%'
+		<include refid="ebookType"/>
+	</select>
+	
+	<!--  모든 ebook 갯수 가져오기 -->
+	<select id="selectAllRecord" parameterType="string" resultType="int">
+		select 
+			count(book_no) 
+		from 
+			ebook_manage 
+		where 
+			ae_id = #{ae_id}
+	</select>
+ 	
+ 	<!-- 가지고 있는 e북 하나의 정보 가져오기 -->
+ 	<select id="getEbookManager" parameterType="string" resultType="ebookManagerVO">
+ 		select 
+ 			  ae_id
+ 			, book_no
+ 			, book_page
+ 			, book_read_ymd
+ 			, em_date
+ 			, em_read_page
+ 			, ebook_file
+ 			, ebook_coordinate
+ 		from
+ 			ebook_manage
+ 		where
+ 			book_no = #{book_no} 
+ 		and
+ 			ae_id = #{ae_id}
+ 	</select>
+ 	
+ 	<!-- 페이지 저장할 때마다 저장 페이지 업데이트 -->
+ 	<update id="updateReadPage" parameterType="ebookManagerVO">
+ 		update
+ 			ebook_manage
+ 		set
+ 			  em_read_page = #{em_read_page}
+ 		where
+ 			  ae_id = #{ae_id}
+ 		and
+ 			  book_no = #{book_no}  	
+ 	</update>
+ 	
+ 	<!-- E북 가져올 때 마다 마지막 읽은 날짜 업데이트 -->
+ 	<update id="updateReadYmd" parameterType="ebookManagerVO">
+ 	 	update
+ 			ebook_manage
+ 		set
+ 			  book_read_ymd = to_char(sysdate, 'YYYY/MM/DD')
+ 		where
+ 			  ae_id = #{ae_id}
+ 		and
+ 			  book_no = #{book_no}  	
+ 	</update>
+ 	
+ 	<!-- 책갈피 저장 -->
+ 	<insert id="insertBookRecode" parameterType="ebookManagerVO">
+ 		insert 
+ 		into 
+ 			ebook_recode(
+ 			  er_page
+ 			, ae_id
+ 			, book_no  
+ 		)values(
+ 			  #{em_read_page}
+ 			, #{ae_id}
+ 			, #{book_no}  
+ 		)			
+ 	</insert>
+ 	
+ 	<!-- 책갈피 삭제 -->
+ 	<delete id="deleteBookRecode" parameterType="ebookManagerVO">
+ 		delete
+ 		from
+ 			ebook_recode
+ 		where
+ 			  ae_id = #{ae_id}
+ 		and
+ 			  book_no = #{book_no}
+ 		and
+ 			  er_page = #{em_read_page}
+ 	</delete>
+ 	
+ 	<!-- 책갈피 있는지 없는지 확인 -->
+ 	<select id="checkBookRecode" parameterType="ebookRecodeVO" resultType="string">
+ 		select
+ 			er_page
+ 		from
+ 			ebook_recode
+ 		where
+ 			  ae_id = #{ae_id}
+ 		and
+ 			  book_no = #{book_no}
+ 		and
+ 		 	  er_page = #{er_page}  
+ 	</select>
+ 	
+ 	<!-- 모든 책갈피 정보 가져오기 -->
+ 	<select id="getBookMarkList" parameterType="ebookRecodeVO" resultType="string">
+ 		select
+ 			er_page
+ 		from
+ 			ebook_recode
+ 		where
+ 			ae_id = #{ae_id}
+ 		and
+ 			book_no = #{book_no}
+ 	</select>
+ 	
+ 	<!-- 메모가 존재하는지 확인 -->
+ 	<select id="ebookMemoCheck" parameterType="ebookMemoVO" resultType="string">
+ 		select
+ 			em_page
+ 		from
+ 			ebook_memo
+ 		where
+ 			em_page = #{em_page}
+ 		and
+ 			ae_id = #{ae_id}
+ 		and
+ 			book_no = #{book_no}	
+ 	</select>
+ 	
+ 	<!-- 메모가 존재한다면 메모를 업데이트 -->
+ 	<update id="ebookUpdate" parameterType="ebookMemoVO">
+ 		update
+ 			ebook_memo
+ 		set
+ 			em_content = #{em_content}
+ 		where
+ 			em_page = #{em_page}
+ 		and
+ 			ae_id = #{ae_id}
+ 		and
+ 			book_no = #{book_no}		
+ 	</update>
+ 	
+ 	<!-- 메모가 존재하지 않다면 메모 생성 -->
+ 	<insert id="ebookInsert" parameterType="ebookMemoVO">
+ 		insert 
+ 		into
+ 			ebook_memo(
+ 			   em_page
+ 			 , ae_id
+ 			 , book_no
+ 			 , em_content
+ 		)values(
+ 			  #{em_page}
+ 			, #{ae_id}
+ 			, #{book_no}
+ 			, #{em_content}
+ 		)	
+ 	</insert>
+ 	
+ 	<!-- 페이지 별 메모를 가져옴 -->
+ 	<select id="getEbookMemo" parameterType="ebookMemoVO" resultType="ebookMemoVO">
+ 		select
+ 			  em_page
+ 			, ae_id
+ 			, book_no
+ 			, em_content
+ 		from
+ 			ebook_memo
+ 		where
+ 			em_page = #{em_page}
+ 		and
+ 			ae_id = #{ae_id}
+ 		and
+ 			book_no = #{book_no}
+ 			
+ 	</select>
+ </mapper>

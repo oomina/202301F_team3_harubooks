@@ -1,0 +1,23 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+<%@taglib uri="http://tiles.apache.org/tags-tiles" prefix="tiles" %>
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="/resources/asset/css/style.css">
+    <!--아이콘-->
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@3.4.0/fonts/remixicon.css" rel="stylesheet">
+</head>
+<body>
+	<tiles:insertAttribute name="haruterSidebar"/>
+    <!--메인-->
+    <div class="main-home">
+        <!--헤더-->
+		<tiles:insertAttribute name="haruterHeader"/>
+		<tiles:insertAttribute name="haruterContent"/>
+    </div>
+</body>
+</html>

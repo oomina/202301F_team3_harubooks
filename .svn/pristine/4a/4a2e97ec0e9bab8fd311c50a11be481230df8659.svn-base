@@ -1,0 +1,268 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+<div class="content-wrapper" style="padding: 10px;">
+	<div class="row" style="padding: 10px;">
+		<div class="col-lg-12 grid-margin stretch-card">
+			<div class="card">
+				<div class="card-body">
+					<h4 class="card-title" style="font-size:1.25rem; font-family: 'orbit', sans-serif;">카테고리 관리</h4>
+					<div class="row" style="text-align : center;">
+						<div class="col-lg-6" style="float: left; width: 100%; font-weight: bold;">대분류
+							<button type="button" class="btn btn-primary btn-sm" id="ccg_code_main" onclick="categoryInsert('B002')" style="float: right; margin-right: 25px; margin-bottom: 10px;">추가</button>
+						</div>
+						<div class="col-lg-6" style="float: right; width: 100%; font-weight: bold;">소분류
+							<button type="button" class="btn btn-primary btn-sm" id="ccg_code_mid" onclick="categoryInsert('B003')" style="float: right; margin-right: 40px; margin-bottom: 10px;">추가</button>
+						</div>
+					</div>
+					<div class="col-lg-6 table-responsive" style="float: left; width: 50%;">
+						<table class="table table-hover">
+							<tbody id="mainList">
+							</tbody>
+						</table>
+					</div>
+					<div class="col-lg-6 table-responsive" style="float: left; width: 50%;">
+						<table class="table table-hover">
+							<tbody id="midList">
+							</tbody>
+						</table>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<button id="categoryInsertModal" type="button" class="btn btn-primary" data-toggle="modal" data-target=".categoryInsertModal-bg" style="display : none;" >modalShow</button>
+<div class="modal fade categoryInsertModal-bg" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+	<div class="modal-dialog modal-lg">
+	<div class="modal-content" style="margin : 0 auto; width: 500px; top: 100px; left: 100px;">
+		<div class ="modal-header" style="border: 1px solid white;">
+			<h4 style="margin : 0 auto; font-weight: bold;">카테고리 추가</h4>
+			<button type="button" class="close" data-dismiss="modal" aria-label="Close" style="margin: -25px -26px -25px;">
+				<span aria-hidden="true">&times;</span>
+			</button>
+		</div>
+		<div class="modal-body" style="display: flex; border: 1px solid white;  max-height: 700px; padding : 10px 10px;">
+			<div style="float: left; width: 100%; border: 1px solid lightgrey;">
+				<div id="categoryInsertDisp" >
+					<table>
+						<tr>
+							<th class="table-primary" style="width:40%; text-align : center;">카테고리명</th>
+							<td style="width:60%;"><input type="text" id="cc_nm" style="width:179%; border: 1px solid lightgrey;"></td>
+						</tr>
+					</table>
+				</div>
+			</div>
+		</div>
+		<div class="modal-footer" style="border : 1px solid white; padding: 15px 8px;">
+			<button type="button" class="btn btn-primary" id="insertBtn">추가</button>&nbsp;&nbsp;
+			<button type="button" class="btn btn-outline-primary" data-dismiss="modal">목록</button>
+		</div>
+	</div>
+	</div>
+</div>
+<button id="categoryUpdateModal" type="button" class="btn btn-primary" data-toggle="modal" data-target=".categoryUpdateModal-bg" style="display : none;" >modalShow</button>
+<div class="modal fade categoryUpdateModal-bg" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+	<div class="modal-dialog modal-lg">
+	<div class="modal-content" style="margin : 0 auto; width: 500px; top: 100px; left: 100px;">
+		<div class ="modal-header" style="border: 1px solid white;">
+			<h4 style="margin : 0 auto; font-weight: bold;">카테고리 수정</h4>
+			<button type="button" class="close" data-dismiss="modal" aria-label="Close" style="margin: -25px -26px -25px;">
+				<span aria-hidden="true">&times;</span>
+			</button>
+		</div>
+		<div class="modal-body" style="display: flex; border: 1px solid white; max-height: 700px; padding : 10px 10px;">
+			<div style="float: left; width: 100%; border: 1px solid lightgrey;">
+				<div id="categoryUpdateDisp" >
+					<table>
+						<tr>
+							<th class="table-primary" style="width:40%; text-align : center;">카테고리명</th>
+							<td style="width:60%;"><input type="text" id="new_cc_nm" style="width:179%; border: 1px solid lightgrey;"></td>
+						</tr>
+					</table>
+				</div>
+			</div>
+		</div>
+		<div class="modal-footer" style="border : 1px solid white; padding: 15px 8px;">
+			<button type="button" class="btn btn-primary" id="updateBtn">수정</button>&nbsp;&nbsp;
+			<button type="button" class="btn btn-outline-primary" data-dismiss="modal">목록</button>
+		</div>
+	</div>
+	</div>
+</div>
+<script type="text/javascript">
+var insertBtn = document.querySelector("#insertBtn");			// 카테고리 추가 버튼
+var updateBtn = document.querySelector("#updateBtn");			// 카테고리 수정 버튼
+var ccg_code_main = document.querySelector("#ccg_code_main");	// 카테고리 대분류 추가 버튼
+var ccg_code_mid = document.querySelector("#ccg_code_mid");		// 카테고리 소분류 추가 버튼
+
+window.onload = function(){
+	let cc_nm = "";
+	mainList();
+	midList();
+}
+
+// 카테고리 대분류
+function mainList() {
+	var mainList = document.querySelector("#mainList");
+	$.ajax({
+		type : "get",
+		url : "category/categoryMainList",
+		data : "",
+		contentType : "application/json; charset=utf-8",
+		success : function(result){
+			console.log("result : " + result);
+			console.log(JSON.stringify(result));
+			var html = "";
+			if(result.length == 0){
+				html += "<tr>"
+				html += "<td colspan='4' align='center'>요청 목록이 존재하지 않습니다.</td>"
+				html += "</tr>"
+			} else {
+				for (var i = 0; i < result.length; i++) {
+					console.log(result[i].CC_NM);
+					html += "<tr>"
+					html += "<td style='width : 10%; text-align : center;'>"+ (i+1) +"</td>"
+					html += "<td style='width : 50%;'>"+ result[i].CC_NM +"</td>"
+					html += `<td style="width : 20%; text-align : center;"><button type="button" class="btn btn-outline-info btn-sm" id="mainPutBtn" onclick="categoryUpdate('\${result[i].CC_NM}')">수정</button></td>`
+					html += `<td style="width : 20%; text-align : center;"><button type="button" class="btn btn-outline-danger btn-sm" id="mainDelBtn" onclick="categoryDelete('\${result[i].CC_NM}')">삭제</button></td>`
+					html += "</tr>"
+				}
+			}
+			console.log($(this).closest('tr').find('td').eq(1).text());
+			$("#mainList").append(html);
+		}
+	});
+}
+
+// 카테고리 소분류
+function midList() {
+	var mainList = document.querySelector("#midList");
+	const cc_nm = "";
+	$.ajax({
+		type : "get",
+		url : "category/categoryMidList",
+		data : "",
+		contentType : "application/json; charset=utf-8",
+		success : function(result){
+			console.log("result : " + result);
+			console.log(JSON.stringify(result));
+			var html = "";
+			if(result.length == 0){
+				html += "<tr>"
+				html += "<td colspan='4' align='center'>요청 목록이 존재하지 않습니다.</td>"
+				html += "</tr>"
+			} else {
+				for (var i = 0; i < result.length; i++) {
+					console.log(result[i].CC_NM);
+					html += "<tr>"
+					html += "<td style='width : 10%; text-align : center;'>"+ (i+1) +"</td>"
+					html += "<td style='width : 50%;'>"+ result[i].CC_NM +"</td>"
+					html += `<td style="width : 20%; text-align : center;"><button type="button" class="btn btn-outline-info btn-sm" id="midPutBtn" onclick="categoryUpdate('\${result[i].CC_NM}')">수정</button></td>`
+					html += `<td style="width : 20%; text-align : center;"><button type="button" class="btn btn-outline-danger btn-sm" id="midDelBtn" onclick="categoryDelete('\${result[i].CC_NM}')">삭제</button></td>`
+					html += "</tr>"
+				}
+			}
+			$("#midList").append(html);
+		}
+	});
+}
+
+// 카테고리 추가
+function categoryInsert(ccg_code_click) {
+	ccg_code = ccg_code_click
+	console.log(ccg_code);
+	$("#categoryInsertModal").click();
+}
+
+insertBtn.onclick = function () {
+	console.log(ccg_code);
+	let data = {
+			ccg_code : ccg_code,
+			cc_nm : cc_nm.value
+	}
+	console.log(ccg_code);
+	console.log(cc_nm.value);
+	
+	$.ajax({
+		url : "/mng/category/categoryInsert",
+		type : "post",
+		beforeSend : function(xhr){
+			xhr.setRequestHeader("${_csrf.headerName}", "${_csrf.token}");
+		},
+		data : JSON.stringify(data),
+		contentType : "application/json;charset=utf-8",
+		success : function(res){
+			if(res == "success"){
+				Swal.fire({
+					title : '추가되었습니다.',
+					text : '확인해주세요.',
+					icon : 'success',
+					confirmButtonText: '확인'
+				}).then(function (result) {
+					if (result.isConfirmed) {
+						// 확인 버튼을 클릭한 경우
+						location.href="/mng/category";
+					}
+				}); 
+			}
+		}
+	});
+}
+
+// 카테고리 수정
+function categoryUpdate(cc_nm_input) {
+	cc_nm = cc_nm_input
+	$("#new_cc_nm").val(cc_nm_input);
+	$("#categoryUpdateModal").click();
+}
+
+updateBtn.onclick = function () {
+	console.log(new_cc_nm.value);
+	let data = {
+			new_cc_nm : new_cc_nm.value,
+			cc_nm : cc_nm
+	}
+	$.ajax({
+		type : "put",
+		url : "/mng/category/categoryUpdate",
+		beforeSend : function(xhr){
+			xhr.setRequestHeader("${_csrf.headerName}", "${_csrf.token}");
+		},
+		data : JSON.stringify(data),
+		contentType : "application/json;charset=utf-8",
+		success : function(result){
+			if(result == "fail"){
+				alert("수정 실패! 다시 시도해주세요.");
+			} else {
+				alert("수정되었습니다.");
+				location.href="/mng/category";
+			}
+		}
+	});
+}
+
+// 카테고리 삭제
+function categoryDelete(cc_nm) {
+	cc_nm = cc_nm
+	let data = {
+			cc_nm : cc_nm
+	}
+	$.ajax({
+		type : "delete",
+		url : "/mng/category/categoryDelete",
+		beforeSend : function(xhr){
+			xhr.setRequestHeader("${_csrf.headerName}", "${_csrf.token}");
+		},
+		data : JSON.stringify(data),
+		contentType : "application/json; charset=utf-8",
+		success : function(result){
+			if(result == "fail"){
+				alert("삭제 실패! 다시 시도해주세요.");
+			} else {
+				alert("삭제되었습니다.");
+				location.href="/mng/category";
+			}
+		}
+	});
+}
+</script>

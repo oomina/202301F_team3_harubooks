@@ -1,0 +1,219 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+<div class="content-wrapper">
+	<div class="row" style="padding: 20px;">
+		<div class="col-lg-12 grid-margin stretch-card">
+			<div class="card">
+				<div class="card-body">
+					<h4 class="card-title">도서 정보</h4>
+					<form action="">
+						<div class="row" style="padding-left : 30px; margin-top : 20px; margin-right: 0px; margin-bottom: 5px; float:right;">
+							<input type="file" name="" id="imgFile" style="display:none" accept=".jpg,.png">
+							<button type="button" id="imgPutBtn" style="border: 1px solid lightgray;">표지 수정</button>&nbsp;&nbsp;
+							<button type="button" id="imgDelBtn" onclick="imgDelete()" style="border: 1px solid lightgray;">표지 삭제</button>&nbsp;&nbsp;
+						</div>
+						<div class="table-responsive" style="overflow:hidden">
+							<table class="table" style="border:1px solid #CED4DA; max-width: 900px;">
+								<tbody>
+									<tr>
+										<th class="table-primary" style="width:10%;">ISBN</th>
+										<td style="width:40%;"><input type="text" name="book_isbn" id="book_isbn" value="" style="width:100%;"></td>
+										<th class="table-primary" style="width:10%;">유형</th>
+										<td style="width:25%;"><input type="radio" class="ccg_b001" name="ccg_b001" id="ccg_b001_1" value="종이책"> 종이책&nbsp;&nbsp;&nbsp;<input type="radio" class="ccg_b001" name="ccg_b001" id="ccg_b001_2" value="E북"> E북</td>
+										<td rowspan="3" style="width:15%; padding: 0px;">
+											<img src="" name="book_cover" id="book_cover" style="width:90%; height:90%; border-radius: 0%; margin: 0%;"><br>
+										</td>
+									</tr>
+									<tr>
+										<th class="table-primary">도서번호</th>
+										<td><input type="text" name="book_no" id="book_no" value="" style="width:100%;" readonly></td>
+										<th class="table-primary">분류</th>
+										<td><input type="radio" class="ccg_b002" name="ccg_b002" id="ccg_b002_1" value="국내도서"> 국내도서&nbsp;&nbsp;&nbsp;<input type="radio" class="ccg_b002" name="ccg_b002" id="ccg_b002_2" value="해외도서"> 해외도서&nbsp;&nbsp;&nbsp;<input type="radio" class="ccg_b002" name="ccg_b002" id="ccg_b002_3" value="인터넷도서"> 인터넷도서</td>
+									</tr>
+									<tr>
+										<th class="table-primary">도서명</th>
+										<td><input type="text" name="book_title" id="book_title" value="" style="width:100%;"></td>
+										<th class="table-primary">종류</th>
+										<td>
+											<select name="ccg_b003" id="ccg_b003" style="width:100%;">
+												<option value="건강/스포츠">건강/스포츠</option>
+												<option value="경제/경영">경제/경영</option>
+												<option value="과학">과학</option>
+												<option value="소설">소설</option>
+												<option value="시/에세이">시/에세이</option>
+												<option value="아동/청소년">아동/청소년</option>
+												<option value="여행">여행</option>
+												<option value="예술/건축">예술/건축</option>
+												<option value="외국어">외국어</option>
+												<option value="요리">요리</option>
+												<option value="인문">인문</option>
+												<option value="정치/사회">정치/사회</option>
+												<option value="컴퓨터/IT">컴퓨터/IT</option>
+											</select>
+										</td>
+									</tr>
+									<tr>
+										<th class="table-primary">저자</th>
+										<td><input type="text" name="book_author" id="book_author" value="" style="width:100%;"></td>
+										<th class="table-primary">번역자</th>
+										<td colspan="2"><input type="text" name="book_talt" id="book_talt" value="" style="width:100%;"></td>
+									</tr>
+									<tr>
+										<th class="table-primary">출판사</th>
+										<td><input type="text" name="pub_nm" id="pub_nm" value="" style="width:100%;"></td>
+										<th class="table-primary">페이지 수</th>
+										<td colspan="2"><input type="text" name="book_page_cnt" id="book_page_cnt" value="" style="width:100%;"></td>
+									</tr>
+									<tr>
+										<th class="table-primary">출간일</th>
+										<td><input type="text" name="book_spmt_ymd" id="book_spmt_ymd" value="" style="width:100%;"></td>
+										<th class="table-primary">마일리지</th>
+										<td colspan="2"><input type="text" name="book_mileage" id="book_mileage" value="" style="width:100%;"></td>
+										
+									</tr>
+									<tr>
+										<th class="table-primary">가격</th>
+										<td><input type="text" name="book_amt" id="book_amt" value="" style="width:100%;"></td>
+										<th class="table-primary">할인율</th>
+										<td colspan="2"><input type="text" name="book_discount" id="book_discount" value="" style="width:100%;"></td>
+									</tr>
+									<tr>
+										<th class="table-primary">판매가격</th>
+										<td><input type="text" name="book_ntsl_amt" id="book_ntsl_amt" value="" style="width:100%;"></td>
+										<th class="table-primary">마진율</th>
+										<td colspan="2"><input type="text" name="book_margin" id="book_margin" value="" style="width:100%;"></td>
+									</tr>
+									<tr>
+										<th class="table-primary">내용</th>
+										<td colspan="5"><textarea rows="5" cols="120" name="book_content" id="book_content"></textarea></td>
+										
+									</tr>
+								</tbody>
+							</table>
+							<div class="row" style="padding-left : 30px; margin-top : 20px; ">
+								<button type="button" class="btn btn-primary" id="putBtn" onclick="booksUpdate()">수정</button>&nbsp;&nbsp;
+								<button type="button" class="btn btn-danger" id="delBtn" onclick="booksDelete()">삭제</button>&nbsp;&nbsp;
+								<a href="/mng/books"><button type="button" class="btn btn-outline-primary" id="listBtn">목록</button></a>
+							</div>
+						</div>
+					</form>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<script type="text/javascript">
+var imgFile = document.querySelector("#imgFile");
+var imgPutBtn = document.querySelector("#imgPutBtn");
+var book_cover = document.querySelector("#book_cover");
+var putBtn = document.querySelector("#putBtn");
+var fileName;
+
+imgPutBtn.addEventListener("click", function(){
+	imgFile.click();
+});
+
+//프로필 이미지 선택
+imgFile.addEventListener("change", function() {
+	fileName = event.target.files[0];
+	
+	if(isImageFile(fileName)){
+		var reader = new FileReader();
+		reader.onload = function(e) {
+			book_cover.src = e.target.result;
+		}
+		reader.readAsDataURL(fileName);
+		console.log(imgFile);
+		console.log(fileName);
+		console.log(book_cover.src);
+		console.log(book_cover);
+		console.log(book_cover.src);
+	} else {	// 이미지 파일을 선택하지 않음
+		alert("이미지 파일을 선택해주세요!");
+	}
+});
+
+//이미지 파일인지 체크(확장자를 이용해서)
+function isImageFile(file) {
+	var ext = file.name.split(".").pop().toLowerCase(); // 파일명에서 확장자를 가져온다.
+	return ($.inArray(ext, ["jpg","jpeg","gif","png"]) === -1) ? false : true;
+}
+
+const myForm = document.forms[0];
+
+function booksUpdate() {
+	let data = {
+		book_no : myForm.book_no.value,
+		book_title : myForm.book_title.value,
+		book_content : myForm.book_content.value,
+		book_cover : myForm.book_cover.src,
+		book_spmt_ymd : myForm.book_spmt_ymd.value,
+		book_author : myForm.book_author.value,
+		pub_nm : myForm.pub_nm.value,
+		book_talt : myForm.book_talt.value,
+		book_margin : myForm.book_margin.value,
+		book_mileage : myForm.book_mileage.value,
+		ccg_b001 : myForm.ccg_b001.value,
+		ccg_b002 : myForm.ccg_b002.value,
+		ccg_b003 : myForm.ccg_b003.value,
+		book_page_cnt : myForm.book_page_cnt.value,
+		book_amt : myForm.book_amt.value,
+		book_discount : myForm.book_discount.value,
+		book_ntsl_amt : myForm.book_ntsl_amt.value,
+		book_isbn : myForm.book_isbn.value
+	}
+	
+	let xhr = new XMLHttpRequest();
+	xhr.open("put","/mng/books",true);
+	xhr.setRequestHeader("Content-Type","application/json;charset=utf-8")
+	xhr.setRequestHeader("${_csrf.headerName}", "${_csrf.token}");
+	xhr.onreadystatechange = function(){
+		if(xhr.readyState== 4 && xhr.status == 200){
+			if(xhr.responseText != 0){
+				alert("수정 성공");
+				location.href="/mng/books";
+			}
+		}
+	}
+	xhr.send(JSON.stringify(data))
+	console.log(JSON.stringify(data));
+}
+
+window.onload = function(){
+	const url = document.location.href;
+	const urlArr = url.split("/");
+	const no = urlArr[urlArr.length-1];
+	var putBtn = $("#putBtn");
+	var delBtn = $("#delBtn");
+	var listBtn = $("#listBtn");
+	
+	$.ajax({
+		type : "get",
+		url : "/mng/books/booksInfo/"+no,
+		data : "",
+		contentType : "application/json; charset=utf-8",
+		success : function(result){
+			console.log("result : " + result);
+			console.log(JSON.stringify(result));
+			$("#book_no").val(result.book_no);
+			$("#book_title").val(result.book_title);
+			$("#book_content").val(result.book_content);
+			$("#book_cover").attr("src",result.book_cover);
+			$("#book_spmt_ymd").val(result.book_spmt_ymd);
+			$("#book_author").val(result.book_author);
+			$("#pub_nm").val(result.pub_nm);
+			$("#book_talt").val(result.book_talt);
+			$("#book_margin").val(result.book_margin);
+			$("#book_mileage").val(result.book_mileage);
+			$('input:radio[name="ccg_b001"][value="'+ result.ccg_b001 +'"]').attr('checked', 'checked');
+			$('input:radio[name="ccg_b002"][value="'+ result.ccg_b002 +'"]').attr('checked', 'checked');
+			$("#ccg_b003").val(result.ccg_b003);
+			$("#book_page_cnt").val(result.book_page_cnt);
+			$("#book_amt").val(result.book_amt);
+			$("#book_discount").val(result.book_discount);
+			$("#book_ntsl_amt").val(result.book_ntsl_amt);
+			$("#book_isbn").val(result.book_isbn);
+		}
+	});
+}
+</script>

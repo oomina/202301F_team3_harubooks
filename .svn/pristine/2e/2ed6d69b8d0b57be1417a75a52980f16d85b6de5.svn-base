@@ -1,0 +1,15 @@
+package kr.or.ddit.service.omn.books;
+
+import java.util.List;
+
+import kr.or.ddit.vo.omn.MngBooksVO;
+import kr.or.ddit.vo.omn.MngPaginationInfoVO;
+import kr.or.ddit.vo.omn.NewBookRequestVO;
+
+public interface IMngBookRequestService {
+	public List<NewBookRequestVO> requestList();
+	public int requestCount(MngPaginationInfoVO<NewBookRequestVO> pagingVO);
+	public int requestAllCount(String nbr_no);
+	public List<NewBookRequestVO> selectRequestList(MngPaginationInfoVO<NewBookRequestVO> pagingVO);
+	public int booksInsert(MngBooksVO mngBooksVO);
+}

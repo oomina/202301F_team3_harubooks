@@ -1,0 +1,146 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+    <div class="content-wrapper" style="padding : 10px;">
+		<div class="row" style=" padding : 10px;">
+            <div class="col-12 grid-margin stretch-card">
+                <div class="card">
+                    <div class="card-body">
+                        <h4 class="card-title" style="font-size:1.25rem; font-family: 'Nunito', sans-serif;">공지사항 등록</h4>
+                        <form class="forms-sample" action="/mng/board/notice" method="post" enctype="multipart/form-data">
+                            <div class="form-group">
+                                <label for="nTitle">제목</label>
+                                <input type="text" class="form-control" id="nTitle" name="notice_title"placeholder="제목을 입력해주세요.">
+                            </div>
+                            <div class="form-group">
+                                <label for="nContent">내용</label>
+                                <textarea class="form-control" id="nContent" rows="4" name="notice_content"></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label for="nFile">파일</label><br>
+                                <input type="file" id="nFile" name="notice_file">
+                            </div>
+                            <div style="float : right; ">
+	                            <button type="button" onclick="fNoticeInsert()" class="btn btn-primary mr-2">등록</button>
+	                            <button type="button" class="btn btn-outline-primary" onclick="location.href='/mng/notice'">목록</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script>
+    const nFile = document.querySelector("#nFile");   // input file
+    const nFileUpload = document.querySelector("#nFileUpload"); // button file upload
+	const nTitle = document.querySelector("#nTitle");         // 공지사항 제목
+    const nContent = document.querySelector("#nContent");    // 공지사항 내용
+    const nFileName = document.querySelector("#nFileName"); // 첨부파일 이름 뜨는 곳
+
+/*     function fFileUpload(){
+        nFile.click();
+    }
+ */
+    function fNoticeInsert(){
+        let formData = new FormData();
+        formData.append("notice_title", nTitle.value);
+        formData.append("notice_content", nContent.value);
+        
+        if(nFile.files[0] != undefined){
+	        formData.append("notice_file", nFile.files[0]);
+		}
+        
+        console.log(nTitle.value, nContent.value, nFile.files[0]);
+
+        $.ajax({
+        	type : "post",
+			url : "/mng/board/notice",
+			beforeSend : function(xhr){
+				xhr.setRequestHeader("${_csrf.headerName}", "${_csrf.token}");
+			},
+			data : formData,
+			dataType : "text",
+			processData : false,
+			contentType : false,
+			success : function(data){
+				if(data == "fail"){
+					alert("등록 실패하였습니다. 다시 시도해주세요.");
+				} else {
+					alert("등록되었습니다.");
+					location.href="/mng/notice/"+data;
+				}
+			}
+        	
+        })
+        
+        /* var xhr = new XMLHttpRequest();
+        xhr.open("POST", "/mng/board/notice", true);
+        xhr.setRequestHeader("Content-Type", "application/json; charset=UTF-8");
+		xhr.setRequestHeader("${_csrf.headerName}", "${_csrf.token}"); 
+        xhr.onreadystatechange = function(){
+            if(xhr.readyState == 4 && xhr.status == 200){
+            	alert("체킁")
+                console.log(xhr.responseText);
+            }
+        }
+        xhr.send(formData); */
+    }
+    
+ 	// 이미지 파일인지 확인
+	/* function isImageFile(file){
+		var ext = file.name.split(".").pop().toLowerCase();	// 파일명에서 확장자명을 가져온다. pop은 마지막요소를 꺼냄
+		// 확장자 중 이미지에 해당하는 확장자가 아닌 경우 포함되어 있는 문자가 없으니까 -1(false)가 리턴
+		// 확장자 중 이미지 확장자가 포함되어 있다면 0보다 큰 수 일테니 true가 리턴
+		return ($.inArray(ext, ["jpg", "jpeg", "gif", "png"]) === -1) ? false : true; 
+	// inArray(비교할 대상, 배열) -> 비교대상을 배열에 있는 내용을 하나씩 꺼내서 비교
+	} 
+    
+	$(function(){
+		nFile.on("change", function(event){
+			console.log("change event...!");
+			var files = event.target.files;
+			var file = files[0];
+			
+			if(isImageFile(file)){ // 이미지 파일 일 때만 썸네일 생성하고자 이미지임을 확인
+				// 비동기 처리시, 파일 데이터를 전송할 때에는 무조건!!! FormData()를 이용하여 데이터를 전송한다
+				var formData = new FormData();
+				formData.append("nFile", nFile.files[0]);
+				formData.append("nTitle", nTitle.value);
+		        formData.append("nContent", nContent.value);
+				
+				$.ajax({
+					type : "post",
+					url : "/ajax/uploadAjax",
+					data : formData,
+					dataType : "text",
+					processData : false,
+					contentType : false,
+					success : function(data){
+						alert(data);
+						if(data === "UPLOAD SUCCESS"){
+							var file = event.target.files[0]; 
+							// ajax는 비동기라 시점이 일정하지 않아서 앞에서 변수에 선언한 파일을 가져오면 제대로 읽어오지 못할 수 있음. 
+							// 처음에 발생한 event에서 파일을 꺼내옴
+							var reader = new FileReader();
+							reader.onload = function(e){
+								console.log(e)
+								
+									e.target.result 결과값
+									data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAtQAAAFDCAYAAAAappmWAAA
+									이미지를 base64로 코드화 시킨 내용
+								
+								$("#preview").attr("src", e.target.result);
+							}
+							reader.readAsDataURL(file);
+							 
+						}
+					}
+					
+				})
+			} else { 				// 이미지 파일이 아닐 때
+				alert("이미지를 넣으라구요!!");
+			}
+		});
+	}); */
+
+</script>

@@ -1,0 +1,220 @@
+@charset "UTF-8";
+   @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@200&display=swap');
+   @import url('https://fonts.googleapis.com/css2?family=Nanum+Pen+Script&display=swap');
+   @import url('https://fonts.googleapis.com/css2?family=Jua&display=swap');
+   @import url('https://fonts.googleapis.com/css2?family=Nanum+Gothic&display=swap');
+   
+   #ebook-select{
+      display: flex;
+      width: 100%;
+      padding: 5px 50px 0px 50px;
+      font-weight: bold;
+      align-items: center;
+   }
+   
+   #ebook-my{
+    	flex: 25;
+    	font-family: 'Nanum Gothic', sans-serif;
+    	font-size: 1.5em;
+    	color: #53b12e;
+   }
+   
+   #ebook-input{
+	    flex: 60;
+	    text-align: center;
+	    font-family: 'Nanum Gothic', sans-serif;
+   }
+
+   #ebook-input input[type='text']{
+   	  font-size: 0.9em;
+      text-align: center;
+      width: 70%;
+      padding: 8px;
+      border-radius: 0.5rem;
+      border: 2px solid #53b12e;
+      font-weight: bold;
+      outline: none;
+   }
+   
+   #ebook-input button[type='button']{
+      font-family: 'Nanum Gothic', sans-serif;
+      padding: 10.5px;
+   	  color: white;
+   	  border: none;
+   	  background-color: #53b12e;
+   	  font-weight: bold;
+   	  cursor: pointer;
+   	  border-radius: 0.5rem;
+   }
+   
+   #ebook-options{
+      flex:15;
+   }
+   
+   #ebook_option{
+   	  font-family: 'Nanum Gothic', sans-serif;
+   	  border-radius: 0.5rem;
+      border: 2px solid #53b12e;	
+      padding: 2px;
+   }
+   
+   #ebookLists{
+      margin: 0px 30px 0px 30px;
+      display: grid;
+      grid-template-columns: repeat(auto-fit,minmax(350px, auto));
+      height: 570px;
+   }
+
+   .ebookList{
+	   display: flex;
+	   margin-left: 2px;
+	   margin-top: 30px;
+	   width: 420px;
+	   height: 270px;
+	   border: 0.2px solid #bdbdbd88;
+	   border-radius: 0.5rem;
+   }
+   
+   
+   #ebook-image{
+    flex: 30;
+    text-align: center;
+    margin-top: 40px;
+    margin-left: 13px;
+   }
+
+   #ebook-info{
+	  flex: 60;
+	  text-align: center;
+	  margin-top: 20px;
+   }
+   
+	#ebook_title{
+      font-family: 'Nanum Gothic', sans-serif;
+      font-size: 1.2em;
+      font-weight: bold;
+      color: #53b12e;	
+	}
+	
+	#ebook-gauge-div{
+      width: 60%;
+      height: 5px;
+      border: 1px solid rgb(177, 175, 175);
+      margin: 20px auto 1px auto;
+      padding: 7px;
+      position: relative;
+	}
+	
+	#ebook-gauge{
+		width: 0%;
+		height: 100%;
+		background-color: #53b12e;
+		position: absolute;
+		top: 0px;
+		left: 0px;
+	}
+	
+	#ebook-gauge-p{
+		font-family: 'Nanum Gothic', sans-serif;
+		font-weight: bold;
+		font-size: 0.9em;
+		
+	}
+	
+	#ebook-date{
+		padding-top: 15px;
+		color: gray;
+		font-size: 0.8em;
+	}
+	
+	.date-info{
+		width: 500px;
+	}
+	
+	.ebook-see{
+		margin-top: 15px;
+	    font-family: 'Nanum Gothic', sans-serif;
+	    font-weight: bold;
+	    font-size: 1.1em;
+	    padding: 10px 35px 10px 35px;
+	    background-color: #53b12e;
+	    color: white;
+	    border: none;
+	    border-radius: 0.8rem;
+	    cursor: pointer;
+	}
+	
+	.ebook-see:hover{
+		box-shadow: 0px 0px 4px 4px #53b12e5d;
+	}
+	
+   .ebook-url{
+	    flex: 20;
+	    margin-top: 80px;    
+		margin-right: 18px;
+   }
+  
+   #pagingArea{
+		text-align: center;
+   }
+   
+   #pagingBtns{
+   		display: flex;
+ 		align-items: center;
+   		padding: 0px 30% 0px 30%;
+ 		justify-content: center;
+ 		margin-top: 70px;
+   }
+
+	.page-item{
+ 		margin-right: 30px; 
+	}	
+	
+	.page-link{
+		font-family: 'Nanum Gothic', sans-serif;
+		font-weight: bold;
+		font-size: 1.2em;
+		color: #53b12e;
+	}
+	
+	.page-add-link{
+		font-size: 1.4em;
+	}
+	
+	#no-ebook-img-div{
+	    flex: 30;
+	    margin-top: 40px;
+	    margin-left: 20px;
+	}
+	
+	#no-ebook-img{
+		text-align: center;
+	    border: 2px solid #53b12e;
+	    width: 90%;
+	    height: 75%;
+	}
+	
+	#no-ebook-plus{
+		margin: 55px auto;
+    	border: 2px solid #53B12C;
+    	width: 55px;
+    	height: 55px;
+    	border-radius: 50%;
+    	text-align: center;
+	}
+	
+	#no-ebook-plus p{
+    	font-size: 35px;
+     	font-weight: bold;
+     	color: #53B12C;
+	}
+	
+	#no-ebook-text{
+	    flex: 70;
+	    font-size: 25px;
+	    color: #53B12C;
+	    text-align: center;
+	    margin-top: 100px;
+	    font-weight: bold;
+	}
+   

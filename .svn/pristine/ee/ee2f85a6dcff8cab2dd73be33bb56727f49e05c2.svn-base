@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+ <mapper namespace="kr.or.ddit.mapper.odh.wishListMapper">
+ 	
+ 	<!-- 책 목록 불러오기 -->
+ 	<select id="selectWishList" parameterType="String" resultType="bookVO">
+ 		select
+ 		   c.book_no,
+ 		   c.ae_id,
+ 		   a.book_cover,
+	       a.ccg_b001,
+	       a.ccg_b002,
+	       a.ccg_b003,
+	       a.book_author,
+	       a.book_title,
+	       b.book_amt,
+	       b.book_ntsl_amt
+	 	from books a, paper_book b, book_wishlist c
+		   where c.ae_id = #{ae_id}
+		   and a.book_no = b.book_no
+		   and b.book_no = c.book_no
+ 	</select>
+ 	
+ 	<!-- 찜 목록 삭제하기 -->
+ 	<delete id="deleteList" parameterType="String">
+ 		delete from book_wishlist
+    	where book_no = #{book_no} and ae_id = #{ae_id}
+ 	</delete>
+ 	
+ 	<!-- 찜 목록 체크로 삭제하기 -->
+ 	<delete id="delete" parameterType="String">
+ 		delete from book_wishlist
+    	where book_no = #{book_no} and ae_id = #{ae_id}
+ 	</delete>
+ 	
+ 	<!-- 장바구니 추가하기 -->
+	<insert id="inputCart" parameterType="cartVO">
+		insert into cart (ae_id, book_no,cart_cnt)
+		values(#{ae_id},#{book_no},#{cart_cnt})
+	</insert>
+	
+ 	<!-- 장바구니 체크 추가하기 -->
+	<insert id="insert" parameterType="cartVO">
+		insert into cart (ae_id, book_no,cart_cnt)
+		values(#{ae_id},#{book_no},#{cart_cnt})
+	</insert>
+	
+	<!-- 장바구니에 존재 여부 확인하기 -->
+	<select id="existCart" parameterType="cartVO" resultType="int">
+		select count(*)
+		from cart
+		where ae_id = #{ae_id} and book_no = #{book_no}
+	</select>
+
+ </mapper>

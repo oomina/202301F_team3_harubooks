@@ -1,0 +1,13 @@
+package kr.or.ddit.service.ljy;
+
+import java.util.List;
+
+import kr.or.ddit.vo.ljy.OrderMngVO;
+
+public interface OrderMngService {
+
+	public List<OrderMngVO> orderList();
+
+	public OrderMngVO orderOne(String order_no);
+
+}

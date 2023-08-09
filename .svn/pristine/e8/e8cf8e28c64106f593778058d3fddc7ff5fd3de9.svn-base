@@ -1,0 +1,664 @@
+package kr.or.ddit.controller.kmw.harubooks;
+
+import java.io.IOException;
+import java.net.URLEncoder;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.crypto.AEADBadTagException;
+import javax.inject.Inject;
+import javax.servlet.http.HttpSession;
+
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import kr.or.ddit.ResultStatus;
+import kr.or.ddit.service.FileService;
+import kr.or.ddit.service.LoginService;
+import kr.or.ddit.service.kmw.BookService;
+import kr.or.ddit.service.kmw.OrderService;
+import kr.or.ddit.service.kmw.ReviewService;
+import kr.or.ddit.service.ljy.NoticeService;
+import kr.or.ddit.vo.FileVO;
+import kr.or.ddit.vo.UserInfoVO;
+import kr.or.ddit.vo.kmw.BookInfoVO;
+import kr.or.ddit.vo.kmw.CartVO;
+import kr.or.ddit.vo.kmw.OrderVO;
+import kr.or.ddit.vo.kmw.PaginationVO;
+import kr.or.ddit.vo.kmw.ReviewVO;
+import kr.or.ddit.vo.ljy.NoticeVO;
+import lombok.extern.slf4j.Slf4j;
+
+
+@Slf4j
+@Controller
+@RequestMapping("/harubooks")
+public class HaruBooksController {
+
+	@Inject
+	private BookService service;
+
+	@Inject
+	private LoginService userService;
+
+	@Inject
+	private OrderService orderService;
+	
+	@Inject 	
+	private ReviewService reviewService;
+	
+	@Inject
+	private FileService fileService;
+	
+	@Inject
+	private NoticeService noticeService;
+
+	@GetMapping("")
+	public String firstPage() {
+		return "bookstore/harufirst";
+	}
+
+	@GetMapping("/main")
+	public String mainPage(HttpSession session,Model model) {
+		log.debug("유저 정보 : " + SecurityContextHolder.getContext().getAuthentication());
+		// 시큐리티 세션에 존재하는 유저 ID가져오는 변수
+		String userId = SecurityContextHolder.getContext().getAuthentication().getName();
+		List<BookInfoVO> bestBoookInfo = new ArrayList<BookInfoVO>();
+		List<BookInfoVO> koreaBookList = new ArrayList<BookInfoVO>();
+		List<BookInfoVO> abroadBookList = new ArrayList<BookInfoVO>();
+		List<BookInfoVO> eBookList = new ArrayList<BookInfoVO>();
+		if (userId != null) {
+			List<BookInfoVO> bestSellerList = service.bestSeller();
+			for(BookInfoVO bVO : bestSellerList) {
+				bestBoookInfo.add(service.bestBookInfo(bVO.getBook_no()));
+			}
+			koreaBookList = service.koreaBookList();
+			abroadBookList = service.abroadBookList();
+			eBookList = service.eBookList();
+			int cartCnt = service.cartCnt(userId);
+			session.setAttribute("cartCnt", cartCnt);
+			model.addAttribute("koreaBookList",koreaBookList);
+			model.addAttribute("abroadBookList",abroadBookList);
+			model.addAttribute("eBookList",eBookList);
+			model.addAttribute("bestSellerList", bestBoookInfo);
+			model.addAttribute("userId", userId);
+			return "bookstore/home/home";
+		}else {
+			List<BookInfoVO> bestSellerList = service.bestSeller();
+			for(BookInfoVO bVO : bestSellerList) {
+				bestBoookInfo.add((BookInfoVO) service.bestBookInfo(bVO.getBook_no()));				
+			}
+			koreaBookList = service.koreaBookList();
+			abroadBookList = service.abroadBookList();
+			eBookList = service.eBookList();
+			model.addAttribute("koreaBookList",koreaBookList);
+			model.addAttribute("abroadBookList",abroadBookList);
+			model.addAttribute("eBookList",eBookList);
+			model.addAttribute("bestSellerList", bestBoookInfo);
+			return "bookstore/home/home";
+		}
+	}
+
+	// 도서 분류 클릭시 페이지 이동
+	@RequestMapping(value = "/category")
+	public String bookList(@RequestParam(required = false) String ccg_b002,
+			@RequestParam(required = false) String ccg_b003,
+			@RequestParam(name = "page", required = false, defaultValue = "1") int currentPage,
+			@RequestParam(required = false) String searchWord, Model model) {
+		PaginationVO<BookInfoVO> pagingVO = new PaginationVO<BookInfoVO>();
+
+		// 검색 기능 추가 시 활용
+		if (StringUtils.isNotBlank(searchWord)) {
+			pagingVO.setSearchWord(searchWord);
+			model.addAttribute("searchWord", searchWord);
+		}
+		//전체 검색 헤더 부분에서 검색
+		if(ccg_b002 == null && ccg_b003  == null) {
+			pagingVO.setCurrentPage(currentPage);
+			int totalRecord = service.bookCount(pagingVO); // 총 책의 개수
+			pagingVO.setTotalRecord(totalRecord);
+			// 책 리스트
+			List<BookInfoVO> bookList = service.selectBookListAll(pagingVO);
+			pagingVO.setDataList(bookList);
+			
+			model.addAttribute("bookList", bookList);
+			model.addAttribute("pagingVO", pagingVO);
+				
+		}else {
+			pagingVO.setCcg_b002(ccg_b002);
+			pagingVO.setCcg_b003(ccg_b003);
+			
+			pagingVO.setCurrentPage(currentPage);
+			int totalRecord = service.bookCount(pagingVO); // 총 책의 개수
+			pagingVO.setTotalRecord(totalRecord);
+			// List<BookInfoVO> bookList = service.bookInfo(vo);
+			// 책 리스트
+			List<BookInfoVO> bookList = service.selectBookList(pagingVO);
+			pagingVO.setDataList(bookList);
+			
+			// 책 종류별 카테고리
+			List<String> category = service.kindBycategory(ccg_b002);
+			
+			model.addAttribute("category", category);
+			model.addAttribute("pagingVO", pagingVO);			
+		}
+		
+		return "bookstore/shop/categoryBooks";
+	}
+
+	// 책 클릭시 도서 상세보기 페이지로 이동
+	@GetMapping("/detailBook")
+	public String detailBook(@RequestParam("bookNo") String bookNo, @RequestParam("ccg_b002") String ccg_b002,
+			Model model) {
+		log.info(bookNo);
+		log.info(ccg_b002);
+		BookInfoVO vo = new BookInfoVO();
+		vo.setBook_no(bookNo);
+		vo.setCcg_b002(ccg_b002);
+		BookInfoVO bookInfo = service.detailBook(vo);
+		List<ReviewVO> reviewList = reviewService.reviewList(bookNo);
+		String ae_id = SecurityContextHolder.getContext().getAuthentication().getName();
+		List<FileVO> reviewImgList = fileService.reviewImgList(bookNo);
+		int reviewCnt = reviewService.reviewCnt(bookNo);
+		int reviewTotalScore = reviewService.reviewTotalScore(bookNo);
+		List<ReviewVO> scrList = reviewService.scrList(bookNo);
+		for(ReviewVO rVO : reviewList) {
+			if(rVO.getUa_no() != null) {
+				for(FileVO fVO : reviewImgList) {
+					
+					log.info("유저 아이디 : "+fVO.getAe_id()+" 파일명 : "+fVO.getUa_stre_nm());
+					
+				}
+			}
+		}
+		model.addAttribute("ae_id", ae_id);
+		model.addAttribute("book", bookInfo);
+		model.addAttribute("reviewList", reviewList);
+		model.addAttribute("reviewImgList", reviewImgList);
+		model.addAttribute("reviewCnt",reviewCnt);
+		model.addAttribute("reviewTotalScore",reviewTotalScore);
+		model.addAttribute("scrList", scrList);
+		
+		return "bookstore/shop/book-detail";
+	}
+
+	// 찜목록 추가하기
+	@ResponseBody
+	@PostMapping("/wishList")
+	public String wishList(@RequestBody Map<String, String> resMap) {
+		String ae_id = resMap.get("ae_id");
+		String book_no = resMap.get("book_no");
+		log.info("유저 아이디 : " + ae_id);
+		log.info("책 번호 : " + book_no);
+		String result = null;
+		BookInfoVO vo = new BookInfoVO();
+		vo.setAe_id(ae_id);
+		vo.setBook_no(book_no);
+		boolean isExist = service.existWisthList(vo);
+		if (isExist) {
+			result = "EXIST";
+		} else {
+			ResultStatus res = service.inputWishList(vo);
+			if (res.equals(ResultStatus.OK)) {
+				result = "OK";
+			} else {
+				result = "FAIL";
+			}
+		}
+		return result;
+	}
+
+	// 장바구니 추가하기
+	@ResponseBody
+	@PostMapping("/basketList")
+	public String basketList(@RequestBody Map<String, String> resMap) {
+		String book_no = resMap.get("book_no");
+		String total_price = resMap.get("totalPrice");
+		String cart_cnt = resMap.get("cart_cnt");
+		String ae_id = resMap.get("ae_id");
+		String ccg_b002 = resMap.get("ccg_b002");
+		String result;
+		CartVO vo = new CartVO();
+		vo.setCcg_b002(ccg_b002);
+		vo.setAe_id(ae_id);
+		vo.setBook_no(book_no);
+		vo.setCart_cnt(cart_cnt);
+		vo.setTotal_price(total_price);
+		boolean isExist = service.existCart(vo);
+		if (isExist) {
+			result = "EXIST";
+		} else {
+			ResultStatus res = service.inputCart(vo);
+			if (res.equals(ResultStatus.OK)) {
+				result = "OK";
+			} else {
+				result = "FAIL";
+			}
+		}
+		return result;
+	}
+
+	// 장바구니로 이동하기
+	@PreAuthorize("hasAnyRole('ROLE_MEMBER','ROLE_ADMIN','ROLE_PUBLISHER','ROLE_TEMP')")
+	@GetMapping("/myCart")
+	public String myCart(Model model) {
+		String ae_id = SecurityContextHolder.getContext().getAuthentication().getName();
+		// 1. 장바구니 테이블과 book테이블에서 현재 본인의 장바구니 리스트를 가져온다
+		List<BookInfoVO> cartList = service.cartList(ae_id);
+		int cartCnt = service.cartCnt(ae_id);
+		// 2. 가져온 책 번호를 통해 책 정보를 가져온다 카트와 책테이블 조인을 통해 정보 추출 후 리스트 출력
+		model.addAttribute("cartCnt", cartCnt);
+		model.addAttribute("cart", cartList);
+		return "bookstore/shop/cart";
+	}
+
+	// 장바구니 목록 ajax로 삭제
+	@ResponseBody
+	@GetMapping("/cartDelete")
+	public String cartList(@RequestParam String bookNo) {
+		String ae_id = SecurityContextHolder.getContext().getAuthentication().getName();
+		String book_no = bookNo;
+		String result = null;
+		BookInfoVO vo = new BookInfoVO();
+		vo.setAe_id(ae_id);
+		vo.setBook_no(book_no);
+		int res = service.cartDel(vo);
+		if (res > 0) {
+			result = "OK";
+		} else {
+			result = "FAIL";
+		}
+		return result;
+	}
+
+	// 결제 폼으로 이동
+	@GetMapping("/prodOrderForm")
+	public String prodOrderForm(@RequestParam(name = "book_no", required = false) String book_no,
+			@RequestParam(name = "pl_cnt", required = false) String pl_cnt,
+			@RequestParam(name = "totalPrice", required = false) String totalPrice,
+			@RequestParam(name = "status", required = false) String status, Model model) {
+		log.info("책번호 : " + book_no);
+		log.info("구매 수량 : " + pl_cnt);
+		String userId = SecurityContextHolder.getContext().getAuthentication().getName();
+		log.info("유저 아이디 : " + userId);
+		BookInfoVO vo = new BookInfoVO();
+
+		// 비회원 결제 페이지 이동
+		if (userId == "anonymousUser") {
+			BookInfoVO selectBook = service.selectBook(book_no);
+			vo.setBook_no(book_no);
+			vo.setCcg_b001(selectBook.getCcg_b001());
+			BookInfoVO book = service.detailBook(vo);
+
+			model.addAttribute("book", book);
+			model.addAttribute("pl_cnt", pl_cnt);
+			model.addAttribute("cnt", 1);
+
+		} else {
+			// 1. 회원정보를 가져온다
+			UserInfoVO user = userService.selectUser(userId);
+			// 장바구니를 통해서 결제를 하거나 바로결제를할때 구분해서 로직구현 만약 status가 없으면 바로결제 status가 있으면 장바구니를 통해서
+			// 결제요청이들어옴
+			if (status != null) {
+				log.info("장바구니에서 왔어용");
+				log.info("총 구매 금액은 : " + totalPrice);
+				// 장바구니에 있는 목록 가져오기
+				List<BookInfoVO> cartList = service.cartList(userId);
+				// 장바구니에 있는 목록 개수 가져오기
+				int cnt = service.cartCnt(userId);
+				String stat = "cart";
+				model.addAttribute("userInfo", user);
+				model.addAttribute("cartList", cartList);
+				model.addAttribute("cnt", cnt);
+				model.addAttribute("totalPrice", totalPrice);
+				model.addAttribute("stat", stat);
+				return "bookstore/shop/prod-order";
+			} else {
+				log.info("바로구매에서 왔어용");
+				BookInfoVO selectBook = service.selectBook(book_no);
+				vo.setBook_no(book_no);
+				vo.setCcg_b001(selectBook.getCcg_b001());
+
+				BookInfoVO book = service.detailBook(vo);
+				model.addAttribute("userInfo", user);
+				model.addAttribute("book", book);
+				model.addAttribute("pl_cnt", pl_cnt);
+				model.addAttribute("cnt", 1);
+
+			}
+		}
+		return "bookstore/shop/prod-order";
+	}
+
+	// 회원 결제 로직
+	@ResponseBody
+	@PostMapping("/memOrder")
+	public String memOrder(@RequestBody Map<String, String> resMap) {
+		// 배송 날짜 구하기
+		LocalDateTime now = LocalDateTime.now();
+		String currentNow = now.format(DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss"));
+		// 바로구매로 결제진행
+		String result;
+		if (resMap.get("stat") == null) {
+			String ae_id = resMap.get("buyerId"); // 사용자 아이디
+			String order_dmnd_nocs = resMap.get("prodCnt");// 총 요청 건수
+			String order_mileage = resMap.get("useMile"); // 사용한 마일리지
+			String book_no = resMap.get("bookNo"); // 책 번호
+			String pl_cnt = resMap.get("pl_cnt"); // 권당 책 개수
+			String user_zip = resMap.get("postcode");
+			String user_addr = resMap.get("address");
+			String user_daddr = resMap.get("detailAddress");
+			String user_telno = resMap.get("buyerTel");
+			String user_nm = resMap.get("buyerName");
+			String reciMileage = resMap.get("reciMileage");
+
+			// 책정보 조회
+			BookInfoVO book = service.selectBook(book_no);
+			// ccg_b001 값과 book_no를 통해서 가격 가져오기
+			BookInfoVO book2 = new BookInfoVO();
+			book2.setCcg_b001(book.getCcg_b001());
+			book2.setBook_no(book_no);
+			BookInfoVO bookVo = service.detailBook(book2);
+			String pl_prchs_amt = bookVo.getBook_amt();
+			String book_ntsl_amt = bookVo.getBook_ntsl_amt();
+
+			OrderVO orderVO = new OrderVO();
+			orderVO.setAe_id(ae_id);
+			orderVO.setOrder_dmnd_nocs(order_dmnd_nocs);
+			orderVO.setOrder_mileage(Integer.parseInt(order_mileage));
+			orderVO.setBook_no(book_no);
+			orderVO.setPl_cnt(pl_cnt);
+			orderVO.setUser_zip(user_zip);
+			orderVO.setUser_addr(user_addr);
+			orderVO.setUser_daddr(user_daddr);
+			orderVO.setUser_telno(user_telno);
+			orderVO.setUser_nm(user_nm);
+			orderVO.setExpected_mileage(reciMileage);
+			orderVO.setBook_ntsl_amt(book_ntsl_amt);
+			orderVO.setPl_prchs_amt(pl_prchs_amt);
+			orderVO.setCcg_b001(book2.getCcg_b001());		
+			orderVO.setDelivery_start_ymd(currentNow);
+			// 주문 결제 db삽입
+
+			int res = orderService.insertOrder(orderVO);
+
+			if (res > 0) {
+				int res2 = orderService.insertPurchs(orderVO);				
+				int res3 = orderService.insertDelivery(orderVO);
+				result = "OK";
+				// 마일리지를 썼으면 쓴만큼 차감
+				if (Integer.parseInt(order_mileage) > 0) {
+					orderService.spendMileage(orderVO);
+				}
+			} else {
+				result = "FAIL";
+			}
+			return result;
+		} else {
+			
+			String ae_id = resMap.get("buyerId"); // 사용자 아이디
+			String order_dmnd_nocs = resMap.get("prodCnt");// 총 요청 건수
+			String order_mileage = resMap.get("useMile"); // 사용한 마일리지
+			String user_zip = resMap.get("postcode");
+			String user_addr = resMap.get("address");
+			String user_daddr = resMap.get("detailAddress");
+			String user_telno = resMap.get("buyerTel");
+			String user_nm = resMap.get("buyerName");
+			String reciMileage = resMap.get("reciMileage");
+
+			OrderVO orderVO = new OrderVO();
+			orderVO.setAe_id(ae_id);
+			orderVO.setOrder_dmnd_nocs(order_dmnd_nocs);
+			orderVO.setOrder_mileage(Integer.parseInt(order_mileage));
+			orderVO.setUser_zip(user_zip);
+			orderVO.setUser_addr(user_addr);
+			orderVO.setUser_daddr(user_daddr);
+			orderVO.setUser_telno(user_telno);
+			orderVO.setUser_nm(user_nm);
+			orderVO.setExpected_mileage(reciMileage);
+			orderVO.setDelivery_start_ymd(currentNow);
+			
+			// pl_cnt값 bookNo값 가져오고 set해준다.
+			List<BookInfoVO> cartList = service.cartList(ae_id);
+			int res = orderService.insertOrder(orderVO);
+			boolean isExist = false;
+			if (res > 0) {
+				for (BookInfoVO vo : cartList) {
+					int bookPrice = Integer.parseInt(vo.getBook_ntsl_amt());
+					int bookCnt = Integer.parseInt(vo.getCartVO().getCart_cnt());
+					float mileage = vo.getBook_mileage();
+					int getMileage = (int) Math.round(bookPrice * bookCnt * 0.05);
+					orderVO.setPl_prchs_amt(vo.getBook_amt());
+					orderVO.setBook_no(vo.getBook_no());
+					orderVO.setBook_ntsl_amt(vo.getBook_ntsl_amt());
+					orderVO.setPl_cnt(vo.getCartVO().getCart_cnt());
+					orderVO.setCcg_b001(vo.getCcg_b001());
+					orderVO.setExpected_mileage(Integer.toString(getMileage));
+					log.info("책 제목 : " + vo.getBook_title());
+					log.info("책 원가 : " + vo.getBook_amt());
+					log.info("책 할인률 적용 가격 : " + bookPrice);
+					log.info("책 수량 : " + bookCnt);
+					log.info("얻을 수 있는 마일리지 : " + getMileage);
+					log.info("사용한 마일리지 : " + order_mileage);
+					int res2 = orderService.insertPurchs(orderVO);
+				}
+				int res3 = orderService.insertDelivery(orderVO);
+				
+				// 마일리지를 썼으면 쓴만큼 차감
+				if (Integer.parseInt(order_mileage) > 0) {
+					orderService.spendMileage(orderVO);
+				}
+
+				orderService.deleteCart(ae_id);
+
+				result = "OK";
+			} else {
+				result = "FAIL";
+			}
+
+		}
+		return result;
+	}
+
+	// 비회원 결제 로직
+	@ResponseBody
+	@PostMapping("/nonMemOrder")
+	public String nonMemOrder(@RequestBody Map<String, String> resMap) {
+		// 배송 날짜 구하기
+		LocalDateTime now = LocalDateTime.now();
+		String currentNow = now.format(DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss"));
+		// 바로구매로 결제진행
+		String result;
+
+		String ae_id = resMap.get("buyerEmail");
+		String ae_pw = resMap.get("nonMemPw");
+		String order_dmnd_nocs = resMap.get("prodCnt");
+		String book_no = resMap.get("bookNo");
+		String pl_cnt = resMap.get("pl_cnt");
+		String user_zip = resMap.get("postcode");
+		String user_addr = resMap.get("address");
+		String user_daddr = resMap.get("detailAddress");
+		String user_telno = resMap.get("buyerTel");
+		String user_nm = resMap.get("buyerName");
+
+		// 책정보 조회
+		BookInfoVO book = service.selectBook(book_no);
+		// ccg_b001 값과 book_no를 통해서 가격 가져오기
+		BookInfoVO book2 = new BookInfoVO();
+		book2.setCcg_b001(book.getCcg_b001());
+		book2.setBook_no(book_no);
+		BookInfoVO bookVo = service.detailBook(book2);
+		String pl_prchs_amt = bookVo.getBook_amt();
+		String book_ntsl_amt = bookVo.getBook_ntsl_amt();
+
+		OrderVO orderVO = new OrderVO();
+		orderVO.setAe_id(ae_id);
+		orderVO.setAe_pw(ae_pw);
+		orderVO.setOrder_dmnd_nocs(order_dmnd_nocs);
+		orderVO.setOrder_mileage(0);
+		orderVO.setBook_no(book_no);
+		orderVO.setPl_cnt(pl_cnt);
+		orderVO.setUser_zip(user_zip);
+		orderVO.setUser_addr(user_addr);
+		orderVO.setUser_daddr(user_daddr);
+		orderVO.setUser_telno(user_telno);
+		orderVO.setUser_nm(user_nm);
+		orderVO.setExpected_mileage("0");
+		orderVO.setBook_ntsl_amt(book_ntsl_amt);
+		orderVO.setPl_prchs_amt(pl_prchs_amt);
+		orderVO.setCcg_b001(book2.getCcg_b001());
+		orderVO.setDelivery_start_ymd(currentNow);
+		// 주문 결제 db삽입
+		// 비회원 등록
+		String registerNonMem = userService.insertNonMember(orderVO);
+		
+		int res = orderService.insertOrder(orderVO);
+
+		if (res > 0) {
+			int res2 = orderService.insertPurchs(orderVO);
+			int res3 = orderService.insertDelivery(orderVO);
+			result = "OK";
+		} else {
+			result = "FAIL";
+		}
+		return result;
+	}
+	
+	// 구매 완료후 구매 리스트 보여주는 페이지
+	@GetMapping("/orderComplete")
+	public String orderComplete(@RequestParam String ae_id, Model model) {
+		List<OrderVO> orderCompleteList = orderService.orderCompleteList(ae_id);
+		model.addAttribute("orderList", orderCompleteList);
+		return "bookstore/shop/order-complete";
+	}
+	
+	// 리뷰작성 로직 
+	// 리뷰작성 가능여부 체크
+	@ResponseBody
+	@PostMapping("reviewCheck")
+	public String reviewCheck(@RequestBody BookInfoVO bookVO) {
+		int res = service.reviewCheck(bookVO);
+		int res2 = service.reviewCheck2(bookVO);
+		log.info(""+res);
+		String result;
+		if(res > 0) {
+			if(res2==0) {
+				result = "OK";				
+			}else {
+				result = "EXIST";
+			}
+		}else {
+			result = "FAIL";
+		}
+		return result;
+	}
+	
+	// 리뷰 작성
+	@PostMapping("/review")
+	public String review(ReviewVO reviewVO) throws IOException {
+		log.info("사용자 아이디"+reviewVO.getAe_id());
+		log.info("책 번호"+reviewVO.getBook_no());
+		BookInfoVO bVO = service.selectBook(reviewVO.getBook_no());
+		
+		String goPage = "";
+		String result = reviewService.insertReview(reviewVO);
+		if(result.equals("OK")) {
+			String encodeCcg_b002 = URLEncoder.encode(bVO.getCcg_b002(),"UTF-8");
+			goPage = "redirect:/harubooks/detailBook?bookNo="+bVO.getBook_no()+"&ccg_b002="+encodeCcg_b002+"#reviewContent";
+			return goPage;
+		}else {
+			String encodeCcg_b002 = URLEncoder.encode(bVO.getCcg_b002(),"UTF-8");
+			goPage = "redirect:/harubooks/detailBook?bookNo="+bVO.getBook_no()+"&ccg_b002="+encodeCcg_b002+"#reviewContent";
+			return goPage;
+		}
+	}
+	
+	// 리뷰 삭제
+	@ResponseBody
+	@PostMapping("/deleteReview")
+	public String deleteReview(@RequestBody Map<String, String> resMap) {
+		String ae_id = resMap.get("ae_id");
+		String book_no = resMap.get("book_no");
+		String result;
+		ReviewVO rVO = new ReviewVO();
+		rVO.setAe_id(ae_id);
+		rVO.setBook_no(book_no);
+
+		int res = reviewService.deleteReview(rVO);
+		if(res > 0) {
+			result = "OK";
+		}else {
+			result = "FAIL";
+		}
+		return result;
+	}
+	
+	// 고객센터 faq로 이동하기
+	@GetMapping("/faq")
+	public String faq() {
+		return "bookstore/others/faq";
+	}
+	
+	// 공지사항 이동
+	@GetMapping("/noticeView")
+	public String noticeView() {
+		return "bookstore/others/noticeView";
+	}
+	
+	// 공지사항 내용 꺼내오기 AJAX
+	@ResponseBody
+	@GetMapping(value = "/getNotice")
+	public Map<String, Object> noticeList(@RequestParam int curPage){
+		log.info(""+curPage);
+		List<NoticeVO> noticeList = noticeService.noticeListPaging(curPage);
+		int noticeCnt = noticeService.noticeCnt();
+		Map<String, Object> resMap = new HashMap<String, Object>();
+		resMap.put("noticeList", noticeList);
+		resMap.put("noticeCnt", noticeCnt);
+		return resMap;
+	}
+	
+	// 공지사항 세부사항
+	@ResponseBody
+	@GetMapping("noticeDetail")
+	public Map<String, Object> noticeDetail(@RequestParam String noticeNo) {
+		NoticeVO vo = new NoticeVO();
+		vo = noticeService.noticeOne(noticeNo);
+		List<FileVO> file = fileService.fileList(vo.getUa_no());
+		Map<String, Object> resMap = new HashMap<String, Object>();
+		resMap.put("noticeInfo", vo);
+		resMap.put("unityFile", file);
+		return resMap;
+	}
+	
+	// 책 비교 후 책 리스트 검색
+	@ResponseBody
+	@GetMapping("/compareBook")
+	public Map<String, Object> compareBook(@RequestParam String searchBook){
+		List<BookInfoVO> compareBook = service.searchCompareBook(searchBook);
+		List<ReviewVO> scrList = new ArrayList<ReviewVO>();
+		for(BookInfoVO book : compareBook) {
+			scrList.add(reviewService.reviewAvg(book.getBook_no()));
+			log.info("책번호 : "+book.getBook_no());					
+		}
+		
+		Map<String, Object> resMap = new HashMap<String, Object>();
+		resMap.put("compareBook", compareBook);
+		resMap.put("scrList", scrList);
+		return resMap;
+	}
+}

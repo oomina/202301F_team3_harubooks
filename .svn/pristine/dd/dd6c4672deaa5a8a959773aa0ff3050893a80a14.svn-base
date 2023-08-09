@@ -1,0 +1,206 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+<div class="content-wrapper" style="padding : 10px;">
+	<div class="row" style=" padding : 10px;">
+		<div class="col-lg-12 grid-margin stretch-card">
+			<div class="card">
+				<div class="card-body">
+					<h4 class="card-title">문의 상세</h4>
+					<div class="table-responsive pt-3">
+						<table class="table table-bordered" style="font-size : 0.875rem;">
+							<thead>
+								<tr>
+									<th class="table-primary" style="width:10%;">번호</th>
+									<td id="inquiry_no"></td>
+									<th class="table-primary" style="width:10%;">작성자</th>
+									<td id="ae_id"></td>
+									<th class="table-primary" style="width:10%;">작성일</th>
+									<td id="inquiry_ymd"></td>
+									<th class="table-primary" style="width:10%;">문의여부</th>
+									<td id="ccg_i001"></td>
+								</tr>
+							</thead>
+							<tbody>
+								<tr>
+									<th class="table-primary" style="width:10%;">제목</th>
+									<td colspan="7" id="inquiry_title"></td>
+								</tr>
+								<tr>
+									<th class="table-primary" style="width:10%;">내용</th>
+									<td colspan="7" style="height : 250px;" id="inquiry_content"></td>
+								</tr>
+								<tr>
+									<th class="table-primary" style="width:10%;">첨부파일</th>
+									<td colspan="7" id="ua_no">첨부된 파일이 없습니다.</td>
+								</tr>
+							</tbody>
+							<tfoot id="iTfoot">
+							</tfoot>
+						</table>
+					</div>
+					<div class="row" style="padding-left : 30px; margin-top : 20px; ">
+						<a href="/mng/inquiry"><button type="button" class="btn btn-outline-primary" id="noticeBtn">목록</button></a>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<script>
+	const url = document.location.href;
+	const urlArr = url.split("/");
+	const inq_no = urlArr[urlArr.length-1];
+	
+	let inquiry_no = document.querySelector("#inquiry_no");
+	let ae_id = document.querySelector("#ae_id");
+	let inquiry_ymd = document.querySelector("#inquiry_ymd");
+	let ccg_i001 = document.querySelector("#ccg_i001");
+	let inquiry_title = document.querySelector("#inquiry_title");
+	let inquiry_content = document.querySelector("#inquiry_content");
+	let ua_no = document.querySelector("#ua_no");
+
+	let iTfoot = document.querySelector("#iTfoot");
+	
+	function fInquiryOne(inq_no){
+		let xhr = new XMLHttpRequest();
+		xhr.open("GET", "/mng/board/inquiry/" + inq_no, true);
+		xhr.onreadystatechange = function() {
+			if(xhr.readyState == 4 && xhr.status == 200){
+				let inqOne = JSON.parse(xhr.responseText);
+				console.log(inqOne);
+				inquiry_no.innerText = inqOne.inquiry_no;
+				ae_id.innerText = inqOne.ae_id;
+				inquiry_ymd.innerText = inqOne.inquiry_ymd;
+				ccg_i001.innerText = inqOne.ccg_i001;
+				// if(inqOne.ccg_i001 == '문의대기'){
+				// 	ccg_i001.innerHTML = '<code>'+inqOne.ccg_i001+'</code>';
+				// } 
+				// if(inqOne.ccg_i001 == '문의완료'){
+				// 	ccg_i001.innerHTML = 'inqOne.ccg_i001';
+				// }
+
+				inquiry_title.innerText = inqOne.inquiry_title;
+				inquiry_content.innerText = inqOne.inquiry_content;
+				// 첨부파일 위치
+				// 답글 
+				let replyHtml = "";
+				if(inqOne.inquiry_reply == "0"){
+					replyHtml += `<tr><td colspan='8' style="text-align : center;">작성된 답글이 없습니다.</td></tr>
+									<tr>
+										<th class="table-primary">답글</th>
+										<td colspan="6">
+											<textarea id="inq_rep" rows="5" cols="100"></textarea>
+										</td>
+										<td style="width: 5%;">
+											<button type="button" class="btn btn-primary" id="repBtn">답글등록</button>
+										</td>
+									</tr>`
+				} else {
+					replyHtml += `<tr>
+									<th class ="table-primary">관리자</th>
+									<td colspan="7">\${inqOne.inquiry_reply}</td></tr>`
+				}	
+				iTfoot.innerHTML = replyHtml;
+			}
+		}
+		xhr.send();
+	}
+	// 여기서부터 확인해볼것!!
+	// function fInqRepInsert(){
+	// 	let inq_rep = document.querySelector("#inq_rep");
+	// 	let tblstr = "";
+	// 	let data = {
+	// 		ir_content : inq_rep.innerHTML
+	// 		, inquiry_no : inquiry_no.value
+    // 		, ae_id : ae_id.value
+	// 	}
+	// 	console.log(data);
+	// 	let xhr = new XMLHttpRequest();
+	// 	xhr.open("post", "/mng/board/inquiry/rep", true);
+	// 	xhr.setRequestHeader("Content-Type", "application/json; charset=UTF-8");
+	// 	xhr.setRequestHeader("${_csrf.headerName}", "${_csrf.token}");
+	// 	xhr.onreadystatechange = function(){
+	// 		if(xhr.readyState == 4 && xhr.status == 200){
+	// 			alert("체킁" , inq_rep.innerHTML);
+	// 			console.log(xhr.responseText);
+	// 			let rslt = xhr.responseText;
+	// 			// table에 붙이기
+
+	// 			// 댓글 창 비우기
+	// 			inq_rep.innerHTML = "";
+	// 		}
+	// 	}
+	// 	//xhr.send(data);
+	// }
+
+	$(document).on("click", "#repBtn", function(){ // on 이벤트로 변경
+		//alert("버튼 체킁"  , $("#inq_rep").val());
+		inquiry_no = $("#inquiry_no").text();
+		inquiry_reply = $("#inq_rep").val();
+		let data = {
+			inquiry_no : inquiry_no, 
+			inquiry_reply : inquiry_reply
+		}
+
+		let xhr = new XMLHttpRequest();
+		xhr.open("post", "/mng/board/inquiry/rep", true);
+		xhr.setRequestHeader("Content-Type","application/json; charset=UTF-8");
+		xhr.setRequestHeader("${_csrf.headerName}", "${_csrf.token}");
+		xhr.onreadystatechange = function(){
+			if(xhr.readyState == 4 && xhr.status == 200){
+				console.log(xhr.responseText);
+				let rslt = xhr.responseText;
+				if(rslt == "success"){
+					alert("댓글 등록 완료");
+					fInquiryOne(inq_no);
+				} else {
+					alert("댓글 등록 실패");
+					history.back;
+				}
+			}
+		}
+		xhr.send(JSON.stringify(data));
+
+	});
+
+	// function fInqRepList(){
+	// 	let tblstr = "";
+	// 	let data = {
+	// 		inquiry_no : inq_no
+	// 	}
+	// 	let xhr = new XMLHttpRequest();
+	// 	xhr.open("get", "/mng/board/inquiry/reply", true);
+	// 	xhr.onreadystatechange = function(){
+	// 		if(xhr.readyState == 4 && xhr.status == 200){
+	// 			//console.log(JSON.parse(xhr.responseText));
+	// 			let repList = xhr.responseText;
+	// 			if(repList.length < 1){
+	// 				tblstr += "<tr><td colspan='8'>작성된 답글이 없습니다.</td></tr>";
+	// 				tblstr +=`<tr>
+	// 								<th class="table-primary">답글</th>
+	// 								<td colspan="6">
+	// 									<textarea id="inq_rep" rows="5" cols="100"></textarea>
+	// 								</td>
+	// 								<td style="width: 5%;">
+	// 									<button type="button" class="btn btn-primary" id="repBtn">답글등록</button>
+	// 								</td>
+	// 							</tr>`
+	// 			} else {
+	// 				for(let i=0; i<repList.length; i++){
+	// 					tblstr +=`<tr>
+	// 								<td>${repList[i].ae_id}</td>
+	// 								<td colspan="7">${repList[i].ir_content}</td>
+	// 							</tr>`
+						
+	// 				}
+	// 			}
+	// 			iTfoot.innerHTML = tblstr;
+	// 		}
+	// 	}
+	// 	xhr.send(data);
+	// }
+
+	// 문의 상세, 댓글리스트 조회
+	fInquiryOne(inq_no);
+	//fInqRepList();
+</script>

@@ -1,0 +1,50 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+	<!-- content wrapper -->
+	<div class="content-wrapper" style="padding : 10px;">
+		<div class="row" style=" padding : 10px;">
+			<div class="col-lg-12 grid-margin stretch-card">
+				<div class="card">
+					<div class="card-body">
+						<div class="card-title-wrapper">
+							<h4 class="card-title">주문 내역</h4>
+							<p class="card-description">
+                   				전체 <code>1024</code>건
+                  			</p>	
+						</div>
+						<div class="table-responsive">
+							<table class="table table-hover">
+								<thead>
+									<tr class="table-primary">
+										<th>번호</th>
+										<th>주문일시</th>
+										<th>주문번호</th>
+										<th>주문자</th>
+										<th>주문내역</th>
+										<th>주문금액</th>
+										<th>결제방법</th>
+										<th>주문상태</th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr>
+										<td>1024</td>
+										<td>2023-07-01</td>
+										<td>2307010001</td>
+										<td>홍길동</td>
+										<td>메리골드 마음 세탁소 외 1권</td>
+										<td>32,000원</td>
+										<td>카드</td>
+										<td>배송중</td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+<script>
+</script>
+	<!-- content wrapper End-->

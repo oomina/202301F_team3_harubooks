@@ -1,0 +1,103 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+<%@taglib uri="http://tiles.apache.org/tags-tiles" prefix="tiles" %>
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <!-- Required meta tags -->
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <title>Publisher</title>
+  <!-- plugins:css -->
+  <link rel="stylesheet" href="/resources/mng/vendors/feather/feather.css">
+  <link rel="stylesheet" href="/resources/mng/vendors/ti-icons/css/themify-icons.css">
+  <link rel="stylesheet" href="/resources/mng/vendors/css/vendor.bundle.base.css">
+  <link rel="stylesheet" href="/resources/mng/css/mngcss.css">
+  <!-- endinject -->
+  <!-- Plugin css for this page -->
+  <link rel="stylesheet" href="/resources/mng/vendors/datatables.net-bs4/dataTables.bootstrap4.css">
+  <link rel="stylesheet" href="/resources/mng/vendors/ti-icons/css/themify-icons.css">
+  <link rel="stylesheet" type="text/css" href="/resources/mng/js/select.dataTables.min.css">
+  <!-- End plugin css for this page -->
+  <!-- inject:css -->
+  <link rel="stylesheet" href="/resources/mng/css/vertical-layout-light/style.css">
+  <!-- endinject -->
+  <link rel="shortcut icon" href="/resources/mng/images/harubookslogo2.png" />
+</head>
+<body>
+<div style="width:1440px; margin : 0px auto;">
+  <div class="container-scroller">
+  	<!-- 상단 nav바 -->
+    <!-- partial:partials/_navbar.html -->
+    <tiles:insertAttribute name="pubheader"/>
+    <!-- partial -->
+    <div class="container-fluid page-body-wrapper">
+      <!-- partial:partials/_settings-panel.html -->
+      <!-- 우측 하단 톱니바퀴  -->
+      <div class="theme-setting-wrapper">
+        <div id="settings-trigger"><i class="ti-settings"></i></div>
+        <!-- 우측 하단 톱니바퀴 누르면 나타나는 div -->
+        <div id="theme-settings" class="settings-panel">
+          <i class="settings-close ti-close"></i>
+          <p class="settings-heading">SIDEBAR SKINS</p>
+          <div class="sidebar-bg-options selected" id="sidebar-light-theme"><div class="img-ss rounded-circle bg-light border mr-3"></div>Light</div>
+          <div class="sidebar-bg-options" id="sidebar-dark-theme"><div class="img-ss rounded-circle bg-dark border mr-3"></div>Dark</div>
+          <p class="settings-heading mt-2">HEADER SKINS</p>
+          <div class="color-tiles mx-0 px-4">
+            <div class="tiles success"></div>
+            <div class="tiles warning"></div>
+            <div class="tiles danger"></div>
+            <div class="tiles info"></div>
+            <div class="tiles dark"></div>
+            <div class="tiles default"></div>
+          </div>
+        </div>
+      </div>
+      <!-- partial -->
+      <!-- partial:partials/_sidebar.html -->
+      <tiles:insertAttribute name="pubsidebar"/>
+     
+      <!-- partial -->
+      <!-- Container -->
+      <div class="main-panel">
+      <!-- main dashboard -->
+      <tiles:insertAttribute name="content"/>
+        
+        <!-- content-wrapper ends -->
+        <!-- partial:partials/_footer.html -->
+		<tiles:insertAttribute name="pubfooter"/>
+        
+        <!-- partial -->
+      </div>
+      <!-- main-panel ends -->
+    </div>   
+    <!-- page-body-wrapper ends -->
+  </div>
+  <!-- container-scroller -->
+</div>
+  <!-- plugins:js -->
+  <script src="/resources/mng/vendors/js/vendor.bundle.base.js"></script>
+  <!-- endinject -->
+  <!-- Plugin js for this page -->
+  <script src="/resources/mng/vendors/chart.js/Chart.min.js"></script>
+  <script src="/resources/mng/vendors/datatables.net/jquery.dataTables.js"></script>
+  <script src="/resources/mng/vendors/datatables.net-bs4/dataTables.bootstrap4.js"></script>
+  <script src="/resources/mng/js/dataTables.select.min.js"></script>
+
+  <!-- End plugin js for this page -->
+  <!-- inject:js -->
+  <script src="/resources/mng/js/off-canvas.js"></script>
+  <script src="/resources/mng/js/hoverable-collapse.js"></script>
+  <script src="/resources/mng/js/template.js"></script>
+  <script src="/resources/mng/js/settings.js"></script>
+  <script src="/resources/mng/js/todolist.js"></script>
+  <!-- endinject -->
+  <!-- Custom js for this page-->
+  <script src="/resources/mng/js/dashboard.js"></script>
+  <script src="/resources/mng/js/Chart.roundedBarCharts.js"></script>
+  <!-- End custom js for this page-->
+</body>
+
+</html>
+

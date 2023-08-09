@@ -1,0 +1,23 @@
+package kr.or.ddit.controller.bmk.haruter;
+
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+
+import lombok.extern.slf4j.Slf4j;
+
+@Controller
+@Slf4j
+@RequestMapping("/haruter")
+public class meetAuthorController {
+	
+	// 작가와의 만남 페이지로 이동
+	@PreAuthorize("hasRole('ROLE_MEMBER')")
+	@GetMapping("/meetauthor")
+	public String getMeetAuthor(Model model){
+		model.addAttribute("status", 4);
+		return "haruter/meetAuthor";
+	}
+}

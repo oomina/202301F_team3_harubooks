@@ -1,0 +1,115 @@
+package kr.or.ddit.service.kmw;
+
+import java.util.List;
+
+import javax.inject.Inject;
+
+import org.springframework.stereotype.Service;
+
+import kr.or.ddit.ResultStatus;
+import kr.or.ddit.mapper.kmw.BookMapper;
+import kr.or.ddit.vo.kmw.BookInfoVO;
+import kr.or.ddit.vo.kmw.CartVO;
+import kr.or.ddit.vo.kmw.PaginationVO;
+
+@Service
+public class BookServiceImpl implements BookService{
+
+	@Inject 
+	private BookMapper mapper;
+	
+
+	@Override
+	public int bookCount(PaginationVO<BookInfoVO> pagingVO) {
+		return mapper.bookCount(pagingVO);
+	}
+
+
+	@Override
+	public List<BookInfoVO> selectBookList(PaginationVO<BookInfoVO> pagingVO) {
+		return mapper.selectBookList(pagingVO);
+	}
+
+
+	@Override
+	public BookInfoVO detailBook(BookInfoVO vo) {
+		return mapper.detailBook(vo);
+	}
+
+
+	@Override
+	public List<String> kindBycategory(String ccg_b002) {
+		return mapper.kindBycategory(ccg_b002);
+	}
+
+
+	@Override
+	public ResultStatus inputWishList(BookInfoVO vo) {
+		ResultStatus res = null;
+		int cnt = mapper.inputWishList(vo);
+		if(cnt>0) {
+			res = ResultStatus.OK;
+		}else {
+			res = ResultStatus.FAIL;
+		}
+		return res;
+	}
+
+
+	@Override
+	public boolean existWisthList(BookInfoVO vo) {
+		boolean isExist = false;
+		int cnt = mapper.existWisthList(vo);
+		if(cnt > 0) {
+			isExist = true;
+		}else {
+			isExist = false;
+		}
+		return isExist;
+	}
+
+
+	@Override
+	public boolean existCart(CartVO vo) {
+		boolean isExist = false;
+		int cnt = mapper.existCart(vo);
+		if(cnt>0) {
+			isExist = true;
+		}else {
+			isExist = false;
+		}
+		return isExist;
+	}
+
+
+	@Override
+	public ResultStatus inputCart(CartVO vo) {
+		ResultStatus result = null;
+		int cnt = mapper.inputCart(vo);
+		if(cnt>0) {
+			result = ResultStatus.OK;
+		}else {
+			result = ResultStatus.FAIL;
+		}
+		return result;
+	}
+
+
+	@Override
+	public List<BookInfoVO> cartList(String ae_id) {
+		
+		return mapper.cartList(ae_id);
+	}
+
+
+	@Override
+	public int cartCnt(String ae_id) {
+		return mapper.cartCnt(ae_id);
+	}
+
+
+	@Override
+	public int cartDel(BookInfoVO vo) {
+		return mapper.cartDel(vo);
+	}
+}

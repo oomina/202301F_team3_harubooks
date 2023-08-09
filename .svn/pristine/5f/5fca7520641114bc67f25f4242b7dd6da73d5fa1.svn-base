@@ -1,0 +1,212 @@
+package kr.or.ddit.service.bmk;
+
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.annotation.Resource;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Service;
+
+import kr.or.ddit.controller.file.UploadFileUtils;
+import kr.or.ddit.mapper.FileMapper;
+import kr.or.ddit.mapper.bmk.HarustroyMapper;
+import kr.or.ddit.vo.FileVO;
+import kr.or.ddit.vo.bmk.BoardVO;
+import kr.or.ddit.vo.bmk.ReplyVO;
+
+@Service
+public class HarustroyServiceImpl implements IHarustoryService {
+
+	@Resource(name="uploadImg")
+	private String uploadImg;
+	
+	@Autowired
+	private HarustroyMapper harustroyMapper;
+	
+	@Autowired
+	private FileMapper fileMapper;
+	
+	@Override
+	public List<BoardVO> boardList(BoardVO vo) {	
+		return harustroyMapper.boardList(vo);
+	}
+
+	@Override
+	public int storyInsert(BoardVO boardVO) {
+		return harustroyMapper.storyInsert(boardVO);
+	}
+
+	@Override
+	public Map<String,Object> boardOne(BoardVO vo) {
+		Map<String,Object> mvo = new HashMap<>();
+		String id = SecurityContextHolder.getContext().getAuthentication().getName();
+	
+		int result = harustroyMapper.upHit(vo.getBoard_no());
+		BoardVO bvo = harustroyMapper.boardOne(vo);
+		List<FileVO> fvo = fileMapper.getFiles(bvo.getUa_no());
+		if(result > 0 && bvo != null && fvo != null) {
+			mvo.put("board", bvo);
+			mvo.put("file", fvo);			
+		}
+		
+		String aeId = harustroyMapper.getWriterUserId(vo.getBoard_no());
+		
+		if(aeId.equals(id)) {
+			int result2 = harustroyMapper.updateEcho(vo); 
+		}
+		return mvo;
+	}
+	
+
+	@Override
+	public List<ReplyVO> getReplyList(ReplyVO vo) {
+		List<ReplyVO> lvo = harustroyMapper.getReplyList(vo);
+		return lvo;
+	}
+
+	@Override
+	public int updateHarustory(BoardVO boardVO) {
+		return harustroyMapper.updateHarustory(boardVO);
+	}
+
+	@Override
+	public String insertFeed(BoardVO bvo) throws IOException {
+		String status = "";
+		List<FileVO> result = UploadFileUtils.uploadFile(uploadImg, bvo.getImgFile(), "BOARD", bvo.getFilters());
+		if(result.size() > 0) {
+			String uaNo = fileMapper.getUaNo();
+			int fileResult = 0;
+			bvo.setUa_no(uaNo);
+			for(FileVO vo : result) {
+				vo.setUa_regist_id(bvo.getAe_id());
+				vo.setUa_no(uaNo);
+				fileResult += fileMapper.filesFilterInsert(vo);
+			}
+			if(fileResult > 0) {
+				int boardResult = harustroyMapper.storyInsert(bvo);
+				if(boardResult > 0) {
+					status = "OK"; 						
+				}else {
+					status = "FAIL";
+				}
+			}
+		}
+	
+		return status;
+	}
+
+	@Override
+	public String deleteHarustory(BoardVO vo) {
+		String status = "";
+		FileVO vo2 = new FileVO();
+		vo2.setUa_no(vo.getUa_no());
+
+		int result1 = fileMapper.deleteFile(vo.getUa_no());
+		int result2 = harustroyMapper.deleteLike(vo);
+		int result3 = harustroyMapper.deleteReply(vo.getBoard_no());
+		int result4 = harustroyMapper.deleteHarustory(vo);
+		
+		if(result1 > 0  && result4 > 0){
+			status = "OK";
+		}else {
+			status = "FAIL";
+		}
+		
+		if(result1 > 0  && result4 > 0){
+			status = "OK";
+		}else {
+			status = "FAIL";
+		}
+		return status;
+	}
+
+	@Override
+	public String likeCehck(BoardVO vo) {
+		String ynCheck = harustroyMapper.likeCehck(vo);
+		int result = 0;
+		if(ynCheck == null || ynCheck.trim().equals("")) {
+			result += harustroyMapper.likeAdd(vo);
+		}else if(ynCheck.trim().equals("Y")) {
+			result += harustroyMapper.likeN(vo);
+		}else if(ynCheck.trim().equals("N")) {
+			result += harustroyMapper.likeY(vo);
+		}
+		String yn = "";
+		if(result > 0) {
+			yn = harustroyMapper.likeCehck(vo);
+		}
+		return yn;
+	}
+
+	@Override
+	public String replyInsert(ReplyVO vo) {
+		if(vo.getReply_type().toLowerCase().trim().equals("all")) {
+			vo.setReply_type("NO");
+		}
+		if(vo.getAe_id().equals(vo.getBoard_ae_id())) {
+			vo.setCcg_r002("읽음");;
+		}else {
+			vo.setCcg_r002("안읽음");;			
+		}
+		int result = harustroyMapper.replyInsert(vo);
+		int result2 = harustroyMapper.boardBellInsert(vo);
+		String status = "";
+		if(result > 0 && result2 > 0) {
+			status = "OK";
+		}else {
+			status = "FAIL";			
+		}
+		return status; 
+	}
+
+	@Override
+	public List<ReplyVO> getSubReplyList(ReplyVO vo) {
+		return harustroyMapper.getSubReplyList(vo);
+	}
+
+	@Override
+	public String replyDelete(ReplyVO vo) {
+		int result1 = harustroyMapper.replyBellDelete(vo);
+		int result2 = harustroyMapper.replyDelete(vo);
+		String status;
+		if(result1 > 0 && result2 > 0) {
+			status = "OK";
+		}else {
+			status = "FAIL";			
+		}
+		return status;
+	}
+
+	@Override
+	public String updateApply(ReplyVO vo) {
+		int result = harustroyMapper.updateApply(vo);
+		String status;
+		if(result > 0) {
+			status = "OK";
+		}else {
+			status = "FAIL";			
+		}
+		return status;
+	}
+
+	@Override
+	public List<BoardVO> getMyStoryList(BoardVO ae_id) {
+		return harustroyMapper.getMyStoryList(ae_id);
+	}
+
+	@Override
+	public List<BoardVO> getMyStoryListBell(String userId) {
+		return harustroyMapper.getMyStoryListBell(userId);
+	}
+
+	@Override
+	public List<ReplyVO> boardBellCount(String board_no) {
+		return harustroyMapper.boardBellCount(board_no);
+	}
+
+
+}

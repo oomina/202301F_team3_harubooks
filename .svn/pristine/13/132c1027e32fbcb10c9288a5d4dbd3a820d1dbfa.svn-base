@@ -1,0 +1,11 @@
+package kr.or.ddit.service.ljy;
+
+import java.util.List;
+
+import kr.or.ddit.vo.ljy.RemainMngVO;
+
+public interface RemainMngService {
+
+	public List<RemainMngVO> remainList();
+
+}

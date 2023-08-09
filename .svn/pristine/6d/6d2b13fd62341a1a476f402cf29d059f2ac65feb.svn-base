@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+ <mapper namespace="kr.or.ddit.mapper.FileMapper">
+ 	<insert id="fileInsert" parameterType="fileVO">
+ 		<selectKey resultType="String" keyProperty="ua_no" order="BEFORE" >
+ 			SELECT 'UA' || LPAD(seq_ua.nextval, 10, '0') FROM dual
+ 		</selectKey>
+ 			INSERT INTO unity_atchmnfl(
+ 				ua_no	
+				, ua_sn
+				, ua_type
+				, ua_path
+				, ua_nm
+				, ua_stre_nm
+				, ua_file_type
+				, ua_instl_cnt
+				, ua_size
+				, ua_ymd
+				, ua_regist_id	
+ 			)
+ 			VALUES (
+ 				#{ua_no}
+ 				, #{ua_sn}
+ 				, #{ua_type}
+ 				, #{ua_path}
+ 				, #{ua_nm}
+ 				, #{ua_stre_nm}
+ 				, #{ua_file_type}
+ 				, 0
+ 				, #{ua_size}
+ 				, sysdate
+ 				, #{ua_regist_id}
+ 			)
+ 	</insert>
+ 	<select id="fileList" parameterType="String" resultType="fileVO">
+ 		SELECT 
+			ua_no
+			,ua_sn
+			,ua_type
+			,ua_path
+			,ua_nm
+			,ua_stre_nm
+			,ua_file_type
+			,ua_instl_cnt
+			,ua_size
+			,ua_ymd
+			,ua_regist_id
+		FROM 
+			unity_atchmnfl
+		WHERE 
+			ua_no = #{ua_no}
+ 	</select>
+ 	
+ 	<select id="getUaNo" resultType="string"> 		 		
+ 		SELECT 'UA' || LPAD(seq_ua.nextval, 10, '0') FROM dual
+ 	</select>
+ 	
+ 	
+ 	<insert id="filesFilterInsert" parameterType="fileVO">
+		INSERT INTO unity_atchmnfl(
+			  ua_no	
+			, ua_sn
+			, ua_type
+			, ua_path
+			, ua_nm
+			, ua_stre_nm
+			, ua_file_type
+			, ua_instl_cnt
+			, ua_size
+			, ua_ymd
+			, ua_regist_id	
+			, ua_etc
+			)
+			VALUES (
+				  #{ua_no}
+				, #{ua_sn}
+				, #{ua_type}
+				, #{ua_path}
+				, #{ua_nm}
+				, #{ua_stre_nm}
+				, #{ua_file_type}
+				, 0
+				, #{ua_size}
+				, sysdate
+				, #{ua_regist_id}
+				, #{ua_etc}
+		)
+ 	</insert>
+ 	
+ 	<!-- 피드의 사진들 모두 가져오기 -->
+ 	<select id="getFiles" parameterType="string" resultType="fileVO">
+  		select 
+               ua_no
+             , ua_sn
+             , ua_type
+             , ua_path
+             , ua_nm
+             , ua_stre_nm
+             , ua_file_type
+             , ua_instl_cnt
+             , ua_size
+             , ua_ymd
+             , ua_regist_id
+             , ua_etc
+	 	from 
+	 		unity_atchmnfl
+	 	where 
+	 		ua_no = #{ua_no}
+	
+ 	</select>
+ </mapper>

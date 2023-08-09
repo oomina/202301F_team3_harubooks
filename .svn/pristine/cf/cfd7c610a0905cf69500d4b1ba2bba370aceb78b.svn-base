@@ -1,0 +1,21 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<div id="header">
+    <div id="logo-box">
+           <a href="#" class="logo">
+               <img src="/resources/asset/image/logo1.png">
+           </a>
+       </div>
+       <div id="allTitle">
+           <span id="title-1">나의 쉼터</span><span id="title-2">하루터</span>
+       </div>  
+       <div id="btns">
+          <a href="/harubooks/main" class="btn" id="go-back1">
+              <div class="btn-text">하루북스로 이동</div>
+          </a>
+          <a href="/haruter/haruFeed" class="btn" id="go-back2">
+              <div class="btn-text">하루터로 이동</div>
+          </a>
+       </div>
+   </div>

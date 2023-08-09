@@ -1,0 +1,77 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+	<!-- content wrapper -->
+	<div class="content-wrapper" style="padding : 10px;">
+		<div class="row" style=" padding : 10px;">
+			<div class="col-lg-12 grid-margin stretch-card">
+				<div class="card">
+					<div class="card-body">
+						<div class="card-title-wrapper">
+							<h4 class="card-title">재고 내역</h4>
+							<div style="float:left;">
+								<p class="card-description">
+	                   				전체 <code id="total"></code>건
+	                  			</p>
+                  			</div>
+							<div class="form-check" style="float:right;">
+	                            <label class="form-check-label">
+	                              	재고순
+	                              	<input type="checkbox" class="form-check-input">
+	                            </label>
+                          	</div> 
+						</div>
+						<div class="table-responsive" id="tblDisp">
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+<script>
+const tblDisp = document.querySelector("#tblDisp");
+
+$(function(){
+	fRemainList();
+});
+
+function fRemainList(){
+	let xhr = new XMLHttpRequest();
+	xhr.open("get", "/mng/remain/list", true);
+	xhr.onreadystatechange = function(){
+		if(xhr.readyState == 4 && xhr.status == 200){
+			let remainList = JSON.parse(xhr.responseText);
+			let tblstr = "";
+			tblstr += '<table class="table table-hover" style="table-layout:fixed; width : 1000px;">';
+			tblstr += 		'<thead>'
+			tblstr +=			'<tr class="table-primary">'
+			tblstr += 				'<th>번호</th>'
+			tblstr += 				'<th>카테고리</th>'
+			tblstr += 				'<th>책제목</th>'
+			tblstr += 				'<th>저자</th>'
+			tblstr += 				'<th>출판사</th>'
+			tblstr += 				'<th>재고</th>'
+			tblstr += 			'</tr>'
+			tblstr += 		'</thead>'
+			tblstr += 		'<tbody>'
+			for(let i= 0; i<remainList.length; i++){
+				tblstr += `<tr>
+								<td style="width : 10px;">\${i+1}</td>
+								<td style="width : 150px;">\${remainList[i].ccg_b002}&nbsp; \${remainList[i].ccg_b003}</td>
+								<td style="width : 400px; word-wrap: break-word;">\${remainList[i].book_title}</td>
+								<td style="width : 150px; word-wrap: break-word;">\${remainList[i].book_author}</td>
+								<td style="width : 150px; word-wrap: break-word;">\${remainList[i].pub_nm}</td>
+								<td style="width : 20px;">\${remainList[i].bm_cnt}</td>
+							</tr>`
+			}
+			tblstr +=`	</tbody>
+					</table>`
+			tblDisp.innerHTML = tblstr;
+
+			let total = document.querySelector("#total");
+			total.innerText = remainList.length;
+		}
+	}
+	xhr.send();
+}
+</script>
+	<!-- content wrapper End-->>

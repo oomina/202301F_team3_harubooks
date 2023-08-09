@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+ <mapper namespace="kr.or.ddit.mapper.odh.MyPageMapper">
+ 	<!-- 유저 정보 가져오기 -->
+ 	<select id="selectUser" parameterType="String" resultType="userVO">
+ 		select 
+		mbr_mileage, mbr_email, mbr_addr, mbr_dAddr, mbr_zip, mbr_telNo, mbr_brdt, mbr_gender,rank_name
+		from member
+		where ae_id = #{ae_id}
+ 	</select>
+ 	
+ 	
+ 	<select id="selectPw" parameterType="String" resultType="userVO">
+		select *
+		from all_emplyr a
+		full outer join member b
+	    on a.ae_id = b.ae_id
+	    where a.ae_id = #{ae_id}
+ 	</select>
+ 	
+ 	<update id="memberUpdate" parameterType="userVO">
+ 		update member
+ 		set user_nm = #{user_nm},
+ 			mbr_gender = #{mbr_gender},
+ 			mbr_telNo = #{mbr_telNo},
+ 			mbr_zip = #{mbr_zip},
+ 			mbr_addr = #{mbr_addr},
+ 			mbr_daddr = #{mbr_dAddr},
+ 			mbr_brdt = #{mbr_brdt},
+ 			mbr_email = #{mbr_email}
+ 		where ae_id = #{ae_id}
+ 	</update>
+ 	
+ 	<update id="memberPwupdate" parameterType="userVO">
+ 		update all_emplyr
+ 		set 
+	 		ae_pw = #{ae_pw}
+	 	where ae_id = #{ae_id}
+ 	</update>
+ 	
+ 	<delete id="memberDelete" parameterType="String">
+ 		delete from member
+ 		where ae_id = #{ae_id}
+ 	</delete>
+ 	
+ 	<delete id="memberDelete2" parameterType="String">
+ 		delete from all_emplyr
+ 		where ae_id = #{ae_id}
+ 	</delete>
+ 	
+ 	<delete id="usersDelete" parameterType="String">
+ 		delete from users
+ 		where ae_id = #{ae_id}
+ 	</delete>
+ 	
+ 	<delete id="authorDelete" parameterType="String">
+ 		delete from author
+ 		where ae_id = #{ae_id}
+ 	</delete>
+ 	
+ 	
+ 	
+ </mapper>

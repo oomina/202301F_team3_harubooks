@@ -1,0 +1,48 @@
+package kr.or.ddit.service.omn.mbr;
+
+import java.util.List;
+
+import javax.inject.Inject;
+
+import org.springframework.stereotype.Service;
+
+import kr.or.ddit.mapper.omn.mbr.MngMbrMapper;
+import kr.or.ddit.vo.omn.MngMbrVO;
+import kr.or.ddit.vo.omn.MngPaginationInfoVO;
+
+@Service
+public class MngMbrServiceImpl implements IMngMbrService{
+	
+	@Inject
+	private MngMbrMapper mapper;
+	
+	@Override
+	public List<MngMbrVO> mbrList() {
+		return mapper.mbrList();
+	}
+
+	@Override
+	public List<MngMbrVO> selectMbrList(MngPaginationInfoVO<MngMbrVO> pagingVO) {
+		return mapper.selectMbrList(pagingVO);
+	}
+
+	@Override
+	public MngMbrVO mbrInfo(String ae_id) {
+		return mapper.mbrInfo(ae_id);
+	}
+
+	@Override
+	public int mbrUpdate(MngMbrVO mngMbrVO) {
+		return mapper.mbrUpdate(mngMbrVO);
+	}
+
+	@Override
+	public int mbrCount(MngPaginationInfoVO<MngMbrVO> pagingVO) {
+		return mapper.mbrCount(pagingVO);
+	}
+
+	@Override
+	public int mbrAllCount(String ae_id) {
+		return mapper.mbrAllCount(ae_id);
+	}
+}

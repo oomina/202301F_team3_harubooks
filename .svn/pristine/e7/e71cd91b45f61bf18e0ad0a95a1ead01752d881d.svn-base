@@ -1,0 +1,12 @@
+package kr.or.ddit.service.bmk;
+
+import java.util.List;
+
+import kr.or.ddit.vo.bmk.BoardVO;
+
+public interface IHarustoryService {
+
+	public List<BoardVO> boardList();
+	
+	
+}

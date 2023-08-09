@@ -1,0 +1,13 @@
+package kr.or.ddit.service.ljy;
+
+import java.util.List;
+
+import kr.or.ddit.vo.ljy.PubMngVO;
+
+public interface PubMngService {
+
+	public List<PubMngVO> pubList();
+
+	public String signUpPub(PubMngVO pubMngVO);
+
+}

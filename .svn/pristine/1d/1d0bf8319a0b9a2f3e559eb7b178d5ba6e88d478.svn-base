@@ -1,0 +1,20 @@
+package kr.or.ddit.service.jhs;
+
+import java.util.List;
+
+import kr.or.ddit.vo.jhs.Chat_MemVO;
+import kr.or.ddit.vo.jhs.Chat_RoomVO;
+
+public interface IChattingService {
+
+	public String insertChat(Chat_RoomVO vo);
+
+	public List<Chat_RoomVO> getChatList(Chat_RoomVO vo);
+
+	public Chat_RoomVO getChatOne(Chat_RoomVO vo);
+
+	public String chattingRoomIn(Chat_RoomVO vo);
+
+	public Chat_MemVO getChatMem(Chat_MemVO vo);
+
+}

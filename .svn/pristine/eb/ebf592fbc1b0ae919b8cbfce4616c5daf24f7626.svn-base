@@ -1,0 +1,76 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<div class="content-wrapper" style="padding : 10px;">
+	<div class="row" style=" padding : 10px;">
+		<div class="col-lg-12 grid-margin stretch-card">
+			<div class="card">
+			    <div class="card-body">
+				    <div class="card-title-wrapper">
+					    <h4 class="card-title" style="font-size:1.25rem; font-family: 'Nunito', sans-serif;">문의내역</h4>
+					    <p class="card-description">
+                  			전체 <code id="total"></code>건
+                 		</p>	
+				    </div>
+				    <div class="table-responsive" id="tblDisp">
+					</div>
+			  	</div>
+			</div>
+        </div>
+	</div>
+</div>
+<script>
+const tblDisp = document.querySelector("#tblDisp");
+
+$(function(){
+	fInquiryList();
+});
+
+function fInquiryList(){
+	let xhr = new XMLHttpRequest();
+	let tblstr = "";
+	xhr.open("GET", "/mng/board/inquiry", true);
+	xhr.onreadystatechange = function(){
+		if(xhr.readyState == 4 && xhr.status == 200){
+			let inquiryList = JSON.parse(xhr.responseText);
+			console.log(inquiryList);
+			tblDisp.innerHTML = "";
+			tblstr +='<table class="table table-hover">';
+			tblstr +="		<thead>";
+			tblstr +='          <tr class="table-primary">';
+            tblstr +="              <th>번호</th>   ";
+            tblstr +="              <th>제목</th>   ";
+            tblstr +="              <th>작성자</th>  ";
+            tblstr +="              <th>작성일</th>  ";
+            tblstr +="              <th>답변여부</th>";
+            tblstr +="          </tr>              ";
+			tblstr +="		</thead>               ";
+			tblstr +="		<tbody>              ";
+			for(let i=0; i<inquiryList.length; i++){
+				/* tblstr +=`<tr>
+							<td>${i+1}</td>
+							<td>${inquiryList[i].inquiry_title}</td>
+							<td>${inquiryList[i].ae_id}</td>
+							<td>${inquiryList[i].inquiry_ymd}</td>` */
+				tblstr += `<tr onclick="fInquiryDetail('\${inquiryList[i].inquiry_no}')"> <td>\${i+1}</td> <td>\${inquiryList[i].inquiry_title}</td> <td>\${inquiryList[i].ae_id}</td> <td>\${inquiryList[i].inquiry_ymd}</td>`;
+				if(inquiryList[i].ccg_i001 == '문의대기'){
+					tblstr += '<td><label class="badge badge-warning">대기</label></td>';
+				} 
+				if(inquiryList[i].ccg_i001 == '문의완료'){
+					tblstr += '<td><label class="badge badge-info">완료</label></td>';
+				}
+				tblstr += "</tr>";			
+			}	
+			tblstr += "</tbody></table>";
+			tblDisp.innerHTML = tblstr;
+			let total = document.querySelector("#total");
+			total.innerText = inquiryList.length;
+		}
+	}
+	xhr.send();
+}
+
+function fInquiryDetail(inq_no){
+	location.href="/mng/inquiry/" + inq_no;
+}
+</script>

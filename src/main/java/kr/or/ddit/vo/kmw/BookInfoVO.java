@@ -1,0 +1,40 @@
+package kr.or.ddit.vo.kmw;
+
+import java.util.List;
+
+import org.springframework.web.multipart.MultipartFile;
+
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
+
+@Getter
+@Setter
+@ToString
+public class BookInfoVO {
+	private String ae_id;
+	private String book_no;
+    private String book_title;
+    private String book_content;
+    private String book_cover;
+    private String book_spmt_ymd;
+    private String book_author;
+    private String pub_nm;
+    private String book_talt;	// 
+    private float book_margin;	// 책 판매시 남는 마진비율
+    private float book_mileage;	// 책 구매시 마일리지
+    private String ccg_b001;	// 책종류 (ex. 종이책, e북)
+    private String ccg_b002;	// 대분류 (ex. 국내도서, 해외도서, ebook)
+    private String ccg_b003;	// 소분류 (ex. 소설, 에세이 ...)
+    private int book_page_cnt;	// 책 페이지 수
+    private String book_amt;		// 책 가격
+    private int book_discount;	// 책 할인율
+    private String book_ntsl_amt;	// 책 할인율이 적용된 가격
+    private String book_isbn;
+    private String searchWord; // 책 검색
+    private int startRow;	// 시작 행
+    private int endRow; //끝 행
+    private int book_sum;
+    
+    private CartVO cartVO;
+}

@@ -1,0 +1,221 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+<%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<link rel="stylesheet" href="/resources/asset/css/myDiary.css">
+<meta charset="UTF-8">
+<style>
+.bt_wrap {
+	margin-top: 11px;
+    justify-content: center;
+}
+.board_write .title p{
+	margin-left: 0px;
+	margin-bottom: 10px;
+}
+.board_write .title {
+	display:flex;
+	border-bottom: 1px solid #999;
+	justify-content: space-between;
+}
+.board_title #titleP{
+	margin-left: 30%;
+	font-size: 2.4rem;
+}
+
+.board_title #ymdP{
+	margin-right: 7%;
+	margin-top: 2%;
+}
+.board_wrap {
+	margin-top: 12%;
+}
+div #insertBtn{
+	display: inline-block;
+    min-width: 7%;
+    margin-left: 10px;
+    padding: 10px;
+    border-radius: 2px;
+    font-size: 17px;
+    background: #71cd5ad9;
+    border: none;
+    color: #fff;
+}
+#strong{
+	text-align: center;
+	font-family: 'Nanum Pen Script';
+	font-size: 40px;
+	margin-bottom: 2%;
+}
+textarea#diary_content{
+	resize: none;
+}
+div #textCount{
+	display: flex;
+	justify-content: flex-end;
+}
+</style>
+<c:set value="작성" var="name"/>
+<c:if test="${status eq 'u' }">
+	<c:set value="수정" var="name"/>
+</c:if>   
+<div class="board_wrap">
+	<div id="strong">
+		<strong>일기 ${name}</strong>
+	</div>
+    <div class="board_write_wrap">
+   	 <form action="/myHaru/mydiary?${_csrf.parameterName }=${_csrf.token}" method="post" id="diaryForm">
+   	 	<input type="hidden" value="<sec:authentication property="name"/>" id="ae_id" name="ae_id">
+   	 	<c:if test="${status eq 'u' }">
+   	 		<input type="hidden" name="diary_no" id="diary_no" value="${dvo.diary_no}">
+   	 	</c:if>
+       	<div class="board_write">
+           <div class="title">
+               <input type="text" placeholder="제목을 입력해주세요..." name="diary_title" id="diary_title" value="${dvo.diary_title }">
+           </div>
+           <div class="cont">
+               <textarea placeholder="내용을 입력해주세요..."  name="diary_content" id="diary_content" maxlength="500">${dvo.diary_content}</textarea>
+           </div>
+        </div>
+        <div id="textCount">
+			<p class="textCount">(0</p><p class="textTotal">/500)</p>
+		</div>
+     	<div class="bt_wrap">
+        <input type="button" id="insertBtn" class="on" value="${name }"/>
+        <c:if test="${status eq 'u'}">
+        	<a href="/myHaru/detaildiary?diary_no=${dvo.diary_no}">취소</a>
+        </c:if>
+        <c:if test="${status ne 'u'}">
+        	<a href="/myHaru/mydiary">취소</a>
+        </c:if>
+     	</div>
+     </form>
+   </div>
+</div>
+<script type="text/javascript">
+$(function (){
+	$(document).ready(function () {
+		// 수정, 작성페이지 들어오면 바로 title에 커서
+		$("#diary_title").focus();
+	})
+	
+	var insertBtn = $("#insertBtn");
+	var diaryForm = $("#diaryForm");
+	var cont = $("#diary_content");
+
+	insertBtn.on("click", function () {
+		const swalWithBootstrapButtons = Swal.mixin({
+            customClass: {
+                confirmButton: 'btn btn-success',
+                cancelButton: 'btn btn-danger'
+            },
+            buttonsStyling: false
+        })
+		var title = $("#diary_title").val();
+		var content = $("#diary_content").val();
+		var id = $("#ae_id").val();
+		
+		title.replaceAll(/<script>/gi, "");
+        content.replaceAll(/<script>/gi, "");
+        
+        if(title == null || title == ""){
+        	Swal.fire('제목을 입력해주세요')
+            return false;
+        }
+        if(content == null || content == ""){
+        	Swal.fire('내용을 입력해주세요')
+            return false;
+        }
+        
+        if($(this).val() == "수정"){
+        	Swal.fire({
+            	title: '정말로 수정하시겠습니까?',
+				text: '수정된 글을 되돌릴 수 없습니다',
+            	icon: 'question',
+            	iconHtml: '?',
+            	confirmButtonText: '확인',
+            	cancelButtonText: '취소',
+            	showCancelButton: true,
+            	showCloseButton: true
+            }).then(function (result) {
+                if (result.isConfirmed) {
+                	Swal.fire({
+                        title: '정상적으로 수정되었습니다.',
+                        icon: 'success',
+                        confirmButtonText: '확인',                               
+                    }).then(function (result) {
+                        if (result.isConfirmed) {
+							diaryForm.attr("action", "/myHaru/updatediary?${_csrf.parameterName }=${_csrf.token}");
+                        	diaryForm.submit();
+                        }
+                    });
+                }else{
+					return false;
+				}
+			});
+		} 
+        if($(this).val() == "작성"){
+        	Swal.fire({
+            	title: '정말로 작성하시겠습니까?',
+				text: '',
+            	icon: 'question',
+            	iconHtml: '?',
+            	confirmButtonText: '확인',
+            	cancelButtonText: '취소',
+            	showCancelButton: true,
+            	showCloseButton: true
+            }).then(function (result) {
+                if (result.isConfirmed) {
+                	Swal.fire({
+                        title: '정상적으로 작성되었습니다.',
+                        icon: 'success',
+                        confirmButtonText: '확인',                               
+                    }).then(function (result) {
+                        if (result.isConfirmed) {
+                        	diaryForm.submit();
+                        }
+                    });
+                }else{
+					return false;
+				}
+			});
+		} 
+        
+	})
+
+	cont.keyup(function (e){
+		let content = $(this).val();
+		let count = $(".textCount")
+
+		if (content.length == 0 || content == ''){
+			count.text('(0');
+		}else{
+			count.text("("+content.length);
+		}
+
+		// 글자수 제한
+		if (content.length >= 500){
+			swal({
+			  title: "글자수 제한",
+			  text: "500자까지만 가능합니다.",
+			  icon: "error",
+			  button: "확인",
+			});
+		}
+
+	})
+
+	$(document).ready(function() {
+		var cont = $("#diary_content").val();
+		console.log(cont,"cononocon")
+		let count = $(".textCount")
+		console.log(cont.length)
+		
+		if (cont.length == 0 || cont == ''){
+			count.text('(0');
+		}else{
+			count.text("("+cont.length);
+		}
+	})
+})
+</script>

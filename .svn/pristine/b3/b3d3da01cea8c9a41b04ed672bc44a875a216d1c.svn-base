@@ -1,0 +1,160 @@
+package kr.or.ddit.controller.kmw.harubooks;
+
+import java.util.List;
+import java.util.Map;
+
+import javax.inject.Inject;
+
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.security.core.context.SecurityContextHolder;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import kr.or.ddit.ResultStatus;
+import kr.or.ddit.service.kmw.BookService;
+import kr.or.ddit.vo.kmw.BookInfoVO;
+import kr.or.ddit.vo.kmw.CartVO;
+import kr.or.ddit.vo.kmw.PaginationVO;
+import lombok.extern.slf4j.Slf4j;
+
+
+@Slf4j
+@Controller
+@RequestMapping("/harubooks")
+public class HaruBooksController {
+	
+	@Inject
+	private BookService service;
+	
+	@GetMapping("")
+	public String firstPage() {
+		return "bookstore/harufirst";
+	}
+	
+	@GetMapping("/main")
+	public String mainPage(Model model) {
+		log.debug("유저 정보 : "+ SecurityContextHolder.getContext().getAuthentication());
+		// 시큐리티 세션에 존재하는 유저 ID가져오는 변수
+		String userId =  SecurityContextHolder.getContext().getAuthentication().getName();	
+		if(userId != null) {
+			model.addAttribute("userId",userId);
+			return "bookstore/home/home";
+		}
+		return "bookstore/home/home";	
+		
+	}
+	
+	// 도서 분류 클릭시 페이지 이동
+	@RequestMapping(value = "/category")
+	public String bookList(@RequestParam(required = false) String ccg_b002,
+						   @RequestParam(required = false) String ccg_b003,
+						   @RequestParam(name="page", required = false, defaultValue = "1") int currentPage,
+						   @RequestParam(required = false) String searchWord,
+						   Model model) {
+		PaginationVO<BookInfoVO> pagingVO = new PaginationVO<BookInfoVO>();
+		
+		// 검색 기능 추가 시 활용
+		if(StringUtils.isNotBlank(searchWord)) {
+			pagingVO.setSearchWord(searchWord);
+			model.addAttribute("searchWord",searchWord);
+		}
+
+
+		pagingVO.setCcg_b002(ccg_b002);
+		pagingVO.setCcg_b003(ccg_b003);
+		
+		
+		pagingVO.setCurrentPage(currentPage);
+		int totalRecord = service.bookCount(pagingVO); // 총 책의 개수
+		pagingVO.setTotalRecord(totalRecord);
+		System.out.println(totalRecord);
+		System.out.println(pagingVO.getTotalPage());
+		//List<BookInfoVO> bookList = service.bookInfo(vo);
+		// 책 리스트
+		List<BookInfoVO> bookList = service.selectBookList(pagingVO);
+		System.out.println(bookList);
+		pagingVO.setDataList(bookList);
+		
+		// 책 종류별 카테고리 
+		List<String> category = service.kindBycategory(ccg_b002);
+
+		model.addAttribute("category",category);
+		model.addAttribute("pagingVO",pagingVO);
+		
+		
+		return "bookstore/shop/categoryBooks";
+	}
+	 // 책 클릭시 도서 상세보기 페이지로 이동
+	@GetMapping("/detailBook")
+	public String detailBook(@RequestParam("bookNo") String bookNo,@RequestParam("ccg_b002") String ccg_b002, Model model) {
+		log.info(bookNo);
+		log.info(ccg_b002);
+		BookInfoVO vo = new BookInfoVO();
+		vo.setBook_no(bookNo);
+		vo.setCcg_b002(ccg_b002);
+		BookInfoVO bookInfo = service.detailBook(vo);
+		model.addAttribute("book",bookInfo);
+		return "bookstore/shop/book-detail";
+	}
+	
+	// 찜목록 추가하기
+	@ResponseBody
+	@PostMapping("/wishList")
+	public String wishList(@RequestBody Map<String, String> resMap) {
+		String ae_id = resMap.get("ae_id");
+		String book_no = resMap.get("book_no");
+		log.info("유저 아이디 : "+ae_id);
+		log.info("책 번호 : "+book_no);
+		String result = null;
+		BookInfoVO vo = new BookInfoVO();
+		vo.setAe_id(ae_id);
+		vo.setBook_no(book_no);
+		boolean isExist = service.existWisthList(vo);
+		if(isExist) {
+			result = "EXIST";
+		}else {
+			ResultStatus res = service.inputWishList(vo);
+			if(res.equals(ResultStatus.OK)) {
+				result = "OK";
+			}else {
+				result = "FAIL";
+			}					
+		}
+		return result;
+	}
+	
+	// 장바구니 추가하기
+	@ResponseBody
+	@PostMapping("/basketList")
+	public String basketList(@RequestBody Map<String, String> resMap) {
+		String book_no = resMap.get("book_no");
+		String total_price = resMap.get("totalPrice");
+		String cart_cnt = resMap.get("cart_cnt");
+		String ae_id = resMap.get("ae_id");
+		String result;
+		CartVO vo = new CartVO();
+		vo.setAe_id(ae_id);
+		vo.setBook_no(book_no);
+		vo.setCart_cnt(cart_cnt);
+		vo.setTotal_price(total_price);
+		boolean isExist = service.existCart(vo);
+		if(isExist) {
+			result = "EXIST";
+		}else {
+			ResultStatus res = service.inputCart(vo);
+			if(res.equals(ResultStatus.OK)) {
+				result = "OK";
+			}else {
+				result = "FAIL";
+			}
+		}
+		return result;
+	}
+}

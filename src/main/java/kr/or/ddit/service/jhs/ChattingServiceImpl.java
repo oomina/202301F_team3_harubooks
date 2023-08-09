@@ -1,0 +1,347 @@
+package kr.or.ddit.service.jhs;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.inject.Inject;
+
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Service;
+
+import kr.or.ddit.mapper.jhs.ChattingMapper;
+import kr.or.ddit.vo.bmk.BoardVO;
+import kr.or.ddit.vo.bmk.ReplyVO;
+import kr.or.ddit.vo.jhs.Chat_MemVO;
+import kr.or.ddit.vo.jhs.Chat_RoomVO;
+import kr.or.ddit.vo.jhs.ChattingVO;
+
+@Service
+public class ChattingServiceImpl implements IChattingService{
+
+	@Inject
+	private ChattingMapper mapper;
+	
+	@Override
+	public String insertChat(Chat_RoomVO vo) {
+		if(vo.getCcg_r003().trim().equals("false")) {
+			vo.setCcg_r003("비공개");
+		}else {
+			vo.setCcg_r003("공개");			
+		}
+		
+		int result1 = mapper.insertChat(vo);
+		int result2 = mapper.insertChatMem(vo);
+		
+		String status = null;
+		if(result1 > 0 && result2 > 0) {
+			status = "OK";
+		}else{
+			status = "FAIL";			
+		}
+		return status;
+	}
+
+	@Override
+	public List<Chat_RoomVO> getChatList(Chat_RoomVO vo) {
+		return mapper.getChatList(vo);
+	}
+
+	@Override
+	public Chat_RoomVO getChatOne(Chat_RoomVO vo) {
+		Chat_RoomVO cvo = mapper.getChatOne(vo);
+		return cvo;
+	}
+
+	@Override
+	public String chattingRoomIn(Chat_RoomVO vo) {
+		String statue = "";
+		Chat_MemVO crNo = mapper.checkUser(vo);
+		String crPw = "";	
+
+		// 해당 인원이 이미 채팅방에 있으면 바로 들어갈 수 있다
+		if(crNo !=null) {
+			
+			// 해당 인원이 이미 들어가 있는 상태이면 또 못들어가게 한다.
+			if(crNo.getCn_cntn_yn().equals("Y")) {
+				statue = "이미 해당 채팅방에 들어가 있습니다.";
+				return statue;
+			}	
+			
+			if(crNo.getCm_out_yn().equals("Y")) {
+				statue = "강퇴당했던 방입니다.";
+				return statue;
+			}
+			statue = "OK";
+			return statue;
+		}
+		
+		// 채팅방 인원이 모두 차면 못 들어가게 막는다
+		if(vo.getCr_nope() >= vo.getCr_max_nope()) {
+			statue = "채팅방 인원이 모두 찼습니다!";
+			return statue;
+		}
+		
+		
+		// 비밀번호가 틀리면 못 들어가게 막는다
+		if(vo.getCcg_r003().equals("비공개")) {
+			crPw = mapper.checkPw(vo);
+			if(crPw==null || crPw.equals("")) {
+				statue = "비밀번호가 틀렸습니다!";
+				return statue;
+			}
+		}
+		
+		// 채팅방의 채팅인원이 추가된다.
+		int result = mapper.chattingRoomIn(vo);
+		
+		if(result < 0) {
+			statue = "서버 에러! 채팅방 가입에 실패했습니다!";
+		}else {
+			// 채팅방에 현재 가입 인원의 수가 증가한다.
+			int result2 = mapper.addChatNope(vo);
+			if(result2 < 0) {
+				statue = "서버 에러! 채팅방 가입에 실패했습니다!";				
+			}else {
+				statue = "OK";				
+			}
+		}
+		return statue;
+	}
+
+	@Override
+	public Chat_MemVO getChatMem(Chat_MemVO vo) {
+		return mapper.getChatMem(vo);
+	}
+
+	@Override
+	public Map<String, Object> getChat(Chat_RoomVO vo) {
+		Chat_MemVO mvo = new Chat_MemVO();
+		Map<String, Object> map = new HashMap<>();
+		
+		mvo.setAe_id(vo.getAe_id());
+		mvo.setCr_no(vo.getCr_no());
+		mapper.updateChatMemState(mvo);
+		
+		List<Chat_MemVO> lvo = mapper.getChatMemList(vo);
+		Chat_RoomVO cvo = mapper.getChatOne(vo);
+		map.put("chatMem", lvo);
+		map.put("chatRoom", cvo);
+		return map;
+	}
+
+	@Override
+	public String deleteChatRoom(Chat_RoomVO vo) {
+		int result3 = mapper.deleteChatting(vo);
+		int result1 = mapper.deleteChatMem(vo);
+		int result2 = mapper.deleteChatRoom(vo);
+		
+		String status = "";
+		if(result1 > 0 && result2 > 0 && result3 > 0) {
+			status = "OK";
+		}else {
+			status = "FAIL";
+		}
+		return status;
+	}
+
+	@Override
+	public String updateChatRoom(Chat_RoomVO vo) {
+		int result = mapper.updateChatRoom(vo);
+		String status = "";
+		if(result > 0) {
+			status = "OK";
+		}else {
+			status = "FAIL";			
+		}
+		return status;
+	}
+	
+	// 채팅방에 들어가면서 업데이트
+	@Override
+	public void updateChatState(Chat_MemVO member) {
+		mapper.updateChatMemState(member);
+		mapper.updateChatRoomState(member);
+	}
+	
+	// 채팅방에 나가면서 업데이트
+	@Override
+	public void updateChatStateDown(Chat_MemVO member) {
+		mapper.updateChatMemStateDown(member);
+		mapper.updateChatRoomStateDown(member);	
+	}
+
+	// 채팅 기록을 저장
+	@Override
+	public void insertChatInfo(Chat_MemVO member) {
+		mapper.insertChatInfo(member);
+	}
+	
+	//채팅 기록을 가져온다.
+	@Override
+	public List<ChattingVO> getChatting(String cr_no) {
+		return mapper.getChatting(cr_no);
+	}
+	
+	
+	// 강퇴 시켰을 때 변화 내용 
+	@Override
+	public String outUser(Chat_MemVO vo) {
+		int result1 = mapper.outUser(vo);
+		int result2 = mapper.outRoom(vo);
+		String status = "";
+		if(result1 > 0 && result2 > 0) {
+			status = "OK";
+		}else {
+			status = "FAIL";			
+		}
+		return status;
+	}
+	
+	// 채팅방에 나갔을 때
+	@Override
+	public String outChatRoom(Chat_MemVO vo) {
+		int reulst1 = mapper.deleteUserChatting(vo);
+		int result2 = mapper.deleteUser(vo);
+		int result3 = mapper.outRoom(vo);
+		
+		String status = "";
+		
+		if(result2 > 0 && result3 > 0) {
+			status = "OK";
+		}else {
+			status = "FAIL";			
+		}
+		return status;
+	}
+
+	@Override
+	public List<Chat_RoomVO> getChatRoomNo(String ae_id) {
+		return mapper.getChatRoomNo(ae_id);
+	}
+
+	@Override
+	public String createChatBoard(BoardVO bvo) {
+		int result1 = mapper.createChatBoard(bvo);
+		int result2 = mapper.createDedateBoard(bvo);
+		
+		String status = "";
+		if(result1 > 0 && result2 > 0) {
+			status = "OK";
+		}else {
+			status = "FAIL";			
+		}
+
+		return status;
+	}
+
+	@Override
+	public List<BoardVO> getChatBoardList(BoardVO bvo) {
+		List<BoardVO> lvo = mapper.getChatBoardList(bvo);
+		return lvo;
+	}
+
+	@Override
+	public BoardVO getChatBoardOne(BoardVO bvo) {
+		String id = SecurityContextHolder.getContext().getAuthentication().getName();
+		mapper.updateCnt(bvo);
+		BoardVO vo = mapper.getChatBoardOne(bvo);
+		
+		String aeId = mapper.getWriterUserId(vo.getBoard_no());
+		if(aeId.equals(id)) {
+			int result2 = mapper.updateEcho(vo); 
+		}
+ 		return vo;
+	}
+
+	@Override
+	public List<ReplyVO> getChatBoardReplyList(BoardVO bvo) {
+		List<ReplyVO> vo = mapper.getChatBoardReplyList(bvo);
+		return vo;
+	}
+
+	@Override
+	public String insetChat(ReplyVO rvo) {
+		if(rvo.getAe_id().equals(rvo.getBoard_ae_id())) {
+			rvo.setCcg_r002("읽음");;
+		}else {
+			rvo.setCcg_r002("안읽음");;			
+		}
+		
+		int reulst1 = mapper.insetChat(rvo);
+		int result2 = mapper.chatBoardBellInsert(rvo);
+		String status = "";
+		if(reulst1 > 0) {
+			status = "OK";
+		}else {
+			status = "FAIL";			
+		}
+
+		return status;
+	}
+
+	@Override
+	public List<ReplyVO> getChatBoardSubReplyList(ReplyVO rvo) {
+		return mapper.getChatBoardSubReplyList(rvo);
+	}
+
+	@Override
+	public String updateChatBoard(BoardVO rvo) {
+		int result = mapper.updateChatBoard(rvo);
+		String status = "";
+		if(result > 0) {
+			status = "OK";
+		}else {
+			status = "FAIL";			
+		}
+
+		return status;
+	}
+
+	@Override
+	public String deleteChatBoard(BoardVO rvo) {
+		int result4 = mapper.deleteChatBell(rvo);
+		int result1 = mapper.deleteChatReply(rvo);
+		int result2 = mapper.deleteChatDedateBoard(rvo);
+		int result3 = mapper.deleteChatBoard(rvo);
+		
+		String status = "";
+		if(result2 > 0 && result3 > 0) {
+			status = "OK";
+		}else {
+			status = "FAIL";			
+		}
+		return status;
+	}
+
+	@Override
+	public String chatBoatdReplyDelete(ReplyVO rvo) {
+		int result1 = mapper.chatBoardReplyBellDelete(rvo);
+		int result2 = mapper.chatBoardReplyDelete(rvo);
+		String status = "";
+		if(result2 > 0 && result1 > 0) {
+			status = "OK";
+		}else {
+			status = "FAIL";			
+		}
+		return status;
+	}
+
+	@Override
+	public String chatBoatdReplyUpdate(ReplyVO rvo) {
+		int result = mapper.chatBoatdReplyUpdate(rvo);
+		String status = "";
+		if(result > 0) {
+			status = "OK";
+		}else {
+			status = "FAIL";			
+		}
+		return status;
+	}
+
+	@Override
+	public List<Chat_RoomVO> getMyChatList(Chat_RoomVO vo) {
+		return mapper.getMyChatList(vo);
+	}
+
+}

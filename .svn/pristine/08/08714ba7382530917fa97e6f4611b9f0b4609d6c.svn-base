@@ -1,0 +1,66 @@
+package kr.or.ddit.service.jhs;
+
+import java.util.List;
+
+import javax.inject.Inject;
+
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Service;
+
+import kr.or.ddit.ResultStatus;
+import kr.or.ddit.mapper.jhs.MyLibraryMapper;
+import kr.or.ddit.vo.jhs.Com_MemberVO;
+import kr.or.ddit.vo.jhs.Ebook_ManagerVO;
+import kr.or.ddit.vo.jhs.Ebook_PageVO;
+
+@Service	
+public class MyLibraryServiceImpl implements IMyLibraryService {
+	
+	@Inject
+	private MyLibraryMapper mapper;
+	
+	@Override
+	public List<Ebook_ManagerVO> getEbookList(Ebook_PageVO<Ebook_ManagerVO> evo) {
+		List<Ebook_ManagerVO> vo = mapper.getEbookList(evo);
+	
+		return vo;
+	}
+
+	@Override
+	public int selectEbookListCount(Ebook_PageVO<Ebook_ManagerVO> evo) {
+		return mapper.selectEbookListCount(evo);
+	}
+
+	@Override
+	public int selectAllRecord(String id) {
+		return mapper.selectAllRecord(id);
+	}
+
+	@Override
+	public Com_MemberVO callComMember(String id) {
+		return mapper.callComMember(id);
+	}
+
+	@Override
+	public Ebook_ManagerVO getEbookManager(Ebook_ManagerVO vo) {
+		
+		Ebook_ManagerVO evo = mapper.getEbookManager(vo);
+		
+		List<Integer> recodePage = mapper.getEbookRecode(vo);
+		
+		evo.setEr_page(recodePage);
+		
+		return evo; 
+	}
+
+	@Override
+	public int updateReadPage(Ebook_ManagerVO vo) {
+		return mapper.updateReadPage(vo);
+	}
+
+	@Override
+	public int insertBookRecode(Ebook_ManagerVO vo) {
+		return mapper.insertBookRecode(vo);
+	}
+	
+}

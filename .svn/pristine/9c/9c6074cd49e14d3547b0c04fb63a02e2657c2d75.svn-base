@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+ <mapper namespace="kr.or.ddit.mapper.bmk.HarustroyMapper">
+ 
+ 	<!-- 피드 리스트 -->
+ 	<select id="boardList" resultType="boardVO">
+	 	select 
+			  board_no
+			, board_title
+			, board_content
+			, wrt_ymd
+			, last_mdfcn_ymd
+			, inq_cnt
+			, ccg_b004
+			, ua_no
+			, ae_id
+	 	from board
+ 		where ccg_b004 = '자유게시판'
+ 		order by board_no desc
+ 	</select>
+ 	
+ 	<!-- 피드 상세보기 -->
+ 	<select id="boardOne" parameterType="string" resultType="boardVO">
+ 		select 
+			  board_no
+			, board_title
+			, board_content
+			, wrt_ymd
+			, last_mdfcn_ymd
+			, inq_cnt
+			, ccg_b004
+			, ua_no
+			, ae_id
+	 	from board
+	 	where board_no = #{board_no}
+ 	</select>
+ 	
+ 	<!-- 게시글 작성 -->
+ 	<insert id="storyInsert" parameterType="boardVO">
+ 		<selectKey keyProperty="board_no" resultType="string" order="BEFORE"> 
+	 		select 'BO' || lpad(seq_bo.nextval, 10,'0') from dual
+	 	</selectKey>
+ 			insert into board (
+	 				board_no
+	 	  		  , board_title
+	 	  		  , board_content
+	 	  		  , wrt_ymd
+	 	  		  , last_mdfcn_ymd
+	 	  		  , inq_cnt
+	 	  		  , ccg_b004
+	 	  		  , ua_no
+	 	  		  , ae_id)
+			values (
+	  			  	#{board_no}
+	  			  , #{board_title}
+	  			  , #{board_content}
+			  	  , sysdate
+			  	  , 0
+				  , 0
+			      , '자유게시판'
+			  	  , '0'
+			  	  , #{ae_id})
+ 	</insert>
+ 	
+ </mapper>

@@ -1,0 +1,77 @@
+package kr.or.ddit.controller.jhs.myHaru;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.inject.Inject;
+
+import org.apache.commons.lang.StringUtils;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import kr.or.ddit.ResultStatus;
+import kr.or.ddit.service.jhs.IMyLibraryService;
+import kr.or.ddit.vo.jhs.Ebook_ManagerVO;
+import kr.or.ddit.vo.jhs.Ebook_PageVO;
+
+@Controller
+@RequestMapping("/myHaru")
+public class MyLibraryController {
+
+	@Inject
+	private IMyLibraryService service;
+	
+	// 하루피드 폼으로 이동 만약 세션이 없다면 로그인 창으로 이동
+	@PreAuthorize("hasRole('ROLE_MEMBER')")
+	@GetMapping("/myHaruMain")
+	public String signinForm(Model model) {	
+		String path = "myHaru/myLibrary";
+
+		return path;
+	}
+	
+	// 현재 사용자가 가지고 있는 E북리스트 가져오기
+	@ResponseBody
+	@GetMapping("/getEbookList")
+	public Map<String,Object> getEbookList(
+			@RequestParam(name="page", required = false, defaultValue = "1") int currentPage,
+			@RequestParam(required = false, defaultValue = "order-young") String searchType,
+			@RequestParam(required = false, defaultValue = "") String searchWord,
+			String id) {
+
+		Map<String,Object> eMap = new HashMap<>();
+		Ebook_PageVO<Ebook_ManagerVO> evo = new Ebook_PageVO<>();
+
+		evo.setSearchType(searchType);
+		evo.setSearchWord(searchWord);
+		eMap.put("searchType", searchType);
+		eMap.put("searchWord", searchWord);
+
+		evo.setCurrentPage(currentPage);
+		evo.setAe_id(id);
+		int totalRecord = service.selectEbookListCount(evo);
+		System.out.println(totalRecord);
+		evo.setTotalRecord(totalRecord);
+
+		List<Ebook_ManagerVO> ebookList = service.getEbookList(evo);
+		evo.setDataList(ebookList);
+		
+		eMap.put("ebook", evo);
+		
+		return eMap;
+	}
+	
+	// E북펼치기
+	@GetMapping("/ebookDetail")
+	public String ebookDetail(String ebook) {
+		System.out.println(ebook);
+		return "myHaru/ebookDetail";
+	}
+
+}

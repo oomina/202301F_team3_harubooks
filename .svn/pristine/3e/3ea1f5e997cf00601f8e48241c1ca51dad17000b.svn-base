@@ -1,0 +1,93 @@
+package kr.or.ddit.controller.omn.books;
+
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.inject.Inject;
+
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import kr.or.ddit.service.omn.books.IPubBookRequestService;
+import kr.or.ddit.vo.omn.MngPaginationInfoVO;
+import kr.or.ddit.vo.omn.NewBookRequestVO;
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
+@Controller
+@RequestMapping("/pub/bookRequest")
+@PreAuthorize("hasRole('ROLE_PUBLISHER')")
+public class PubBookRequestController {
+	
+	@Inject
+	private IPubBookRequestService service;
+	
+	@ResponseBody
+	@GetMapping(value = "/requestList", produces = "application/json;charset=utf-8")
+	public List<NewBookRequestVO> requestList(){
+		log.info("requestList()실행");
+		return service.requestList();
+	}
+	
+	@ResponseBody
+	@GetMapping(value = "/selectRequestList", produces = "application/json;charset=utf-8")
+	public Map<String, Object> selectRequestList(
+			@RequestParam(name = "page", required = false, defaultValue = "1") int currentPage,
+			@RequestParam(required = false, defaultValue = "id") String searchType,
+			@RequestParam(required = false, defaultValue = "") String searchWord,
+			String nbr_no){
+		
+		log.info("selectRequestList()실행");
+		String id = SecurityContextHolder.getContext().getAuthentication().getName();
+		log.info("출판사 로그인 id :::" + id);
+		Map<String, Object> map = new HashMap<>();
+		MngPaginationInfoVO<NewBookRequestVO> pagingVO = new MngPaginationInfoVO<>();
+		pagingVO.setAe_id(id);
+		if(StringUtils.isNotBlank(searchWord)) {
+			pagingVO.setSearchType(searchType);
+			pagingVO.setSearchWord(searchWord);
+			map.put("searchType", searchType);
+			map.put("searchWord", searchWord);
+		}
+		
+		pagingVO.setCurrentPage(currentPage);
+		pagingVO.setNbr_no(nbr_no);
+		int totalRecord = service.requestCount(pagingVO);
+		log.info("totalRecord : " + totalRecord);
+		pagingVO.setTotalRecord(totalRecord);
+		int allRecord = service.requestAllCount(id);
+		pagingVO.setAllRecord(allRecord);
+		List<NewBookRequestVO> dataList = service.selectRequestList(pagingVO);
+		pagingVO.setDataList(dataList);
+		map.put("pagingVO", pagingVO);
+		
+		return map;
+	}
+	
+	// 신규 도서 등록 요청 (비동기로  파일 1개 업로드)
+	@ResponseBody
+	@PostMapping(value = "/bookRequestInsert", produces = "text/plain; charset=utf-8")
+	public String bookRequestInsert(NewBookRequestVO newBookRequestVO) throws IOException {
+		log.info("bookRequestInsert()실행");
+		String id = SecurityContextHolder.getContext().getAuthentication().getName();
+		log.info("출판사 로그인 id :::" + id);
+		newBookRequestVO.setAe_id(id);
+		int cnt = service.bookRequestInsert(newBookRequestVO);
+		String result = "";
+		if(cnt > 0) {
+			result = "success";
+		} else {
+			result = "fail";
+		}
+		return result;
+	}
+}

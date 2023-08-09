@@ -1,0 +1,114 @@
+package kr.or.ddit.service.omn.mbr;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.List;
+
+import javax.annotation.Resource;
+import javax.inject.Inject;
+
+import org.apache.commons.io.FilenameUtils;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+
+import kr.or.ddit.controller.file.UploadFileUtils;
+import kr.or.ddit.mapper.omn.mbr.MngMbrMapper;
+import kr.or.ddit.service.FileService;
+import kr.or.ddit.vo.FileVO;
+import kr.or.ddit.vo.omn.MngMbrVO;
+import kr.or.ddit.vo.omn.MngPaginationInfoVO;
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
+@Service
+public class MngMbrServiceImpl implements IMngMbrService{
+	
+	// 첨부 파일 저장 경로 - root-context.xml에 설정
+	@Resource(name="uploadImg")
+	private String uploadPath;
+	
+	@Inject
+	private MngMbrMapper mapper;
+	
+	@Inject
+	private FileService fileService;
+	
+	@Override
+	public List<MngMbrVO> mbrList() {
+		return mapper.mbrList();
+	}
+
+	@Override
+	public List<MngMbrVO> selectMbrList(MngPaginationInfoVO<MngMbrVO> pagingVO) {
+		return mapper.selectMbrList(pagingVO);
+	}
+
+	@Override
+	public int mbrCount(MngPaginationInfoVO<MngMbrVO> pagingVO) {
+		return mapper.mbrCount(pagingVO);
+	}
+
+	@Override
+	public int mbrAllCount(String ae_id) {
+		return mapper.mbrAllCount(ae_id);
+	}
+
+	@Override
+	public MngMbrVO mbrInfo(String ae_id) {
+		return mapper.mbrInfo(ae_id);
+	}
+
+	@Override
+	public int mbrUpdate(MngMbrVO mngMbrVO) {
+		try {
+			if(mngMbrVO.getMem_profile_file() != null) {
+				MultipartFile memProfile = mngMbrVO.getMem_profile_file();
+				log.info("file.name" + memProfile.getOriginalFilename());	// 파일 이름
+				String uploadedFileName = UploadFileUtils.uploadFile(uploadPath, memProfile.getOriginalFilename(), memProfile.getBytes());
+				String savedName = uploadedFileName.substring(uploadedFileName.lastIndexOf("/") + 1) ;
+				log.info("savedName" + savedName);	// 저장 이름 : uuid_파일 이름
+				log.info("uploadedFileName : " + uploadedFileName);	// 저장 경로 + 저장 이름
+				log.info("uploadPath : " + uploadPath);
+				String destPath = uploadedFileName;
+				log.info("destPath : " + destPath);
+				String fileType = memProfile.getOriginalFilename().substring(memProfile.getOriginalFilename().lastIndexOf(".") + 1); // 확장자
+				log.info("fileType : " + fileType);
+				memProfile.transferTo(new File(destPath));
+				log.info(FilenameUtils.getExtension(memProfile.getOriginalFilename()));	// 확장자 추출하는 방법
+				log.info("파일 복사 성공");
+				
+				// 파일 업로드
+				FileVO fileVO = new FileVO();
+				fileVO.setUa_sn("1");
+				fileVO.setUa_type("COM_MEMBER");
+				fileVO.setUa_path(destPath);
+				fileVO.setUa_nm(memProfile.getOriginalFilename());
+				fileVO.setUa_stre_nm(savedName);
+				fileVO.setUa_file_type(fileType);
+				fileVO.setUa_size(memProfile.getSize());
+				String id = SecurityContextHolder.getContext().getAuthentication().getName();
+				fileVO.setUa_regist_id(id);
+				int cnt = fileService.fileInsert(fileVO);
+				
+				if(cnt > 0) {  // 파일 등록 성공
+					mngMbrVO.setMem_profile(savedName);
+				}
+			}
+		} catch (IllegalStateException | IOException e) {
+			log.error("{}", e);
+		}
+		int cnt;
+		cnt = mapper.comMbrUpdate(mngMbrVO);
+		cnt = mapper.mbrUpdate(mngMbrVO);
+		return cnt;
+	}
+
+	@Override
+	public int mbrDelete(String ae_id) {
+		int cnt;
+		cnt = mapper.comMbrDelete(ae_id);
+		cnt = mapper.mbrDelete(ae_id);
+		return cnt;
+	}
+}

@@ -1,0 +1,182 @@
+package kr.or.ddit.controller.jhs.myHaru;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.inject.Inject;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import kr.or.ddit.service.jhs.IMyLibraryService;
+import kr.or.ddit.vo.jhs.Com_MemberVO;
+import kr.or.ddit.vo.jhs.Ebook_ManagerVO;
+import kr.or.ddit.vo.jhs.Ebook_MemoVO;
+import kr.or.ddit.vo.jhs.Ebook_PageVO;
+import kr.or.ddit.vo.jhs.Ebook_RecodeVO;
+
+@Controller
+@RequestMapping("/myHaru")
+public class MyLibraryController {
+
+	@Inject
+	private IMyLibraryService service;
+	
+	// 하루피드 폼으로 이동 만약 세션이 없다면 로그인 창으로 이동
+	@PreAuthorize("hasRole('ROLE_MEMBER')")
+	@GetMapping("/myHaruMain")
+	public String signinForm(Model model) {	
+			
+		String path = "myHaru/myLibrary";
+
+		return path;
+	}
+	
+	// 현재 사용자가 가지고 있는 E북리스트 가져오기
+	@ResponseBody
+	@GetMapping("/getEbookList")
+	public Map<String,Object> getEbookList(
+			@RequestParam(name="page", required = false, defaultValue = "1") int currentPage,
+			@RequestParam(required = false, defaultValue = "order-young") String searchType,
+			@RequestParam(required = false, defaultValue = "") String searchWord,
+			String id) {
+
+		Map<String,Object> eMap = new HashMap<>();
+		Ebook_PageVO<Ebook_ManagerVO> evo = new Ebook_PageVO<>();
+
+		evo.setSearchType(searchType);
+		evo.setSearchWord(searchWord);
+		eMap.put("searchType", searchType);
+		eMap.put("searchWord", searchWord);
+
+		evo.setCurrentPage(currentPage);
+		evo.setAe_id(id);
+		int totalRecord = service.selectEbookListCount(evo);
+		evo.setTotalRecord(totalRecord);
+		
+		int allRecord = service.selectAllRecord(id);
+		evo.setAllRecord(allRecord);
+		
+		List<Ebook_ManagerVO> ebookList = service.getEbookList(evo);
+		evo.setDataList(ebookList);
+		
+		eMap.put("ebook", evo);
+		
+		return eMap;
+	}
+	
+	// E북펼치기
+	@PreAuthorize("hasRole('ROLE_MEMBER')")
+	@GetMapping("/ebookDetail")
+	public String ebookDetail(String book_no, Model model) {
+		Ebook_ManagerVO vo = new Ebook_ManagerVO();
+		String id = SecurityContextHolder.getContext().getAuthentication().getName();
+		vo.setBook_no(book_no);
+		vo.setAe_id(id);
+		
+		Ebook_ManagerVO evo = service.getEbookManager(vo);
+		String url;
+		if(evo==null) {
+			url = "redirect:/harubooks/main";
+		}else {
+			url = "ebook/ebookDetail";
+			model.addAttribute("ebook", evo);
+		}
+		return url;
+	}
+	
+	// E북 페이지 저장 업데이트
+	@PostMapping("/updateReadPage")
+	public ResponseEntity<String> updateReadPage(Ebook_ManagerVO vo, Model model) {
+		int result = service.updateReadPage(vo);
+		String status;
+		if(result > 0) {
+		   status = "OK";
+		}else {
+		   status = "FAIL";
+		}
+		ResponseEntity<String> entity = new ResponseEntity<String>(status, HttpStatus.OK);
+		return entity;
+	}
+	
+	// E북 책갈피 등록
+	@PostMapping("/insertBookRecode")
+	public ResponseEntity<String> insertBookRecode(Ebook_ManagerVO vo, Model model) {
+		int result = service.insertBookRecode(vo);
+		String status;
+		if(result > 0) {
+		   status = "OK";
+		}else {
+		   status = "FAIL";
+		}
+		ResponseEntity<String> entity = new ResponseEntity<String>(status, HttpStatus.OK);
+		return entity;
+	}
+	
+	// E북 책갈피 삭제
+	@PostMapping("/deleteBookRecode")
+	public ResponseEntity<String> deleteBookRecode(Ebook_ManagerVO vo, Model model){
+		int result = service.deleteBookRecode(vo);
+		String status;
+		if(result > 0) {
+		   status = "OK";
+		}else {
+		   status = "FAIL";
+		}
+		return new ResponseEntity<String>(status, HttpStatus.OK);
+	}
+	
+	// E북 책갈피 확인
+	@GetMapping("/checkBookRecode")
+	public ResponseEntity<String> checkBookRecode(Ebook_RecodeVO vo, Model model){
+		String page;
+		page = service.checkBookRecode(vo);
+		String status;
+		if(page==null) {
+			status = "FAIL";
+		}else {
+			status = "OK";
+		}
+		return new ResponseEntity<String>(status, HttpStatus.OK);
+	}
+	
+	// E북 책갈피 리스트 가져오기
+	@GetMapping("/getBookMarkList")
+	public ResponseEntity<List<String>> getBookMarkList(Ebook_RecodeVO vo){
+		List<String> lvo = service.getBookMarkList(vo);
+		
+		return new ResponseEntity<List<String>>(lvo, HttpStatus.OK);
+	}
+	
+	// 메모장 업데이트 또는 추가하기
+	@PostMapping("/insertOrUpdateEbookMemo")
+	public ResponseEntity<String> insertOrUpdateEbookMemo(Ebook_MemoVO vo){
+		int result = service.insertOrUpdateEbookMemo(vo);
+		String status;
+		if(result > 0) {
+			   status = "OK";
+			}else {
+			   status = "FAIL";
+			}
+		return new ResponseEntity<String>(status, HttpStatus.OK);
+	}
+	
+	@GetMapping("/getEbookMemo")
+	public ResponseEntity<Object> getEbookMemo(Ebook_MemoVO vo){
+		Ebook_MemoVO evo = service.getEbookMemo(vo);
+		
+		return new ResponseEntity<Object>(evo, HttpStatus.OK);
+	}
+	
+	
+}

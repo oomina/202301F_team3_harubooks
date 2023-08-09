@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+<mapper namespace="kr.or.ddit.mapper.omn.books.PubBookRequestMapper">
+	
+	<sql id="requestSearch">
+		<if test="searchType != null and searchType == 'title'">
+			and (nbr_nm like '%'||#{searchWord}||'%')
+		</if>
+		<if test="searchType != null and searchType == 'author'">
+			and (nbr_author like '%'||#{searchWord}||'%')
+		</if>
+	</sql>
+	
+	<select id="requestAllCount" parameterType="string" resultType="int">
+		SELECT count(nbr_no)
+		FROM new_book_request
+		WHERE pub_nm = (SELECT pub_nm
+						FROM publisher
+						WHERE ae_id = #{ae_id})
+	</select>
+	
+	<select id="requestCount" parameterType="mngPaginationInfoVO" resultType="int">
+		SELECT count(nbr_no)
+		FROM new_book_request
+		WHERE 1=1
+		<include refid="requestSearch"/>
+		AND pub_nm = (SELECT pub_nm
+					  FROM publisher
+					  WHERE ae_id = #{ae_id})
+	</select>
+	
+	<!-- 도서 등록 요청 리스트 -->
+	<select id="selectRequestList" parameterType="mngPaginationInfoVO" resultType="newBookRequestVO">
+		SELECT b.nbr_no
+			 , b.ae_id
+			 , b.nbr_nm
+			 , b.nbr_content
+			 , b.nbr_cover
+			 , b.nbr_spmt_ymd
+			 , b.nbr_author
+			 , b.book_talt
+			 , b.nbr_ymd
+			 , b.pub_nm
+			 , b.book_page_cnt
+			 , b.book_amt
+			 , b.book_isbn
+			 , b.ccg_b001
+			 , b.ccg_b002
+			 , b.ccg_b003
+			 , b.ccg_r001
+			 , b.rnum
+		FROM(
+			SELECT
+				a.*, row_number() over (order by a.nbr_no DESC) rnum
+			FROM(
+				SELECT c.nbr_no
+					 , c.ae_id
+					 , c.nbr_nm
+					 , c.nbr_content
+					 , c.nbr_cover
+					 , c.nbr_spmt_ymd
+					 , c.nbr_author
+					 , c.book_talt
+					 , c.nbr_ymd
+					 , c.pub_nm
+					 , c.book_page_cnt
+					 , c.book_amt
+					 , c.book_isbn
+					 , c.ccg_b001
+					 , c.ccg_b002
+					 , c.ccg_b003
+					 , c.ccg_r001
+				FROM new_book_request c
+				WHERE 1=1
+				<include refid="requestSearch"/>
+				AND c.pub_nm = (SELECT pub_nm
+		 					 	FROM publisher 
+		 					 	WHERE ae_id = #{ae_id})
+				ORDER BY c.nbr_no
+			) a
+		) b
+		<![CDATA[
+			WHERE b.rnum >= #{startRow} and b.rnum <= #{endRow}
+		]]>
+	</select>
+	
+	<!-- 도서 등록 요청 리스트 -->
+	<select id="requestList" resultType="map">
+		select nbr_no
+			 , ae_id
+			 , nbr_nm
+			 , nbr_content
+			 , nbr_cover
+			 , nbr_spmt_ymd
+			 , nbr_author
+			 , book_talt
+			 , nbr_ymd
+			 , pub_nm
+			 , book_page_cnt
+			 , book_amt
+			 , book_isbn
+			 , ccg_b001
+			 , ccg_b002
+			 , ccg_b003
+			 , ccg_r001
+		from new_book_request
+	</select>
+	
+	<!-- 도서 등록 요청 -->
+	<insert id="bookRequestInsert" parameterType="newBookRequestVO">
+		<selectKey keyProperty="nbr_no" resultType="String" order="BEFORE">
+			select 'NB' || LPAD(seq_nb.nextval, 10, '0') from dual
+		</selectKey>
+		INSERT INTO new_book_request(
+			nbr_no
+		  , ae_id
+		  , nbr_nm
+		  , nbr_content
+		  , nbr_cover
+		  , nbr_spmt_ymd
+		  , nbr_author
+		  , book_talt
+		  , nbr_ymd
+		  , pub_nm
+		  , book_page_cnt
+		  , book_amt
+		  , book_isbn
+		  , ccg_b001
+		  , ccg_b002
+		  , ccg_b003
+		  , ccg_r001
+		)
+		VALUES (
+			#{nbr_no}
+		  , #{ae_id}
+		  , #{nbr_nm}
+		  , #{nbr_content}
+		  , #{nbr_cover}
+		  , #{nbr_spmt_ymd}
+		  , #{nbr_author}
+		  , #{book_talt}
+		  , TO_CHAR(sysdate, 'YYYY/MM/DD')
+		  , (SELECT pub_nm
+		  	 FROM publisher
+		  	 WHERE ae_id = #{ae_id})
+		  , #{book_page_cnt}
+		  , #{book_amt}
+		  , #{book_isbn}
+		  , #{ccg_b001}
+		  , #{ccg_b002}
+		  , #{ccg_b003}
+		  , '요청대기'
+		)
+	</insert>
+	
+</mapper>

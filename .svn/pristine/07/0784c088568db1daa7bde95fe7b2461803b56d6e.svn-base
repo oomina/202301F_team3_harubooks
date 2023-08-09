@@ -1,0 +1,96 @@
+package kr.or.ddit.controller.ljy.mng;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import kr.or.ddit.service.ljy.OrderMngService;
+import kr.or.ddit.service.ljy.RefundMngService;
+import kr.or.ddit.vo.ljy.OrderMngVO;
+import kr.or.ddit.vo.ljy.RefundMngVO;
+import lombok.extern.slf4j.Slf4j;
+
+@Controller
+@RequestMapping("/mng/order")
+@Slf4j
+@PreAuthorize("hasRole('ROLE_ADMIN')")
+public class OrderRestController {
+	
+	@Autowired
+	private OrderMngService orderService;
+	
+	@Autowired
+	private RefundMngService refundService;
+	
+	@ResponseBody
+	@GetMapping("/list")
+	public OrderMngVO orderList(
+			@RequestParam(name = "page", required = false, defaultValue = "1") int currentPage
+			) {
+		OrderMngVO orderMngVO = new OrderMngVO();
+		orderMngVO.setCurrentPage(currentPage);
+		List<OrderMngVO> orderList = orderService.orderList(orderMngVO);
+		int totalRecord = orderService.orderListCnt(orderMngVO);
+		orderMngVO.setTotalRecord(totalRecord);
+		log.info("orderList" + orderList);
+		orderMngVO.setDataList(orderList);
+		return orderMngVO;
+	}
+	
+	@ResponseBody
+	@GetMapping("/detail/{order_no}")
+	public OrderMngVO orderOne(@PathVariable("order_no") String order_no) {
+		return orderService.orderOne(order_no);
+	}
+	
+	@ResponseBody
+	@PostMapping(value = "/refund")
+	public String refundOne(@RequestBody RefundMngVO refundMngVO) {
+		log.info("refundOne controller 도착");
+		log.info("" +refundMngVO);
+		return refundService.refundOne(refundMngVO);
+	}
+	
+	@ResponseBody
+	@GetMapping("/refund/list")
+	public RefundMngVO refundList(
+			@RequestParam(name = "page", required = false, defaultValue = "1") int currentPage
+			){
+		RefundMngVO refundMngVO = new RefundMngVO();
+		refundMngVO.setCurrentPage(currentPage);
+		List<RefundMngVO> refundList = refundService.refundList(refundMngVO);
+		refundMngVO.setDataList(refundList);
+		int totalRecord = refundService.refundListCnt(refundMngVO);
+		refundMngVO.setTotalRecord(totalRecord);
+		return refundMngVO;
+	}
+	@ResponseBody
+	@PostMapping(value = "/refund/detail", produces = "application/json;charset=utf-8")
+	public RefundMngVO refundDetail(@RequestBody RefundMngVO refundMngVO) {
+		log.info("detail" + refundMngVO);
+		return refundService.refundDetail(refundMngVO);
+	}
+	@ResponseBody
+	@GetMapping("/today")
+	public int countOrderToday() {
+		log.info("countOrderToday");
+		return orderService.countOrderToday();
+	}
+	
+	@ResponseBody
+	@GetMapping("/refundcnt")
+	public int countWaitingRefund() {
+		log.info("countWaitingRefund");
+		return refundService.countWaitingRefund();
+	}
+}

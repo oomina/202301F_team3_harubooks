@@ -1,0 +1,22 @@
+package kr.or.ddit.service.omn.books;
+
+import java.util.List;
+
+import javax.inject.Inject;
+
+import org.springframework.stereotype.Service;
+
+import kr.or.ddit.mapper.omn.books.PubBookRequestMapper;
+import kr.or.ddit.vo.omn.NewBookRequestVO;
+
+@Service
+public class PubBookRequestServiceImpl implements IPubBookRequestService{
+	
+	@Inject
+	private PubBookRequestMapper mapper;
+
+	@Override
+	public List<NewBookRequestVO> requestList() {
+		return mapper.requestList();
+	}
+}

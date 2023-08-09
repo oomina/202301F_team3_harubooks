@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+<mapper namespace="kr.or.ddit.mapper.ljy.InquiryReplyMapper">
+	<select id="inqRepList" resultType="inqRepVO">
+		SELECT
+			ir_no
+		    , ir_content
+		    , inquiry_no
+		    , ae_id
+		FROM 
+			inquiry_reply 
+	</select>
+	<insert id="inqRepInsert" parameterType="inqRepVO">
+		<selectKey keyProperty="ir_no" order="BEFORE" resultType="String">
+			select 'IR' || LPAD(seq_ir.nextval, 10, '0') from dual 
+		</selectKey>
+		INSERT INTO inquiry_reply(
+		    ir_no
+		    , ir_content
+		    , inquiry_no
+		    , ae_id
+		)VALUES(
+		    #{ir_no}
+		    , #{ir_content}
+		    , #{inquiry_no}
+		    , #{ae_id}
+		)
+	</insert>
+</mapper>

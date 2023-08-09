@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+ <mapper namespace="kr.or.ddit.mapper.bmk.MyDiaryMapper">
+ 
+ 	<!-- 정렬한 타입 -->
+ 	<sql id="diaryType">
+		<if test="searchType != null and searchType == 'order-young'">
+			order by diary_ymd asc
+		</if>
+		<if test="searchType != null and searchType == 'order-old'">
+			order by diary_ymd desc
+		</if>
+	</sql>
+	
+ 	<!-- 일기 리스트 -->
+ 	<select id="getDiaryList" parameterType="diaryPageVO" resultType="diaryVO">
+	 	select 
+      		b.diary_no
+    	  , b.ae_id
+    	  , b.diary_title
+    	  , b.diary_content
+     	  , b.diary_ymd
+    	  , b.diary_modify_ymd
+    	  , b.rnum
+  	    from (
+  	    	select
+  	    			a.*, row_number() over (<include refid="diaryType"/>) rnum
+  	    	from(
+  	    		select
+  	    				c.diary_no
+			    	  , c.ae_id
+			    	  , c.diary_title
+			    	  , c.diary_content
+			     	  , c.diary_ymd
+			    	  , c.diary_modify_ymd
+			    from
+			    	diary c
+			    where
+			    	ae_id = #{ae_id}
+			    and
+			    	c.diary_title LIKE '%${searchWord}%'
+  	    	) a
+  	    ) b
+  	    <![CDATA[
+			where 
+				b.rnum >= #{startRow} and b.rnum <= #{endRow}	
+		]]>
+	</select> 	
+	
+	<!-- 검색된 일기 리스트 카운트 (검색어 없을 시 모든 리스트) -->
+	<select id="selectDiaryListCount" parameterType="diaryPageVO" resultType="int"> 
+		select 
+			count(diary_no)
+    	  from 
+    	  	diary
+    	 where 
+    	 	diary_title LIKE '%${searchWord}%'
+    	   and 
+    	   	ae_id = #{ae_id}
+    	 <include refid="diaryType"/>
+	</select>
+	
+	<!-- 해당 id 모든 일기갯수 -->
+	<select id="selectAllRecord" parameterType="string" resultType="int">
+		select 
+			count(diary_no) 
+  		  from 
+  		  	diary 
+ 	 	 where 
+ 	 	 	ae_id = #{ae_id}
+	</select>
+	
+	<!-- 일기 상세보기 -->
+	<select id="getDetailDiary" parameterType="string" resultType="diaryVO">
+		select 
+      		  diary_no
+    		, ae_id
+    	    , diary_title
+    		, diary_content
+    		, diary_ymd
+    		, diary_modify_ymd
+  	     from 
+  	     	diary
+        where 
+        	diary_no =  #{diary_no}
+	</select>
+ 	
+ 	<insert id="insertDiary" parameterType="diaryVO">
+ 		<selectKey keyProperty="diary_no" resultType="string" order="BEFORE"> 
+	 		select 'DI' || lpad(seq_di.nextval, 10,'0') from dual
+	 	</selectKey>
+	 	insert into diary(
+		      	  diary_no
+		    	, ae_id
+			    , diary_title
+			    , diary_content
+			    , diary_ymd
+			    , diary_modify_ymd
+			)values(
+			      #{diary_no} 
+			    , #{ae_id}
+			    , #{diary_title}
+			    , #{diary_content}
+			    , sysdate
+			    , sysdate
+	    	)
+ 	</insert>
+ 	
+ 	<update id="updateDiary" parameterType="diaryVO">
+ 		update 
+ 			diary set 
+      			diary_title = #{diary_title}
+    		  , diary_content = #{diary_content}
+    	      , DIARY_MODIFY_YMD = sysdate
+    	 	where 
+    	 	  diary_no = #{diary_no}
+ 	</update>
+ 	
+ 	<delete id="deleteDiary" parameterType="string">
+ 		delete 
+ 		  from 
+ 			diary
+ 		 where 
+ 		  	diary_no = #{diary_no}  
+ 	</delete>
+ </mapper>

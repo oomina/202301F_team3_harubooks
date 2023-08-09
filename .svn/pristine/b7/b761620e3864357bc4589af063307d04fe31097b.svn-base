@@ -1,0 +1,31 @@
+package kr.or.ddit.controller.jhs.myHaru;
+
+import javax.inject.Inject;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+
+import kr.or.ddit.ResultStatus;
+import kr.or.ddit.service.jhs.IMyLibraryService;
+
+@Controller
+@RequestMapping("/myHaru")
+public class MyLibraryController {
+
+	@Inject
+	private IMyLibraryService servie;
+	
+	// 하루피드 폼으로 이동
+	@GetMapping("/myHaruMain")
+	public String signinForm(Model model) {
+		ResultStatus status = servie.idCheck();
+		String path = "myHaru/myLibrary";
+		if(status == ResultStatus.FAIL) {
+			path = "redirect:/harubooks/main"; 
+		}	
+		return path;
+	}
+
+}

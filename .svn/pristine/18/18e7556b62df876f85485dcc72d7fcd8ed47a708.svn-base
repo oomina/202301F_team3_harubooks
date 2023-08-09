@@ -1,0 +1,13 @@
+package kr.or.ddit.service.kmw;
+
+import kr.or.ddit.vo.kmw.OrderVO;
+
+public interface OrderService {
+
+	int insertOrder(OrderVO orderVO);
+
+	int insertPurchs(OrderVO orderVO);
+
+	int insertDelivery(OrderVO orderVO);
+
+}

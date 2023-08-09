@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+ <mapper namespace="kr.or.ddit.mapper.kmw.OrderMapper">
+ 	<insert id="insertOrder">
+ 		insert into orders (order_no, ae_id, order_ymd, order_dmnd_nocs, ccg_o001, order_mileage)
+            values ('OR'||LPAD(seq_or.nextval,10,'0'), #{ae_id}, sysdate, #{order_dmnd_nocs}, '카드',#{order_mileage})
+ 	</insert>
+ 	<insert id="insertPurchs">
+ 		insert into purchs_list (order_no, book_no, ae_id, pl_cnt, pl_prchs_amt, book_ntsl_amt, pl_refund_yn, pl_dcsn_yn,expected_mileage)
+            values ((select order_no
+						from (
+  								select order_no
+  								from orders
+  								where ae_id = #{ae_id}
+  								order by order_no desc 
+							  ) where rownum = 1),
+							  <if test="ccg_b001 == '종이책'">
+							  	#{book_no},#{ae_id},#{pl_cnt},#{pl_prchs_amt},#{book_ntsl_amt},'N','N',#{expected_mileage})
+                    		  </if>
+                    		  <if test="ccg_b001 == 'E북'">
+                    			#{book_no},#{ae_id},#{pl_cnt},#{pl_prchs_amt},#{book_ntsl_amt},'N','Y',#{expected_mileage})
+                    		  </if>                  
+ 	</insert>
+ 	
+ 	<insert id="insertDelivery">
+ 		insert into delivery (order_no, ae_id, user_addr, user_daddr, user_zip, user_telno, user_nm, delivery_ymd, ccg_d001)
+            values ((select order_no
+                    from orders
+                    where ae_id = #{ae_id}),#{ae_id},#{user_addr},#{user_daddr},#{user_zip},#{user_telno},#{user_nm},sysdate,'배송준비')
+ 	</insert>
+ </mapper>

@@ -1,0 +1,122 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+<%@ taglib uri="http://www.springframework.org/security/tags" prefix="sec" %>
+<!DOCTYPE html>
+<html>
+<head>
+<style type="text/css">
+#calendar{
+	width: 85%;
+	margin : auto;
+}
+#nav{
+	text-align: center;
+}
+footer h2{
+	text-align: center;
+}
+header h1{
+	text-align: center;	
+}
+</style>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+</head>
+<body>
+<br>
+<input type="hidden" value="<sec:authentication property="name"/>" id="sec-name">
+<div id='calendar'></div>
+<script type="text/javascript">
+var secName = $("#sec-name").val();
+document.addEventListener('DOMContentLoaded', function() {
+    var calendarEl = document.getElementById('calendar');
+	
+    var calendar = new FullCalendar.Calendar(calendarEl, {
+    	locale : 'ko',
+    	timeZone: 'Asia/Seoul',
+      headerToolbar: {
+        left: 'prev,next today',
+        center: 'title',
+        right: 'dayGridMonth,timeGridWeek'
+      },
+      //navLinks: true, // can click day/week names to navigate views
+      selectable: true,
+      selectMirror: true,
+      // 이벤트명 : function(){} : 각 날짜에 대한 이벤트를 통해 처리할 내용..
+      select: function(arg) {
+    	  console.log(arg);
+
+        var title = prompt('입력할 일정:');
+    // title 값이 있을때, 화면에 calendar.addEvent() json형식으로 일정을 추가
+    
+        if (title) {
+          calendar.addEvent({
+            title: title,
+            start: arg.start,
+            end: arg.end,
+            allDay: arg.allDay,
+            
+          })
+          console.log(title);
+        }
+        calendar.unselect()
+      },
+      eventClick: function(arg) {
+    	  // 있는 일정 클릭시,
+    	  console.log("#등록된 일정 클릭#");
+    	  console.log(arg.event);
+    	  
+        if (confirm('지우슈?')) {
+          arg.event.remove()
+        }
+      },
+      editable: true,
+      dayMaxEvents: true, // allow "more" link when too many events
+      
+      // 사용자 id 확인 후 해당하는 일정 조회
+      events: function (info, successCallback, failureCallback) {
+            $.ajax({
+                type:"get",
+                url:"/myHaru/mycals",
+                data:{
+                	ae_id:secName
+                },
+                success: function (data) {
+                	var events = [];
+                    console.log("성공", data)
+                    for(var i =0; i < data.length; i++){
+                    	 events.push({
+                    		   title : data[i].cal_title
+                    		 , start : data[i].cal_start_ymd
+                    		 , end   : data[i].cal_end_ymd
+                    		 , color : data[i].cal_color
+                    	 })
+                    	 
+                    }            
+                	successCallback(events);
+				},
+				error: function (ex){
+					console.log("에러", ex)
+				}
+            }) 
+    	}
+  });
+
+    calendar.render();
+    
+	function openModal() {
+		
+	}    
+/*     function insertCal(){
+    	$.ajax){(
+    		type:"post",
+    		url:"/myHaru/mycal",
+    		data:{
+    			title:
+    		}
+    	)}
+    } */
+  });
+</script>
+</body>
+</html>

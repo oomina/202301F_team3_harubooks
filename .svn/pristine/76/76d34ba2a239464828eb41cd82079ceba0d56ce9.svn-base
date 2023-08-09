@@ -1,0 +1,43 @@
+package kr.or.ddit.service.jhs;
+
+import java.util.List;
+
+import javax.inject.Inject;
+
+import org.springframework.stereotype.Service;
+
+import kr.or.ddit.mapper.jhs.ChattingMapper;
+import kr.or.ddit.vo.jhs.Chat_RoomVO;
+
+@Service
+public class ChattingServiceImpl implements IChattingService{
+
+	@Inject
+	private ChattingMapper mapper;
+	
+	@Override
+	public String insertChat(Chat_RoomVO vo) {
+		if(vo.getCcg_r003().trim().equals("false")) {
+			vo.setCcg_r003("비공개");
+		}else {
+			vo.setCcg_r003("공개");			
+		}
+		
+		int result1 = mapper.insertChat(vo);
+		int result2 = mapper.insertChatMem(vo);
+		
+		String status = null;
+		if(result1 > 0 && result2 > 0) {
+			status = "OK";
+		}else{
+			status = "FAIL";			
+		}
+		return status;
+	}
+
+	@Override
+	public List<Chat_RoomVO> getChatList(Chat_RoomVO vo) {
+		return mapper.getChatList(vo);
+	}
+
+}

@@ -1,0 +1,26 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+	pageEncoding="UTF-8"%>
+<!DOCTYPE html>
+
+
+<!-- ====== MAIN CONTENT ===== -->
+<main id="content">
+	<div class="container">
+		<div class="space-bottom-1 space-top-xl-2 space-bottom-xl-4">
+			<div
+				class="d-flex flex-column align-items-center pt-lg-7 pb-lg-4 pb-lg-6">
+				<div
+					class="font-weight-medium font-size-200 font-size-xs-170 text-lh-sm mt-xl-1">404</div>
+				<h6 class="font-size-4 font-weight-medium mb-2">헉.. 존재하지 않는
+					페이지에요 빠른 시일내에 수정할게요</h6>
+				<div class="d-flex align-items-center flex-column">
+					<button type="submit"
+						class="btn btn-dark rounded-0 btn-wide height-60 width-250 font-weight-medium">뒤로가기
+					</button>
+				</div>
+			</div>
+		</div>
+	</div>
+</main>
+<!-- ====== END MAIN CONTENT ===== -->
+

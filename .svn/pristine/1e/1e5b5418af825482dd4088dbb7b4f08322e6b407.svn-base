@@ -1,0 +1,16 @@
+package kr.or.ddit.service.bmk;
+
+import java.util.List;
+
+import kr.or.ddit.vo.bmk.DiaryVO;
+import kr.or.ddit.vo.bmk.Diary_PageVO;
+
+public interface IMyDiaryService {
+
+	public List<DiaryVO> getDiaryList(Diary_PageVO<DiaryVO> dvo);
+
+	public int selectDiaryListCount(Diary_PageVO<DiaryVO> dvo);
+
+	public int selectAllRecord(String id);
+
+}

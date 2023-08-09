@@ -1,0 +1,31 @@
+package kr.or.ddit.controller.bmk.haruter;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import kr.or.ddit.service.bmk.IHarustoryService;
+import kr.or.ddit.vo.bmk.BoardVO;
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
+@Controller
+@RequestMapping("/haruter")
+public class HarustoryController {
+	
+	@Autowired
+	private IHarustoryService harustoryService;
+	
+	// 리스트 조회
+	@ResponseBody
+	@GetMapping(value = "/harustory", produces = "application/json;charset=utf-8")
+	public List<BoardVO> boardList(){
+		return harustoryService.boardList();
+	}
+	
+}
